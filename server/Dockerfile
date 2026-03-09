@@ -79,15 +79,16 @@ COPY --from=builder --chown=nodejs:nodejs /app/uploads ./uploads.default
 # Create uploads directory (writable by app for file uploads)
 RUN mkdir -p uploads && chown nodejs:nodejs uploads
 
-# Entrypoint script: seed volume from backup if empty, then start app
+# Entrypoint script: seed volume from backup on first run, then start app
 COPY <<'EOF' /app/entrypoint.sh
 #!/bin/sh
 set -e
 
-# If the uploads volume is empty, populate it from the image defaults
-if [ -d /app/uploads.default ] && [ -z "$(ls -A /app/uploads 2>/dev/null)" ]; then
-  echo "Volume is empty — copying default uploads..."
-  cp -r /app/uploads.default/* /app/uploads/ 2>/dev/null || true
+# Use a marker file to track if initial seeding has been done
+if [ -d /app/uploads.default ] && [ ! -f /app/uploads/.seeded ]; then
+  echo "First run — copying default uploads into volume..."
+  cp -rn /app/uploads.default/* /app/uploads/ 2>/dev/null || true
+  touch /app/uploads/.seeded
   echo "Done."
 fi
 
