@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer circle -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="url(#g)" stroke-width="20"/>
+  <!-- Brain circuit paths -->
+  <g fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left hemisphere curves -->
+    <path d="M180 160 C140 180, 120 230, 140 280 C160 330, 200 350, 230 340"/>
+    <path d="M200 140 C170 150, 150 190, 155 230"/>
+    <path d="M155 230 C150 260, 170 310, 210 340"/>
+    <!-- Right hemisphere curves -->
+    <path d="M280 140 C320 150, 350 190, 345 240"/>
+    <path d="M345 240 C340 280, 310 330, 270 350"/>
+    <path d="M320 170 C360 200, 370 260, 340 310"/>
+    <!-- Central connections -->
+    <path d="M230 160 L230 340"/>
+    <path d="M270 150 L270 350"/>
+    <!-- Cross connections -->
+    <path d="M180 220 L320 220"/>
+    <path d="M190 280 L310 280"/>
+    <!-- Branching lines -->
+    <path d="M230 200 L180 160"/>
+    <path d="M270 200 L320 170"/>
+    <path d="M230 300 L190 340"/>
+    <path d="M270 300 L310 340"/>
+  </g>
+  <!-- Circuit nodes (dots) -->
+  <g fill="url(#g)">
+    <circle cx="230" cy="160" r="14"/>
+    <circle cx="270" cy="150" r="14"/>
+    <circle cx="180" cy="160" r="12"/>
+    <circle cx="320" cy="170" r="12"/>
+    <circle cx="155" cy="230" r="12"/>
+    <circle cx="345" cy="240" r="12"/>
+    <circle cx="180" cy="220" r="10"/>
+    <circle cx="320" cy="220" r="10"/>
+    <circle cx="230" cy="200" r="10"/>
+    <circle cx="270" cy="200" r="10"/>
+    <circle cx="250" cy="250" r="16"/>
+    <circle cx="190" cy="280" r="10"/>
+    <circle cx="310" cy="280" r="10"/>
+    <circle cx="230" cy="300" r="10"/>
+    <circle cx="270" cy="300" r="10"/>
+    <circle cx="230" cy="340" r="12"/>
+    <circle cx="270" cy="350" r="12"/>
+    <circle cx="190" cy="340" r="10"/>
+    <circle cx="310" cy="340" r="10"/>
+    <circle cx="140" cy="280" r="12"/>
+    <circle cx="340" cy="310" r="12"/>
+  </g>
+</svg>
