@@ -27,6 +27,10 @@ RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
+# Force development mode so devDependencies (typescript, @types/*) are installed
+# even when Coolify injects NODE_ENV=production as a build-time variable
+ENV NODE_ENV=development
+
 COPY package.json package-lock.json* ./
 RUN npm ci
 
