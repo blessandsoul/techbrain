@@ -1,19 +1,25 @@
 import type { NextConfig } from "next";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-const apiOrigin = (() => {
+const apiUrl = (() => {
   try {
-    return new URL(apiBaseUrl).origin;
+    return new URL(apiBaseUrl);
   } catch {
-    return "http://localhost:8000";
+    return new URL("http://localhost:8000");
   }
 })();
+const apiOrigin = apiUrl.origin;
 
 const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
     remotePatterns: [
-      { protocol: 'http', hostname: 'localhost', port: '8000', pathname: '/uploads/**' },
+      {
+        protocol: apiUrl.protocol.replace(':', '') as 'http' | 'https',
+        hostname: apiUrl.hostname,
+        ...(apiUrl.port ? { port: apiUrl.port } : {}),
+        pathname: '/uploads/**',
+      },
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
