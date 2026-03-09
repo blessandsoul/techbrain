@@ -63,4 +63,3 @@ postman/
 .eslintrc
 .eslintignore
 .editorconfig
-tsconfig.json

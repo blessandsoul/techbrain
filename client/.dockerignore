@@ -1,6 +1,15 @@
 node_modules
 .next
 .git
+.gitignore
 .env*
+!.env.example
 .DS_Store
 Thumbs.db
+.vscode
+.idea
+*.md
+Dockerfile
+.dockerignore
+coverage
+*.tsbuildinfo
