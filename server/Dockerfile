@@ -73,8 +73,27 @@ COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
 # Copy Prisma files (needed for migrations)
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 
+# Store uploads from repo in a backup location (volume will override /app/uploads)
+COPY --from=builder --chown=nodejs:nodejs /app/uploads ./uploads.default
+
 # Create uploads directory (writable by app for file uploads)
 RUN mkdir -p uploads && chown nodejs:nodejs uploads
+
+# Entrypoint script: seed volume from backup if empty, then start app
+COPY <<'EOF' /app/entrypoint.sh
+#!/bin/sh
+set -e
+
+# If the uploads volume is empty, populate it from the image defaults
+if [ -d /app/uploads.default ] && [ -z "$(ls -A /app/uploads 2>/dev/null)" ]; then
+  echo "Volume is empty — copying default uploads..."
+  cp -r /app/uploads.default/* /app/uploads/ 2>/dev/null || true
+  echo "Done."
+fi
+
+exec node dist/server.js
+EOF
+RUN chmod +x /app/entrypoint.sh
 
 # Switch to non-root user
 USER nodejs
@@ -86,4 +105,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD ["node", "dist/server.js"]
+CMD ["/app/entrypoint.sh"]
