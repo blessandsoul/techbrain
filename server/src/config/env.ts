@@ -38,6 +38,10 @@ const envSchema = z.object({
   // --- Cookie ---
   // Separate secret for cookie signing (defaults to JWT_SECRET if not set)
   COOKIE_SECRET: z.string().min(32, 'COOKIE_SECRET must be at least 32 characters').optional(),
+  // Domain for auth cookies (required for cross-subdomain setups)
+  // Example: ".techbrain.example.com" (leading dot = all subdomains)
+  // Leave empty for same-origin setups
+  COOKIE_DOMAIN: z.string().optional(),
 
   // --- CORS ---
   // In development: CORS_ORIGIN is optional (allows all origins)
