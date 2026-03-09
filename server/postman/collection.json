@@ -1,0 +1,1616 @@
+{
+  "info": {
+    "name": "Techbrain API",
+    "_postman_id": "techbrain-server-collection",
+    "description": "API collection for Techbrain.\n\nAll authenticated requests inherit Bearer Token auth from the collection root.\nLogin/Register requests auto-set tokens via test scripts.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "targetUserId",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "productSlug",
+      "value": ""
+    },
+    {
+      "key": "projectId",
+      "value": ""
+    },
+    {
+      "key": "articleId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "inquiryId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints. No auth required for these requests.",
+      "auth": {
+        "type": "noauth"
+      },
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"Password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user account."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const res = pm.response.json();",
+                  "  if (res.data && res.data.user) {",
+                  "    pm.collectionVariables.set('userId', res.data.user.id);",
+                  "  }",
+                  "  // Tokens are set via httpOnly cookies, not in response body",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with email and password. Tokens are set as httpOnly cookies."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const res = pm.response.json();",
+                  "  if (res.data && res.data.user) {",
+                  "    pm.collectionVariables.set('userId', res.data.user.id);",
+                  "  }",
+                  "  // Tokens are set via httpOnly cookies, not in response body",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Refresh access token using the refresh_token cookie."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout and clear auth cookies."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get the currently authenticated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sessions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "sessions"]
+            },
+            "description": "Get all active sessions for the current user."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout All Sessions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout-all"]
+            },
+            "description": "Logout from all sessions and invalidate all refresh tokens."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User profile and avatar management. All requests require authentication (inherited from collection root).",
+      "item": [
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Update the current user's profile. At least one field (firstName or lastName) must be provided."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password123\",\n  \"newPassword\": \"NewPassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "password"]
+            },
+            "description": "Change the current user's password. Requires current password verification. Invalidates all sessions after successful change."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Soft-delete the current user's account. Requires password confirmation. Account data is permanently purged after 30 days."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Avatar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Image file (JPEG, PNG, or WebP, max 10MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "avatar"]
+            },
+            "description": "Upload or replace the current user's avatar. Accepts JPEG, PNG, or WebP. Max 10MB. Image is optimized and converted to WebP."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Avatar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "avatar"]
+            },
+            "description": "Delete the current user's avatar."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Avatar",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "avatar"]
+            },
+            "description": "Get a user's avatar image by user ID. Public endpoint — no authentication required."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "description": "Product catalog endpoints. Public read endpoints + admin CRUD.",
+      "item": [
+        {
+          "name": "Public",
+          "description": "Public product catalog endpoints. No authentication required.",
+          "auth": {
+            "type": "noauth"
+          },
+          "item": [
+            {
+              "name": "Get Catalog",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/catalog?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "catalog"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" },
+                    { "key": "category", "value": "cameras", "disabled": true },
+                    { "key": "search", "value": "tiandy", "disabled": true },
+                    { "key": "sort", "value": "price-asc", "disabled": true },
+                    { "key": "minPrice", "value": "50", "disabled": true },
+                    { "key": "maxPrice", "value": "500", "disabled": true },
+                    { "key": "specs", "value": "{\"brand\":[\"Tiandy\"]}", "disabled": true },
+                    { "key": "subcategorySpecFilter", "value": "{\"kaKey\":\"კამერის ტიპი\",\"value\":\"IP\"}", "disabled": true },
+                    { "key": "locale", "value": "ka", "disabled": true },
+                    { "key": "hasDiscount", "value": "true", "disabled": true }
+                  ]
+                },
+                "description": "Get filtered product listing with pagination. All query params are optional.\n\n- category: filter by category slug (cameras, nvr-kits, accessories, storage, services)\n- search: full-text search across product names and slugs\n- sort: newest | price-asc | price-desc | name-asc\n- minPrice / maxPrice: price range filter\n- specs: JSON string of spec filters, e.g. {\"brand\":[\"Tiandy\",\"Dahua\"]}\n- subcategorySpecFilter: JSON string for virtual subcategory, e.g. {\"kaKey\":\"...\",\"value\":\"...\"}\n- locale: ka | ru | en (for name-based sorting)\n- hasDiscount: true to return only discounted products (originalPrice > price)"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Catalog Config",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/catalog/config",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "catalog", "config"]
+                },
+                "description": "Get catalog configuration including category tree with virtual subcategories and filter definitions per category."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Spec Values",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/catalog/spec-values?category=cameras",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "catalog", "spec-values"],
+                  "query": [
+                    { "key": "category", "value": "cameras" },
+                    { "key": "subcategorySpecFilter", "value": "{\"kaKey\":\"კამერის ტიპი\",\"value\":\"IP\"}", "disabled": true }
+                  ]
+                },
+                "description": "Get available filter values with counts for a given category. Returns spec key/value pairs with the number of matching products."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Price Range",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/catalog/price-range?category=cameras",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "catalog", "price-range"],
+                  "query": [
+                    { "key": "category", "value": "cameras" },
+                    { "key": "subcategorySpecFilter", "value": "{\"kaKey\":\"კამერის ტიპი\",\"value\":\"IP\"}", "disabled": true }
+                  ]
+                },
+                "description": "Get min/max price for products in a category (optionally filtered by subcategory spec)."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Category Counts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/catalog/category-counts",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "catalog", "category-counts"]
+                },
+                "description": "Get product counts per category and virtual subcategory."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Featured Products",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/featured",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "featured"]
+                },
+                "description": "Get featured products (isActive + isFeatured, ordered by createdAt desc)."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Discounted Products",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/catalog?hasDiscount=true&limit=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "catalog"],
+                  "query": [
+                    { "key": "hasDiscount", "value": "true" },
+                    { "key": "limit", "value": "20" }
+                  ]
+                },
+                "description": "Get discounted products (originalPrice > price). Uses the catalog endpoint with hasDiscount filter."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Product by Slug or ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/{{productSlug}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "{{productSlug}}"]
+                },
+                "description": "Get a single product by slug or UUID. Set {{productSlug}} to a product slug (e.g. 'tiandy-5-indoor-camera-1-4') or product ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Related Products",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/{{productSlug}}/related",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "{{productSlug}}", "related"]
+                },
+                "description": "Get related products for a given product. Uses explicit relatedProducts IDs or falls back to same-category products."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "description": "Admin product management endpoints. Requires ADMIN role. Auth inherited from collection root.",
+          "item": [
+            {
+              "name": "Get Categories",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/admin/categories",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "admin", "categories"]
+                },
+                "description": "List all active categories with IDs, slugs, and localized names. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Spec Suggestions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/admin/spec-suggestions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "admin", "spec-suggestions"]
+                },
+                "description": "Get spec key suggestions based on existing products. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Upload Product Image",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "",
+                      "description": "Image file (JPEG, PNG, WebP, max 10MB)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/admin/upload-image",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "admin", "upload-image"]
+                },
+                "description": "Upload a product image. Returns the URL to use in product images array. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Product Image",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"/uploads/products/temp/img-1234567890.webp\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/admin/delete-image",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "admin", "delete-image"]
+                },
+                "description": "Delete a product image by URL. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Product",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slug\": \"test-product\",\n  \"price\": 199,\n  \"originalPrice\": 249,\n  \"currency\": \"GEL\",\n  \"isActive\": true,\n  \"isFeatured\": false,\n  \"images\": [],\n  \"nameKa\": \"ტესტ პროდუქტი\",\n  \"nameRu\": \"Тестовый продукт\",\n  \"nameEn\": \"Test Product\",\n  \"descriptionKa\": \"ტესტ აღწერა\",\n  \"descriptionRu\": \"Тестовое описание\",\n  \"descriptionEn\": \"Test description\",\n  \"categoryIds\": [],\n  \"specs\": [\n    {\n      \"keyKa\": \"ბრენდი\",\n      \"keyRu\": \"Бренд\",\n      \"keyEn\": \"Brand\",\n      \"value\": \"Test\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products"]
+                },
+                "description": "Create a new product. Requires ADMIN role."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "  const res = pm.response.json();",
+                      "  if (res.data && res.data.id) {",
+                      "    pm.collectionVariables.set('productId', res.data.id);",
+                      "    pm.collectionVariables.set('productSlug', res.data.slug);",
+                      "  }",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Update Product",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"price\": 179,\n  \"isFeatured\": true,\n  \"nameEn\": \"Updated Test Product\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/{{productId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "{{productId}}"]
+                },
+                "description": "Update an existing product by ID. All fields are optional. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Product",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/{{productId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "{{productId}}"]
+                },
+                "description": "Delete a product by ID. Cascades to specs and category links. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Catalog Config",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"categories\": {},\n  \"filters\": {}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/catalog/config",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "catalog", "config"]
+                },
+                "description": "Update the catalog config singleton (category tree + filter definitions). Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Products (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/admin?page=1&limit=50",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "admin"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "50" },
+                    { "key": "search", "value": "", "disabled": true },
+                    { "key": "category", "value": "", "disabled": true },
+                    { "key": "isActive", "value": "true", "disabled": true }
+                  ]
+                },
+                "description": "Get paginated list of all products (active and inactive) with optional filters. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Toggle Product Active",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/products/{{productId}}/toggle",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "{{productId}}", "toggle"]
+                },
+                "description": "Toggle a product's isActive status. No body needed. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Batch Toggle Products",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\"{{productId}}\"],\n  \"isActive\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/admin/batch-toggle",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "admin", "batch-toggle"]
+                },
+                "description": "Set isActive status for multiple products at once. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Batch Delete Products",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\"{{productId}}\"]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/admin/batch-delete",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "admin", "batch-delete"]
+                },
+                "description": "Delete multiple products at once. Cascades to specs and category links. Requires ADMIN role."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "description": "Completed projects portfolio. Public read + admin CRUD.",
+      "item": [
+        {
+          "name": "Public",
+          "description": "Public project endpoints. No authentication required.",
+          "auth": {
+            "type": "noauth"
+          },
+          "item": [
+            {
+              "name": "Get Active Projects",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects?limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["projects"],
+                  "query": [
+                    { "key": "limit", "value": "10" }
+                  ]
+                },
+                "description": "Get active projects sorted by sortOrder. Optional limit query param (default 10, max 50)."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Project by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["projects", "{{projectId}}"]
+                },
+                "description": "Get a single project by UUID."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "description": "Admin project management. Requires ADMIN role.",
+          "item": [
+            {
+              "name": "List All Projects (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/admin?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["projects", "admin"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" },
+                    { "key": "isActive", "value": "true", "disabled": true }
+                  ]
+                },
+                "description": "Get paginated list of all projects (active and inactive). Optional isActive filter."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Project",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": { \"ka\": \"ტესტ პროექტი\", \"ru\": \"\", \"en\": \"Test Project\" },\n  \"location\": { \"ka\": \"თბილისი\", \"ru\": \"\", \"en\": \"Tbilisi\" },\n  \"type\": \"commercial\",\n  \"cameras\": 24,\n  \"year\": \"2024\",\n  \"isActive\": true,\n  \"sortOrder\": 0\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["projects"]
+                },
+                "description": "Create a new project. Requires ADMIN role."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "  const res = pm.response.json();",
+                      "  if (res.data && res.data.id) {",
+                      "    pm.collectionVariables.set('projectId', res.data.id);",
+                      "  }",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Update Project",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cameras\": 48,\n  \"isActive\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["projects", "{{projectId}}"]
+                },
+                "description": "Update an existing project. All fields optional. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Project",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["projects", "{{projectId}}"]
+                },
+                "description": "Delete a project and its associated image. Requires ADMIN role."
+              },
+              "response": []
+            },
+            {
+              "name": "Upload Project Image",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "",
+                      "description": "Image file (JPEG, PNG, or WebP, max 10MB)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}/image",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["projects", "{{projectId}}", "image"]
+                },
+                "description": "Upload or replace a project's image. Optimized to WebP at max 1200x800. Requires ADMIN role."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Site Settings",
+      "description": "Site-wide settings (stats, contact, hours, social). Public read + admin update.",
+      "item": [
+        {
+          "name": "Get Site Settings",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/site-settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-settings"]
+            },
+            "description": "Get all site settings. Public endpoint — used by homepage for stats."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Site Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stats\": {\n    \"camerasInstalled\": \"600+\",\n    \"projectsCompleted\": \"150+\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/site-settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["site-settings"]
+            },
+            "description": "Update site settings (deep merge). Only provided fields are updated. Requires ADMIN role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "description": "Admin-only endpoints. Requires ADMIN role. Auth inherited from collection root.",
+      "item": [
+        {
+          "name": "User Management",
+          "description": "Manage users by ID. Requires ADMIN role. Set {{targetUserId}} before calling.",
+          "item": [
+            {
+              "name": "Update Profile (by ID)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{targetUserId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{targetUserId}}"]
+                },
+                "description": "Update a user's profile by ID. Requires owner or admin access."
+              },
+              "response": []
+            },
+            {
+              "name": "Change Password (by ID)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"newPassword\": \"NewPassword456\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{targetUserId}}/password",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{targetUserId}}", "password"]
+                },
+                "description": "Change a user's password by ID. Admin: only newPassword required. Invalidates all target user sessions."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Account (by ID)",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{targetUserId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{targetUserId}}"]
+                },
+                "description": "Soft-delete a user's account by ID. No password required for admin. Invalidates all target user sessions."
+              },
+              "response": []
+            },
+            {
+              "name": "Upload Avatar (by ID)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "",
+                      "description": "Image file (JPEG, PNG, or WebP, max 10MB)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{targetUserId}}/avatar",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{targetUserId}}", "avatar"]
+                },
+                "description": "Upload or replace a user's avatar by ID. Requires admin access. Accepts JPEG, PNG, or WebP."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Avatar (by ID)",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{targetUserId}}/avatar",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{targetUserId}}", "avatar"]
+                },
+                "description": "Delete a user's avatar by ID. Requires admin access."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "List Blocked IPs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/blocked-ips",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "blocked-ips"]
+            },
+            "description": "List all blocked IP addresses. Returns permanent blocks and active auto-blocks separately."
+          },
+          "response": []
+        },
+        {
+          "name": "Block IP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ip\": \"1.2.3.4\",\n  \"reason\": \"Spam bot\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/blocked-ips",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "blocked-ips"]
+            },
+            "description": "Permanently block an IP address. Persisted to database and cached in Redis. Blocked IPs receive 403 IP_BLOCKED on all requests. Optional reason field for audit trail."
+          },
+          "response": []
+        },
+        {
+          "name": "Unblock IP",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/blocked-ips/1.2.3.4",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "blocked-ips", "1.2.3.4"]
+            },
+            "description": "Remove an IP from the permanent block list. Also removes it from auto-blocks if present."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Articles",
+      "description": "Blog article endpoints.\n\nPublic: list published, get by slug.\nAdmin: full CRUD, cover upload, toggle publish.",
+      "item": [
+        {
+          "name": "List Published Articles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/articles?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "category", "value": "guides", "disabled": true }
+              ]
+            },
+            "auth": { "type": "noauth" },
+            "description": "Get published articles with optional category filter. Public endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Article by Slug",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/articles/how-to-choose-security-camera",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "how-to-choose-security-camera"]
+            },
+            "auth": { "type": "noauth" },
+            "description": "Get a single published article by its slug. Public endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — List All Articles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "isPublished", "value": "true", "disabled": true },
+                { "key": "category", "value": "guides", "disabled": true }
+              ]
+            },
+            "description": "Get all articles (published and drafts). Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — Get Article by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "{{articleId}}"]
+            },
+            "description": "Get a single article by ID (including drafts). Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const res = pm.response.json();",
+                  "  pm.collectionVariables.set('articleId', res.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/articles",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles"]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slug\": \"how-to-choose-security-camera\",\n  \"title\": \"როგორ ავირჩიოთ სახლისთვის სათვალთვალო კამერა 2025 წელს\",\n  \"excerpt\": \"IP კამერა, WiFi კამერა თუ ანალოგური? განვიხილოთ მთავარი განსხვავებები.\",\n  \"content\": \"# როგორ ავირჩიოთ სახლისთვის სათვალთვალო კამერა\\n\\nსათვალთვალო კამერის შერჩევა ბევრ ფაქტორზეა დამოკიდებული.\",\n  \"category\": \"guides\",\n  \"readMin\": 5,\n  \"isPublished\": true\n}"
+            },
+            "description": "Create a new article. Admin only. Sets {{articleId}} on success."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "{{articleId}}"]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"readMin\": 7\n}"
+            },
+            "description": "Update an existing article. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Cover Image",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleId}}/cover",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "{{articleId}}", "cover"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            },
+            "description": "Upload a cover image for an article. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Content Image",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleId}}/content-image",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "{{articleId}}", "content-image"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            },
+            "description": "Upload a content image for an article. Returns the image URL to embed in article content. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Publish",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleId}}/toggle-publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "{{articleId}}", "toggle-publish"]
+            },
+            "description": "Toggle article publish status. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "{{articleId}}"]
+            },
+            "description": "Delete an article and its cover image. Admin only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "description": "Order management endpoints.\n\nPublic: create order (cart checkout).\nAdmin: list orders, get by ID, update status.",
+      "item": [
+        {
+          "name": "Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const res = pm.response.json();",
+                  "  pm.collectionVariables.set('orderId', res.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            },
+            "auth": { "type": "noauth" },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"გიორგი გიორგაძე\",\n  \"customerPhone\": \"555 555 555\",\n  \"locale\": \"ka\",\n  \"items\": [\n    {\n      \"productName\": \"IP კამერა 5მპ Fixed IR Fisheye\",\n      \"quantity\": 1,\n      \"unitPrice\": 129\n    },\n    {\n      \"productName\": \"სამეთვალყურეო კამერა, 2mp, 5-80mm\",\n      \"quantity\": 2,\n      \"unitPrice\": 79\n    }\n  ],\n  \"total\": 287\n}"
+            },
+            "description": "Create a new order from cart checkout. Public endpoint (no auth required). Sets {{orderId}} on success."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — List All Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/orders/admin?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "admin"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "NEW", "disabled": true },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            },
+            "description": "Get all orders with optional status filter and search. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — Get Order by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/orders/admin/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "admin", "{{orderId}}"]
+            },
+            "description": "Get a single order with all items. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/orders/admin/{{orderId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "admin", "{{orderId}}", "status"]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONTACTED\"\n}"
+            },
+            "description": "Update order status. Valid values: NEW, CONTACTED, COMPLETED. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — Delete Order",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/orders/admin/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "admin", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}",
+                  "description": "Order UUID"
+                }
+              ]
+            },
+            "description": "Delete an order by ID. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — Bulk Update Status",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/orders/admin/bulk-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "admin", "bulk-status"]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\"order-id-1\", \"order-id-2\"],\n  \"status\": \"CONTACTED\"\n}"
+            },
+            "description": "Update status for multiple orders at once. Valid statuses: NEW, CONTACTED, COMPLETED. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — Add Order Note",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/orders/admin/:id/notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "admin", ":id", "notes"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}",
+                  "description": "Order UUID"
+                }
+              ]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Note text here\"\n}"
+            },
+            "description": "Add a note to an order. Admin only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inquiries",
+      "description": "Contact form inquiry endpoints.\n\nPublic: submit inquiry.\nAdmin: list inquiries, delete inquiry.",
+      "item": [
+        {
+          "name": "Submit Inquiry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const res = pm.response.json();",
+                  "  pm.collectionVariables.set('inquiryId', res.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/inquiries",
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiries"]
+            },
+            "auth": { "type": "noauth" },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"გიორგი გიორგაძე\",\n  \"phone\": \"555 123 456\",\n  \"message\": \"დამაინტერესა თქვენი სამეთვალყურეო სისტემები. გთხოვთ დამიკავშირდეთ.\"\n}"
+            },
+            "description": "Submit a contact form inquiry. Public endpoint (no auth required). Sets {{inquiryId}} on success."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — List All Inquiries",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/inquiries/admin?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiries", "admin"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "50" },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            },
+            "description": "Get all inquiries with optional search. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin — Delete Inquiry",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/inquiries/admin/{{inquiryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiries", "admin", "{{inquiryId}}"]
+            },
+            "description": "Delete an inquiry. Admin only."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
