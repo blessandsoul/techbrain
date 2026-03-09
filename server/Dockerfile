@@ -43,6 +43,9 @@ RUN npx prisma generate
 # Build TypeScript
 RUN npm run build
 
+# Compile seed script separately (not part of src/, so tsc doesn't include it)
+RUN npx tsc prisma/seed.ts --outDir dist/seed --esModuleInterop --module NodeNext --moduleResolution NodeNext --skipLibCheck
+
 # ===================================================================
 # Stage 3: Production Runtime
 # ===================================================================

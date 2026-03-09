@@ -31,7 +31,7 @@ export function Providers({ children }: { children: React.ReactNode }): React.Re
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
         <LocaleProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light" disableTransitionOnChange>
             <AuthInitializer>
               {children}
             </AuthInitializer>
