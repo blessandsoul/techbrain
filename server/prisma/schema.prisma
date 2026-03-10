@@ -135,6 +135,7 @@ model Product {
 
   specs      ProductSpec[]
   categories ProductCategory[]
+  orderItems OrderItem[]
 
   @@index([isActive])
   @@index([isFeatured])
@@ -249,15 +250,20 @@ model Order {
 }
 
 model OrderItem {
-  id          String @id @default(uuid())
-  orderId     String
-  productName String @db.VarChar(500)
-  quantity    Int
-  unitPrice   Float
+  id           String  @id @default(uuid())
+  orderId      String
+  productId    String?
+  productName  String  @db.VarChar(500)
+  productImage String? @db.VarChar(500)
+  productSlug  String? @db.VarChar(300)
+  quantity     Int
+  unitPrice    Float
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
+  @@index([productId])
   @@map("order_items")
 }
 

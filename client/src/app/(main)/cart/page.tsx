@@ -34,7 +34,10 @@ export default function CartPage(): React.ReactElement {
         customerPhone: form.phone,
         locale: 'ka',
         items: items.map((i) => ({
+          productId: i.product.id,
           productName: i.product.name.ka,
+          productImage: i.product.images[0] || undefined,
+          productSlug: i.product.slug,
           quantity: i.quantity,
           unitPrice: i.product.price,
         })),

@@ -11,7 +11,13 @@ import type { OrderResponse } from './orders.types.js';
 // ── Prisma include for relations ────────────────────────
 
 const orderInclude = {
-  items: true,
+  items: {
+    include: {
+      product: {
+        select: { images: true, slug: true },
+      },
+    },
+  },
   notes: {
     orderBy: { createdAt: 'desc' as const },
   },
@@ -20,6 +26,13 @@ const orderInclude = {
 type OrderWithItems = Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
 
 // ── DB → Response Mapper ────────────────────────────────
+
+function getFirstImage(images: unknown): string | null {
+  if (Array.isArray(images) && images.length > 0 && typeof images[0] === 'string') {
+    return images[0];
+  }
+  return null;
+}
 
 function toOrderResponse(row: OrderWithItems): OrderResponse {
   return {
@@ -32,6 +45,8 @@ function toOrderResponse(row: OrderWithItems): OrderResponse {
     items: row.items.map((item) => ({
       id: item.id,
       productName: item.productName,
+      productImage: item.productImage ?? getFirstImage(item.product?.images),
+      productSlug: item.productSlug ?? item.product?.slug ?? null,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
     })),
@@ -98,7 +113,10 @@ class OrdersRepository {
     locale: string;
     total: number;
     items: Array<{
+      productId?: string;
       productName: string;
+      productImage?: string;
+      productSlug?: string;
       quantity: number;
       unitPrice: number;
     }>;

@@ -3,6 +3,8 @@ export type OrderStatus = 'NEW' | 'CONTACTED' | 'COMPLETED';
 export interface IOrderItem {
   id: string;
   productName: string;
+  productImage: string | null;
+  productSlug: string | null;
   quantity: number;
   unitPrice: number;
 }
@@ -37,6 +39,6 @@ export interface CreateOrderRequest {
   customerName: string;
   customerPhone: string;
   locale: string;
-  items: Array<{ productName: string; quantity: number; unitPrice: number }>;
+  items: Array<{ productId: string; productName: string; productImage?: string; productSlug?: string; quantity: number; unitPrice: number }>;
   total: number;
 }

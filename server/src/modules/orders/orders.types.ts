@@ -9,6 +9,8 @@ import type { OrderStatus } from '@prisma/client';
 export interface OrderItemResponse {
   id: string;
   productName: string;
+  productImage: string | null;
+  productSlug: string | null;
   quantity: number;
   unitPrice: number;
 }

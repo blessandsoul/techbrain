@@ -45,7 +45,7 @@ export async function sendTelegramMessage(text: string): Promise<void> {
 
   for (const chatId of chatIds) {
     try {
-      await httpClient.post(url, { chat_id: chatId, text });
+      await httpClient.post(url, { chat_id: chatId, text, parse_mode: 'HTML' });
       logger.info({ chatId }, '[Telegram] Message sent successfully');
     } catch (error: unknown) {
       logger.warn(
@@ -67,21 +67,30 @@ function formatTimestamp(): string {
   });
 }
 
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 /**
- * Format an order into a Telegram notification message.
+ * Format an order into a Telegram notification message (HTML).
  */
 export function formatOrderMessage(order: OrderResponse): string {
   const itemLines = order.items
-    .map((i) => `• ${i.productName} × ${i.quantity} — ${i.unitPrice * i.quantity} ₾`)
+    .map((i) => `• ${escapeHtml(i.productName)} × ${i.quantity} — ${i.unitPrice * i.quantity} ₾`)
     .join('\n');
 
   const now = formatTimestamp();
 
-  return [
-    '🛒 New Order — TechBrain.ge',
+  const orderUrl = env.CLIENT_URL ? `${env.CLIENT_URL}/admin/orders/${order.id}` : null;
+  const header = orderUrl
+    ? `🛒 New Order — <a href="${orderUrl}">TechBrain.ge</a>`
+    : '🛒 New Order — TechBrain.ge';
+
+  const lines = [
+    header,
     '',
-    `👤 Name: ${order.customerName}`,
-    `📞 Phone: ${order.customerPhone}`,
+    `👤 Name: ${escapeHtml(order.customerName)}`,
+    `📞 Phone: ${escapeHtml(order.customerPhone)}`,
     `🌐 Language: ${order.locale}`,
     '',
     '📦 Order items:',
@@ -90,7 +99,9 @@ export function formatOrderMessage(order: OrderResponse): string {
     `💰 Total: ${order.total} ₾`,
     '',
     `🕐 ${now}`,
-  ].join('\n');
+  ];
+
+  return lines.join('\n');
 }
 
 /**
@@ -102,9 +113,9 @@ export function formatInquiryMessage(inquiry: InquiryResponse): string {
   return [
     '📩 New Inquiry — TechBrain.ge',
     '',
-    `👤 Name: ${inquiry.name}`,
-    `📞 Phone: ${inquiry.phone}`,
-    `💬 Message: ${inquiry.message}`,
+    `👤 Name: ${escapeHtml(inquiry.name)}`,
+    `📞 Phone: ${escapeHtml(inquiry.phone)}`,
+    `💬 Message: ${escapeHtml(inquiry.message)}`,
     `🌐 Language: ${inquiry.locale}`,
     '',
     `🕐 ${now}`,

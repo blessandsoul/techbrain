@@ -3,6 +3,7 @@ import type React from 'react';
 import { AnnouncementBanner } from './AnnouncementBanner';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { MobileBottomBar } from './MobileBottomBar';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ export const MainLayout = ({ children }: MainLayoutProps): React.ReactElement =>
       <Header />
       <main className="flex flex-1 flex-col">{children}</main>
       <Footer />
+      <MobileBottomBar />
     </div>
   );
 };

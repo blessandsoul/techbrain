@@ -10,6 +10,7 @@ import { AdminHeader } from '@/features/admin/components/AdminHeader';
 import { InfoTooltip } from '@/features/admin/components/InfoTooltip';
 import { useAdminOrder, useUpdateOrderStatus, useAddOrderNote } from '@/features/orders/hooks/useOrders';
 import { statusColors, statusLabels, nextStatus, localeLabels } from '@/features/orders/constants/orders.constants';
+import { getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
 import { ROUTES } from '@/lib/constants/routes';
 
 import type { OrderStatus } from '@/features/orders/types/orders.types';
@@ -171,17 +172,42 @@ export default function OrderDetailPage(): React.ReactElement {
         <div className="rounded-xl border border-border bg-card p-5">
           <h2 className="text-sm font-medium text-muted-foreground mb-3">ნივთები <InfoTooltip text="შეკვეთილი პროდუქტების სია რაოდენობით და ფასით" /></h2>
           <div className="space-y-3">
-            {order.items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between">
+            {order.items.map((item) => {
+              const productContent = (
                 <div className="flex items-center gap-3 min-w-0">
+                  {item.productImage ? (
+                    <img
+                      src={getProductImageUrl(item.productImage)}
+                      alt={item.productName}
+                      className="w-10 h-10 rounded-lg object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-muted-foreground">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+                      </svg>
+                    </div>
+                  )}
                   <span className="text-sm text-foreground truncate">{item.productName}</span>
                   <span className="text-xs text-muted-foreground shrink-0">×{item.quantity}</span>
                 </div>
-                <span className="text-sm font-medium text-foreground tabular-nums shrink-0 ml-4">
-                  {item.unitPrice * item.quantity} ₾
-                </span>
-              </div>
-            ))}
+              );
+
+              return (
+                <div key={item.id} className="flex items-center justify-between">
+                  {item.productSlug ? (
+                    <Link href={`/catalog/${item.productSlug}`} className="min-w-0 hover:opacity-80 transition-opacity">
+                      {productContent}
+                    </Link>
+                  ) : (
+                    productContent
+                  )}
+                  <span className="text-sm font-medium text-foreground tabular-nums shrink-0 ml-4">
+                    {item.unitPrice * item.quantity} ₾
+                  </span>
+                </div>
+              );
+            })}
           </div>
           <div className="border-t border-border mt-4 pt-4 flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">ჯამი</span>

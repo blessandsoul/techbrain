@@ -58,6 +58,9 @@ const envSchema = z.object({
   // --- Telegram Notifications (Optional) ---
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_CHAT_IDS: z.string().optional(),
+
+  // --- Client URL (for links in notifications) ---
+  CLIENT_URL: z.string().url().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

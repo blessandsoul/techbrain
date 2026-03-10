@@ -26,7 +26,10 @@ export type AdminOrdersQuery = z.infer<typeof AdminOrdersQuerySchema>;
 // ── Body Schemas ────────────────────────────────────────
 
 const OrderItemSchema = z.object({
+  productId: z.string().max(191).optional(),
   productName: z.string().min(1).max(500),
+  productImage: z.string().max(500).optional(),
+  productSlug: z.string().max(300).optional(),
   quantity: z.number().int().min(1).max(10000, 'Quantity cannot exceed 10,000'),
   unitPrice: z.number().min(0).max(1000000, 'Unit price cannot exceed 1,000,000'),
 });
