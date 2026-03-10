@@ -36,6 +36,10 @@ export const truncate = (str: string, length: number): string => {
   return str.length > length ? `${str.substring(0, length)}...` : str;
 };
 
+export const stripHtml = (html: string): string => {
+  return html.replace(/<[^>]*>/g, '').trim();
+};
+
 export const formatPhone = (phone: string): string => {
   const digits = phone.replace(/\D/g, '');
   if (digits.length === 9) {

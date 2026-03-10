@@ -26,7 +26,7 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
+    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, {});
   }
 
   async getMe(): Promise<IUser> {

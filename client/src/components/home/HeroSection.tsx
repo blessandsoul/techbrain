@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Phone, SecurityCamera, CaretLeft, CaretRight, Wrench, ShieldCheck, Truck } from '@phosphor-icons/react';
-import { formatPhone } from '@/lib/utils/format';
+import { formatPhone, stripHtml } from '@/lib/utils/format';
 import { CategoryNavBar } from '@/components/common/CategoryNavBar';
 import { SafeImage } from '@/components/common/SafeImage';
 import { useFeaturedProducts, useCategoryCounts, getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
@@ -78,47 +78,60 @@ function ProductSpecTagsD({ product, specKeyLocalized }: { product: IProduct; sp
 function DotIndicators({ count, current, onDotClick }: { count: number; current: number; onDotClick: (i: number) => void }) {
   if (count <= 1) return null;
 
-  const maxDots = 9;
-  const showCondensed = count > maxDots;
+  const totalDots = 9;
+  const prevRef = useRef(current);
+  const windowStartRef = useRef(((current - 4) % count + count) % count);
+  const activePosRef = useRef(4);
 
-  if (showCondensed) {
-    return (
-      <div className="flex items-center justify-center gap-1.5">
-        {Array.from({ length: Math.min(count, maxDots) }).map((_, i) => {
-          let actualIndex: number;
-          if (current < 4) {
-            actualIndex = i;
-          } else if (current > count - 5) {
-            actualIndex = count - maxDots + i;
-          } else {
-            actualIndex = current - 4 + i;
-          }
-          const isActive = actualIndex === current;
-          const isEdge = i === 0 || i === maxDots - 1;
+  if (prevRef.current !== current) {
+    const prev = prevRef.current;
+    prevRef.current = current;
 
-          return (
-            <button
-              key={actualIndex}
-              onClick={() => onDotClick(actualIndex)}
-              className={`rounded-full transition-all duration-300 cursor-pointer ${isActive ? 'bg-primary w-5 h-2' : isEdge ? 'bg-muted-foreground/20 w-1.5 h-1.5' : 'bg-muted-foreground/30 hover:bg-muted-foreground/50 w-2 h-2'}`}
-              aria-label={`Go to slide ${actualIndex + 1}`}
-            />
-          );
-        })}
-      </div>
-    );
+    const fwd = ((current - prev) % count + count) % count;
+    const bwd = ((prev - current) % count + count) % count;
+
+    if (fwd <= bwd) {
+      activePosRef.current += fwd;
+    } else {
+      activePosRef.current -= bwd;
+    }
+
+    if (activePosRef.current > 6) {
+      const shift = activePosRef.current - 5;
+      windowStartRef.current = (windowStartRef.current + shift) % count;
+      activePosRef.current = 5;
+    } else if (activePosRef.current < 2) {
+      const shift = 3 - activePosRef.current;
+      windowStartRef.current = ((windowStartRef.current - shift) % count + count) % count;
+      activePosRef.current = 3;
+    }
   }
 
   return (
     <div className="flex items-center justify-center gap-1.5">
-      {Array.from({ length: count }).map((_, i) => (
-        <button
-          key={i}
-          onClick={() => onDotClick(i)}
-          className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === current ? 'bg-primary w-5' : 'bg-muted-foreground/30 hover:bg-muted-foreground/50 w-2'}`}
-          aria-label={`Go to slide ${i + 1}`}
-        />
-      ))}
+      {Array.from({ length: totalDots }).map((_, i) => {
+        const actualIndex = (windowStartRef.current + i) % count;
+        const isActive = i === activePosRef.current;
+        const isEdge = i === 0 || i === totalDots - 1;
+
+        let className: string;
+        if (isActive) {
+          className = 'bg-primary w-5 h-2';
+        } else if (isEdge) {
+          className = 'bg-muted-foreground/20 w-1.5 h-1.5';
+        } else {
+          className = 'bg-muted-foreground/30 hover:bg-muted-foreground/50 w-2 h-2';
+        }
+
+        return (
+          <button
+            key={i}
+            onClick={() => onDotClick(actualIndex)}
+            className={`rounded-full transition-all duration-300 cursor-pointer ${className}`}
+            aria-label={`Go to slide ${actualIndex + 1}`}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -225,8 +238,8 @@ export function HeroSection(): React.ReactElement {
             </div>
 
             {/* Text column — second on mobile, first on desktop */}
-            <div className="flex flex-col justify-between gap-4 order-2 lg:order-1 min-w-0 lg:h-full">
-              {/* Top: title + description + specs */}
+            <div className="flex flex-col gap-4 order-2 lg:order-1 min-w-0">
+              {/* Title + description + specs */}
               <div className="space-y-4">
                 {/* Product title */}
                 <div className="overflow-hidden">
@@ -256,7 +269,7 @@ export function HeroSection(): React.ReactElement {
                       transition={{ duration: 0.3, ease: 'easeOut' }}
                       className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed line-clamp-3"
                     >
-                      {localized(currentProduct.description) || t('hero.subtitle')}
+                      {stripHtml(localized(currentProduct.description) || '') || t('hero.subtitle')}
                     </motion.p>
                   </AnimatePresence>
                   </div>
@@ -270,8 +283,8 @@ export function HeroSection(): React.ReactElement {
                 </div>
               </div>
 
-              {/* Bottom: CTA buttons + dots pinned to bottom */}
-              <div className="mt-auto">
+              {/* CTA buttons + dots */}
+              <div>
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <Link href={`/catalog/${currentProduct.slug}`} className="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 lg:px-5 lg:py-3 xl:px-8 xl:py-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm sm:text-base lg:text-sm xl:text-base motion-safe:transition-all duration-200 motion-safe:hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
                     {t('hero.cta')}<ArrowRight size={18} weight="bold" />
@@ -283,7 +296,7 @@ export function HeroSection(): React.ReactElement {
 
                 {/* Desktop dots */}
                 {products.length > 1 && (
-                  <div className="hidden lg:flex items-center gap-3 pt-1">
+                  <div className="hidden lg:flex items-center gap-3 pt-6">
                     <DotIndicators count={products.length} current={currentIndex} onDotClick={go} />
                   </div>
                 )}

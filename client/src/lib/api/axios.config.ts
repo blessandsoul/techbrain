@@ -69,7 +69,7 @@ apiClient.interceptors.response.use(
 
     try {
       // Refresh — cookie is sent automatically
-      await apiClient.post(API_ENDPOINTS.AUTH.REFRESH);
+      await apiClient.post(API_ENDPOINTS.AUTH.REFRESH, {});
 
       processQueue(null);
 

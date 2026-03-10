@@ -43,6 +43,7 @@ class ArticleService {
   async togglePublish(id: string): Promise<IArticle> {
     const response = await apiClient.patch<ApiResponse<IArticle>>(
       API_ENDPOINTS.ARTICLES.TOGGLE_PUBLISH(id),
+      {},
     );
     return response.data.data;
   }
