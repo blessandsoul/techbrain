@@ -290,7 +290,7 @@ export function HeroSection(): React.ReactElement {
                     {t('hero.cta')}<ArrowRight size={18} weight="bold" />
                   </Link>
                   <a href={`https://wa.me/995${phone}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 lg:px-5 lg:py-3 xl:px-8 xl:py-4 rounded-xl border-2 border-border hover:border-primary/40 bg-background/50 backdrop-blur-sm font-bold text-sm sm:text-base lg:text-sm xl:text-base motion-safe:transition-all duration-200 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30">
-                    <Phone size={18} weight="fill" />{formatPhone(phone)}
+                    <Phone size={18} weight="fill" /><span className="font-noto">{formatPhone(phone)}</span>
                   </a>
                 </div>
 
