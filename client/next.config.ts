@@ -43,6 +43,7 @@ const nextConfig: NextConfig = {
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
+              "frame-src 'self' https://www.youtube.com",
               "frame-ancestors 'none'",
               `connect-src 'self' ${apiOrigin}`,
             ].join("; "),

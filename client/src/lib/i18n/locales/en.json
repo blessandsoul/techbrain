@@ -54,6 +54,9 @@
   "projects.location": "Location",
   "projects.installedCameras": "Installed cameras",
   "projects.view": "View",
+  "projects.share": "Share",
+  "projects.linkCopied": "Link copied",
+  "projects.relatedProjects": "More Projects",
 
   "blog.badge": "Useful Information",
   "blog.heading": "Articles & Tips",
@@ -63,6 +66,9 @@
   "blog.back": "Articles",
   "blog.noArticles": "No articles yet.",
   "blog.notFound": "Article not found",
+  "blog.share": "Share",
+  "blog.linkCopied": "Link copied",
+  "blog.relatedArticles": "More Articles",
 
   "contact.title": "Get in Touch",
   "contact.subtitle": "Have questions? Contact us and we'll help",

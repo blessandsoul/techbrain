@@ -54,6 +54,9 @@
   "projects.location": "Местоположение",
   "projects.installedCameras": "Установленных камер",
   "projects.view": "Смотреть",
+  "projects.share": "Поделиться",
+  "projects.linkCopied": "Ссылка скопирована",
+  "projects.relatedProjects": "Другие проекты",
 
   "blog.badge": "Полезная информация",
   "blog.heading": "Статьи и советы",
@@ -63,6 +66,9 @@
   "blog.back": "Статьи",
   "blog.noArticles": "Статей пока нет.",
   "blog.notFound": "Статья не найдена",
+  "blog.share": "Поделиться",
+  "blog.linkCopied": "Ссылка скопирована",
+  "blog.relatedArticles": "Другие статьи",
 
   "contact.title": "Свяжитесь с нами",
   "contact.subtitle": "Есть вопросы? Свяжитесь с нами и мы поможем",

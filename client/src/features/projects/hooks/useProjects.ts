@@ -13,19 +13,29 @@ import type { IProject, AdminProjectFilters, CreateProjectRequest, UpdateProject
 export const projectKeys = {
   all: ['projects'] as const,
   lists: () => [...projectKeys.all, 'list'] as const,
-  active: () => [...projectKeys.lists(), 'active'] as const,
+  active: (params?: { type?: string }) => [...projectKeys.lists(), 'active', params] as const,
   adminLists: () => [...projectKeys.all, 'admin-list'] as const,
   adminList: (filters: AdminProjectFilters) => [...projectKeys.adminLists(), filters] as const,
   details: () => [...projectKeys.all, 'detail'] as const,
   detail: (id: string) => [...projectKeys.details(), id] as const,
+  slugs: () => [...projectKeys.all, 'slug'] as const,
+  slug: (slug: string) => [...projectKeys.slugs(), slug] as const,
 };
 
 // ── Public Queries ───────────────────────────────────
 
-export function useActiveProjects(): ReturnType<typeof useQuery<IProject[]>> {
+export function useActiveProjects(params?: { type?: string; limit?: number }): ReturnType<typeof useQuery<IProject[]>> {
   return useQuery({
-    queryKey: projectKeys.active(),
-    queryFn: () => projectsService.getActiveProjects(),
+    queryKey: projectKeys.active(params),
+    queryFn: () => projectsService.getActiveProjects(params),
+  });
+}
+
+export function useProjectBySlug(slug: string): ReturnType<typeof useQuery<IProject>> {
+  return useQuery({
+    queryKey: projectKeys.slug(slug),
+    queryFn: () => projectsService.getProjectBySlug(slug),
+    enabled: !!slug,
   });
 }
 
@@ -114,6 +124,16 @@ export function useToggleProjectActive() {
       toast.success(variables.currentIsActive ? 'პროექტი გაუქმდა' : 'პროექტი გააქტიურდა');
       queryClient.invalidateQueries({ queryKey: projectKeys.all });
     },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+}
+
+export function useUploadProjectContentImage() {
+  return useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) =>
+      projectsService.uploadContentImage(id, file),
     onError: (error) => {
       toast.error(getErrorMessage(error));
     },

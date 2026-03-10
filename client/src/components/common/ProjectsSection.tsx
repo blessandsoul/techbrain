@@ -5,6 +5,7 @@ import { getProjectImageUrl } from '@/features/projects/hooks/useProjects';
 
 interface Project {
   id: string;
+  slug: string;
   title: string;
   location: string;
   type: 'commercial' | 'residential' | 'retail' | 'office';
@@ -135,7 +136,7 @@ export function ProjectsSection({ projects, stats, labels }: ProjectsSectionProp
             const Icon = TYPE_ICONS[project.type];
             const typeLabel = l.typeLabels[project.type] ?? TYPE_LABELS_FALLBACK[project.type];
             return (
-              <Link key={project.id} href={`/projects/${project.id}`} className="group">
+              <Link key={project.id} href={`/projects/${project.slug}`} className="group">
                 <article
                   className="relative rounded-xl overflow-hidden border border-border/50 bg-card transition-all duration-300 active:scale-[0.98] md:hover:-translate-y-1 md:hover:border-primary/20 md:hover:shadow-lg h-full"
                 >

@@ -1,7 +1,5 @@
 export const ROUTES = {
   HOME: '/',
-  LOGIN: '/login',
-  REGISTER: '/register',
   VERIFY_EMAIL: '/verify-email',
   RESET_PASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',
@@ -9,7 +7,7 @@ export const ROUTES = {
   CONTACT: '/contact',
   CATALOG: '/catalog',
   PROJECTS: '/projects',
-  PROJECT_DETAIL: (id: string) => `/projects/${id}`,
+  PROJECT_DETAIL: (slug: string) => `/projects/${slug}`,
   BLOG: '/blog',
   BLOG_DETAIL: (slug: string) => `/blog/${slug}`,
   CART: '/cart',

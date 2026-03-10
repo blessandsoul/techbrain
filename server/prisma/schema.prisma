@@ -186,15 +186,20 @@ model CatalogConfig {
 
 model Project {
   id         String   @id @default(uuid())
+  slug       String   @unique @db.VarChar(300)
   titleKa    String   @db.VarChar(500)
   titleRu    String   @default("") @db.VarChar(500)
   titleEn    String   @default("") @db.VarChar(500)
+  excerptKa  String   @default("") @db.VarChar(1000)
+  excerptRu  String   @default("") @db.VarChar(1000)
+  excerptEn  String   @default("") @db.VarChar(1000)
   locationKa String   @db.VarChar(500)
   locationRu String   @default("") @db.VarChar(500)
   locationEn String   @default("") @db.VarChar(500)
   type       String   @db.VarChar(50)
   cameras    Int      @default(0)
   image      String?  @db.VarChar(500)
+  content    String   @default("") @db.LongText
   year       String   @db.VarChar(10)
   isActive   Boolean  @default(true)
   sortOrder  Int      @default(0)
@@ -203,6 +208,7 @@ model Project {
 
   @@index([isActive, sortOrder])
   @@index([sortOrder])
+  @@index([slug])
   @@map("projects")
 }
 

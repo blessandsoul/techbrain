@@ -92,9 +92,7 @@ apiClient.interceptors.response.use(
         store.dispatch(logout());
 
         if (typeof window !== 'undefined') {
-          window.location.href = window.location.pathname.startsWith('/admin')
-            ? ROUTES.ADMIN.LOGIN
-            : ROUTES.LOGIN;
+          window.location.href = ROUTES.ADMIN.LOGIN;
         }
       }
 

@@ -168,6 +168,51 @@ class ImageOptimizerService {
   }
 
   /**
+   * Optimizes an image for project content (inline)
+   *
+   * Resize to max 1200px width, WebP, quality 85
+   */
+  async optimizeProjectContentImage(buffer: Buffer): Promise<Buffer> {
+    try {
+      const metadata = await sharp(buffer).metadata();
+
+      if (!metadata.width || !metadata.height) {
+        throw new ValidationError('Unable to read image dimensions', 'INVALID_IMAGE');
+      }
+
+      const optimized = await sharp(buffer)
+        .resize(1200, undefined, {
+          fit: 'inside',
+          withoutEnlargement: true,
+        })
+        .webp({
+          quality: 85,
+          effort: 4,
+        })
+        .withMetadata({
+          exif: {},
+          icc: undefined,
+        })
+        .toBuffer();
+
+      logger.info({
+        msg: 'Project content image optimization complete',
+        optimizedSize: optimized.length,
+        compressionRatio: `${((1 - optimized.length / buffer.length) * 100).toFixed(1)}%`,
+      });
+
+      return optimized;
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        throw error;
+      }
+
+      logger.error({ err: error, msg: 'Project content image optimization failed' });
+      throw new InternalError('Failed to optimize image', 'IMAGE_OPTIMIZATION_FAILED');
+    }
+  }
+
+  /**
    * Optimizes an image for article cover display
    *
    * Resize to max 1200x630 (blog cover ratio), WebP, quality 85

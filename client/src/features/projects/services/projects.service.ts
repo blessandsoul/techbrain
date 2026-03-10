@@ -5,9 +5,17 @@ import type { ApiResponse, PaginatedApiResponse } from '@/lib/api/api.types';
 import type { IProject, CreateProjectRequest, UpdateProjectRequest, AdminProjectFilters } from '../types/projects.types';
 
 class ProjectsService {
-  async getActiveProjects(): Promise<IProject[]> {
+  async getActiveProjects(params?: { type?: string; limit?: number }): Promise<IProject[]> {
     const { data } = await apiClient.get<ApiResponse<IProject[]>>(
       API_ENDPOINTS.PROJECTS.ACTIVE,
+      { params },
+    );
+    return data.data;
+  }
+
+  async getProjectBySlug(slug: string): Promise<IProject> {
+    const { data } = await apiClient.get<ApiResponse<IProject>>(
+      API_ENDPOINTS.PROJECTS.BY_SLUG(slug),
     );
     return data.data;
   }
@@ -56,6 +64,17 @@ class ProjectsService {
     formData.append('file', file);
     const { data } = await apiClient.post<ApiResponse<IProject>>(
       API_ENDPOINTS.PROJECTS.UPLOAD_IMAGE(id),
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
+    return data.data;
+  }
+
+  async uploadContentImage(id: string, file: File): Promise<{ url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await apiClient.post<ApiResponse<{ url: string }>>(
+      API_ENDPOINTS.PROJECTS.UPLOAD_CONTENT_IMAGE(id),
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } },
     );

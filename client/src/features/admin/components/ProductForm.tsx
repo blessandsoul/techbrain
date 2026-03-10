@@ -18,7 +18,6 @@ import type { ICategory, CreateProductInput, UpdateProductInput } from '../types
 
 interface ProductFormProps {
   product?: IProduct;
-  allProducts: IProduct[];
 }
 
 interface SpecRow {
@@ -44,7 +43,7 @@ function mapCategorySlugToId(slug: string, categories: ICategory[]): string | nu
   return cat?.id ?? null;
 }
 
-export function ProductForm({ product, allProducts = [] }: ProductFormProps): React.ReactElement {
+export function ProductForm({ product }: ProductFormProps): React.ReactElement {
   const router = useRouter();
   const { data: categories = [], isLoading: categoriesLoading } = useAdminCategories();
   const { data: specSuggestions = [] } = useSpecSuggestions();
@@ -322,7 +321,7 @@ export function ProductForm({ product, allProducts = [] }: ProductFormProps): Re
             ერთად შეძენა <InfoTooltip text="თანმხლები პროდუქტები — გამოჩნდება 'ასევე შეიძინეთ' სექციაში" />
           </span>
           <RelatedProductsPicker
-            allProducts={allProducts}
+            selectedCategorySlugs={selectedCategorySlugs}
             selectedIds={relatedIds}
             currentProductId={product?.id}
             onChange={setRelatedIds}

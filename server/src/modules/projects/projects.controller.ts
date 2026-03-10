@@ -11,6 +11,7 @@ import { paginatedResponse } from '@shared/responses/paginatedResponse.js';
 import { BadRequestError } from '@shared/errors/errors.js';
 import {
   ProjectIdParamSchema,
+  ProjectSlugParamSchema,
   PublicProjectsQuerySchema,
   AdminProjectsQuerySchema,
   CreateProjectSchema,
@@ -21,9 +22,15 @@ class ProjectsController {
   // ── Public Endpoints ──────────────────────────────
 
   async getActiveProjects(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { limit } = PublicProjectsQuerySchema.parse(request.query);
-    const projects = await projectsService.getActiveProjects(limit);
+    const { limit, type } = PublicProjectsQuerySchema.parse(request.query);
+    const projects = await projectsService.getActiveProjects(limit, type);
     return reply.send(successResponse('Active projects retrieved successfully', projects));
+  }
+
+  async getProjectBySlug(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { slug } = ProjectSlugParamSchema.parse(request.params);
+    const project = await projectsService.getProjectBySlug(slug);
+    return reply.send(successResponse('Project retrieved successfully', project));
   }
 
   async getProject(request: FastifyRequest, reply: FastifyReply): Promise<void> {
@@ -73,6 +80,16 @@ class ProjectsController {
     }
     const project = await projectsService.uploadProjectImage(id, file);
     return reply.send(successResponse('Project image uploaded successfully', project));
+  }
+
+  async uploadContentImage(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { id } = ProjectIdParamSchema.parse(request.params);
+    const file = await request.file();
+    if (!file) {
+      throw new BadRequestError('No file uploaded', 'NO_FILE');
+    }
+    const result = await projectsService.uploadContentImage(id, file);
+    return reply.send(successResponse('Content image uploaded successfully', result));
   }
 }
 

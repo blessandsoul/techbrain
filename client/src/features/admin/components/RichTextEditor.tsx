@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ImageGrid, ImageGridCell } from './extensions/ImageGrid';
+import { YouTubeEmbed } from './extensions/YouTubeEmbed';
 import type { GridLayout } from './extensions/ImageGrid';
 
 interface RichTextEditorProps {
@@ -125,6 +126,151 @@ function GridLayoutPicker({ onSelect }: { onSelect: (layout: GridLayout) => void
   );
 }
 
+function extractYouTubeId(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === 'youtu.be') {
+      return parsed.pathname.slice(1).split('/')[0] || null;
+    }
+    if (parsed.hostname.includes('youtube.com')) {
+      if (parsed.pathname.startsWith('/embed/')) {
+        return parsed.pathname.split('/')[2] || null;
+      }
+      return parsed.searchParams.get('v');
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function VideoInsertButton({ onInsert }: {
+  onInsert: (videoId: string) => void;
+}): React.ReactElement {
+  const [open, setOpen] = useState(false);
+  const [urlValue, setUrlValue] = useState('');
+
+  const videoId = urlValue.trim() ? extractYouTubeId(urlValue.trim()) : null;
+
+  const handleSubmit = (): void => {
+    if (!videoId) return;
+    onInsert(videoId);
+    setUrlValue('');
+    setOpen(false);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button type="button" variant="ghost" size="xs" className="p-1.5 rounded text-sm transition-colors cursor-pointer text-muted-foreground hover:text-[#ff0000] hover:bg-red-50 dark:hover:bg-red-950/30 gap-1" title="YouTube ვიდეო">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.546 12 3.546 12 3.546s-7.505 0-9.377.504A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.504 9.376.504 9.376.504s7.505 0 9.377-.504a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+          <span className="text-xs">YouTube</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-3" align="start" side="bottom">
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">YouTube ბმულის ჩასმა</p>
+          <input
+            type="url"
+            value={urlValue}
+            onChange={(e) => setUrlValue(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } }}
+            placeholder="https://www.youtube.com/watch?v=..."
+            className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          {urlValue.trim() && !videoId && (
+            <p className="text-[10px] text-destructive">არასწორი YouTube ბმული</p>
+          )}
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            className="w-full"
+            disabled={!videoId}
+            onClick={handleSubmit}
+          >
+            ვიდეოს დამატება
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ImageInsertButton({ onFileClick, onUrlInsert }: {
+  onFileClick: () => void;
+  onUrlInsert: (url: string) => void;
+}): React.ReactElement {
+  const [open, setOpen] = useState(false);
+  const [urlValue, setUrlValue] = useState('');
+
+  const handleUrlSubmit = (): void => {
+    const trimmed = urlValue.trim();
+    if (!trimmed) return;
+    try {
+      const parsed = new URL(trimmed);
+      if (!['http:', 'https:'].includes(parsed.protocol)) return;
+      onUrlInsert(trimmed);
+      setUrlValue('');
+      setOpen(false);
+    } catch {
+      // invalid URL — ignore
+    }
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button type="button" variant="ghost" size="xs" className="p-1.5 rounded text-sm transition-colors cursor-pointer text-muted-foreground hover:text-foreground hover:bg-muted" title="სურათი">
+          სურ.
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-3" align="start" side="bottom">
+        <div className="space-y-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => { onFileClick(); setOpen(false); }}
+          >
+            ფაილის ატვირთვა
+          </Button>
+
+          <div className="flex items-center gap-2">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[10px] text-muted-foreground uppercase">ან</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <div className="space-y-1.5">
+            <input
+              type="url"
+              value={urlValue}
+              onChange={(e) => setUrlValue(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleUrlSubmit(); } }}
+              placeholder="https://example.com/image.jpg"
+              className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              className="w-full"
+              disabled={!urlValue.trim()}
+              onClick={handleUrlSubmit}
+            >
+              ბმულით დამატება
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function RichTextEditor({ content, onChange, onImageUpload }: RichTextEditorProps): React.ReactElement {
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -148,6 +294,7 @@ export function RichTextEditor({ content, onChange, onImageUpload }: RichTextEdi
         types: ['heading', 'paragraph'],
       }),
       Underline,
+      YouTubeEmbed,
       ImageGrid,
       ImageGridCell,
     ],
@@ -255,11 +402,19 @@ export function RichTextEditor({ content, onChange, onImageUpload }: RichTextEdi
           ბმული
         </Button>
         {onImageUpload && (
-          <Button type="button" variant="ghost" size="xs" onClick={() => fileRef.current?.click()} className={btnClass(false)} title="სურათი">
-            სურ.
-          </Button>
+          <ImageInsertButton
+            onFileClick={() => fileRef.current?.click()}
+            onUrlInsert={(url) => {
+              if (editor) {
+                editor.commands.insertContent(`<img src="${url}" />`);
+              }
+            }}
+          />
         )}
         <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleImageUpload} />
+        <VideoInsertButton onInsert={(videoId) => {
+          if (editor) editor.commands.insertYouTube(videoId);
+        }} />
 
         <div className="w-px h-5 bg-border mx-1" />
 

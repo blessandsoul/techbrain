@@ -4,7 +4,7 @@
  * Business logic for completed projects portfolio.
  */
 
-import { NotFoundError } from '@shared/errors/errors.js';
+import { NotFoundError, ConflictError } from '@shared/errors/errors.js';
 import { projectsRepository } from './projects.repo.js';
 import { fileStorageService } from '@libs/storage/file-storage.service.js';
 import { imageOptimizerService } from '@libs/storage/image-optimizer.service.js';
@@ -19,12 +19,20 @@ import type {
 class ProjectsService {
   // ── Public Read ───────────────────────────────────
 
-  async getActiveProjects(limit: number = 10): Promise<ProjectResponse[]> {
-    return projectsRepository.findActiveOrdered(limit);
+  async getActiveProjects(limit: number = 10, type?: string): Promise<ProjectResponse[]> {
+    return projectsRepository.findActiveOrdered(limit, type);
   }
 
   async getProject(id: string): Promise<ProjectResponse> {
     const project = await projectsRepository.findById(id);
+    if (!project) {
+      throw new NotFoundError('Project not found', 'PROJECT_NOT_FOUND');
+    }
+    return project;
+  }
+
+  async getProjectBySlug(slug: string): Promise<ProjectResponse> {
+    const project = await projectsRepository.findBySlug(slug);
     if (!project) {
       throw new NotFoundError('Project not found', 'PROJECT_NOT_FOUND');
     }
@@ -42,16 +50,26 @@ class ProjectsService {
   }
 
   async createProject(input: CreateProjectInput): Promise<ProjectResponse> {
+    const slugExists = await projectsRepository.existsBySlug(input.slug);
+    if (slugExists) {
+      throw new ConflictError('Project with this slug already exists', 'SLUG_ALREADY_EXISTS');
+    }
+
     return projectsRepository.create({
+      slug: input.slug,
       titleKa: input.title.ka,
       titleRu: input.title.ru ?? '',
       titleEn: input.title.en ?? '',
+      excerptKa: input.excerpt?.ka ?? '',
+      excerptRu: input.excerpt?.ru ?? '',
+      excerptEn: input.excerpt?.en ?? '',
       locationKa: input.location.ka,
       locationRu: input.location.ru ?? '',
       locationEn: input.location.en ?? '',
       type: input.type,
       cameras: input.cameras,
       image: input.image,
+      content: input.content ?? '',
       year: input.year,
       isActive: input.isActive ?? true,
       sortOrder: input.sortOrder ?? 0,
@@ -64,16 +82,31 @@ class ProjectsService {
       throw new NotFoundError('Project not found', 'PROJECT_NOT_FOUND');
     }
 
+    if (input.slug) {
+      const project = await projectsRepository.findById(id);
+      if (project && project.slug !== input.slug) {
+        const slugExists = await projectsRepository.existsBySlug(input.slug);
+        if (slugExists) {
+          throw new ConflictError('Project with this slug already exists', 'SLUG_ALREADY_EXISTS');
+        }
+      }
+    }
+
     return projectsRepository.update(id, {
+      slug: input.slug,
       titleKa: input.title?.ka,
       titleRu: input.title?.ru,
       titleEn: input.title?.en,
+      excerptKa: input.excerpt?.ka,
+      excerptRu: input.excerpt?.ru,
+      excerptEn: input.excerpt?.en,
       locationKa: input.location?.ka,
       locationRu: input.location?.ru,
       locationEn: input.location?.en,
       type: input.type,
       cameras: input.cameras,
       image: input.image,
+      content: input.content,
       year: input.year,
       isActive: input.isActive,
       sortOrder: input.sortOrder,
@@ -92,7 +125,7 @@ class ProjectsService {
     await projectsRepository.delete(id);
   }
 
-  // ── Image Upload ──────────────────────────────────
+  // ── Cover Image Upload ──────────────────────────────
 
   async uploadProjectImage(id: string, file: MultipartFile): Promise<ProjectResponse> {
     const project = await projectsRepository.findById(id);
@@ -100,24 +133,37 @@ class ProjectsService {
       throw new NotFoundError('Project not found', 'PROJECT_NOT_FOUND');
     }
 
-    // Validate file
     validateImageFile(file);
     const buffer = await file.toBuffer();
     validateFileSize(buffer);
 
-    // Optimize image
     const optimized = await imageOptimizerService.optimizeProjectImage(buffer);
 
-    // Delete old image if exists
     if (project.image) {
       await fileStorageService.deleteProjectImage(id);
     }
 
-    // Save new image
     const { url } = await fileStorageService.saveProjectImage(id, optimized);
 
-    // Update project record with new image URL
     return projectsRepository.update(id, { image: url });
+  }
+
+  // ── Content Image Upload ────────────────────────────
+
+  async uploadContentImage(id: string, file: MultipartFile): Promise<{ url: string }> {
+    const exists = await projectsRepository.existsById(id);
+    if (!exists) {
+      throw new NotFoundError('Project not found', 'PROJECT_NOT_FOUND');
+    }
+
+    validateImageFile(file);
+    const buffer = await file.toBuffer();
+    validateFileSize(buffer);
+
+    const optimized = await imageOptimizerService.optimizeProjectContentImage(buffer);
+    const { url } = await fileStorageService.saveProjectContentImage(id, optimized);
+
+    return { url };
   }
 }
 

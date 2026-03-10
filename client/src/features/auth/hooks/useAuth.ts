@@ -12,17 +12,15 @@ import { ROUTES } from '@/lib/constants/routes';
 import { authService } from '../services/auth.service';
 import { setUser, setLoggingOut, logout as logoutAction } from '../store/authSlice';
 
-import type { ILoginRequest, IRegisterRequest, IUser } from '../types/auth.types';
+import type { ILoginRequest, IUser } from '../types/auth.types';
 
 interface UseAuthReturn {
   user: IUser | null;
   isAuthenticated: boolean;
   isInitializing: boolean;
   login: (data: ILoginRequest) => void;
-  register: (data: IRegisterRequest) => void;
   logout: () => Promise<void>;
   isLoggingIn: boolean;
-  isRegistering: boolean;
   isLoggingOut: boolean;
 }
 
@@ -46,18 +44,6 @@ export const useAuth = (): UseAuthReturn => {
     },
   });
 
-  const registerMutation = useMutation({
-    mutationFn: (data: IRegisterRequest) => authService.register(data),
-    onSuccess: (data) => {
-      dispatch(setUser(data.user));
-      toast.success('Account created successfully');
-      router.push(ROUTES.HOME);
-    },
-    onError: (error) => {
-      toast.error(getErrorMessage(error));
-    },
-  });
-
   const logout = useCallback(async (): Promise<void> => {
     dispatch(setLoggingOut(true));
     try {
@@ -66,7 +52,7 @@ export const useAuth = (): UseAuthReturn => {
       // Proceed with local logout even if server call fails
     } finally {
       dispatch(logoutAction());
-      router.push(ROUTES.LOGIN);
+      router.push(ROUTES.ADMIN.LOGIN);
     }
   }, [dispatch, router]);
 
@@ -75,10 +61,8 @@ export const useAuth = (): UseAuthReturn => {
     isAuthenticated,
     isInitializing,
     login: loginMutation.mutate,
-    register: registerMutation.mutate,
     logout,
     isLoggingIn: loginMutation.isPending,
-    isRegistering: registerMutation.isPending,
     isLoggingOut,
   };
 };

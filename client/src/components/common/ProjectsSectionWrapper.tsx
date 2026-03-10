@@ -8,6 +8,7 @@ import type { IProject } from '@/features/projects/types/projects.types';
 
 interface ProjectForSection {
   id: string;
+  slug: string;
   title: string;
   location: string;
   type: 'commercial' | 'residential' | 'retail' | 'office';
@@ -22,6 +23,7 @@ export function ProjectsSectionWrapper(): React.ReactElement {
 
   const mapped = projects?.slice(0, 4).map((p: IProject): ProjectForSection => ({
     id: p.id,
+    slug: p.slug,
     title: localized(p.title),
     location: localized(p.location),
     type: p.type,

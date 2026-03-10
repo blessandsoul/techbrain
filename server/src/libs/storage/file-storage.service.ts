@@ -244,6 +244,42 @@ class FileStorageService {
     }
   }
 
+  // ── Project Content Image Methods ────────────────
+
+  private getProjectContentDir(projectId: string): string {
+    return path.join(this.projectsDir, projectId, 'content');
+  }
+
+  async saveProjectContentImage(
+    projectId: string,
+    buffer: Buffer,
+  ): Promise<{ filename: string; url: string }> {
+    try {
+      const imageDir = this.getProjectContentDir(projectId);
+      await this.ensureDirectoryExists(imageDir);
+
+      const timestamp = Date.now();
+      const filename = `img-${timestamp}.webp`;
+      const filePath = path.join(imageDir, filename);
+
+      await fs.writeFile(filePath, buffer);
+
+      const url = `/uploads/projects/${projectId}/content/${filename}`;
+
+      logger.info({
+        msg: 'Project content image saved successfully',
+        projectId,
+        filename,
+        fileSize: buffer.length,
+      });
+
+      return { filename, url };
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to save project content image', projectId });
+      throw new InternalError('Failed to save project content image', 'FILE_SAVE_FAILED');
+    }
+  }
+
   // ── Product Image Methods ────────────────────────
 
   /**

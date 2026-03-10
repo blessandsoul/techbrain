@@ -27,12 +27,14 @@ export const API_ENDPOINTS = {
   },
   PROJECTS: {
     ACTIVE: '/projects',
-    GET: (id: string) => `/projects/${id}` as const,
+    BY_SLUG: (slug: string) => `/projects/${slug}` as const,
+    GET: (id: string) => `/projects/admin/${id}` as const,
     ADMIN_LIST: '/projects/admin',
     CREATE: '/projects',
     UPDATE: (id: string) => `/projects/${id}` as const,
     DELETE: (id: string) => `/projects/${id}` as const,
     UPLOAD_IMAGE: (id: string) => `/projects/${id}/image` as const,
+    UPLOAD_CONTENT_IMAGE: (id: string) => `/projects/${id}/content-image` as const,
   },
   ARTICLES: {
     LIST: '/articles',

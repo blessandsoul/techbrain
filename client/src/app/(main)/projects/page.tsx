@@ -67,7 +67,7 @@ export default function ProjectsPage(): React.ReactElement {
             const typeLabel = t(`projects.type.${project.type}` as keyof typeof import('@/lib/i18n/locales/ka.json'));
 
             return (
-              <Link key={project.id} href={ROUTES.PROJECT_DETAIL(project.id)} className="group block">
+              <Link key={project.id} href={ROUTES.PROJECT_DETAIL(project.slug)} className="group block">
                 <article className="flex flex-col rounded-xl overflow-hidden border border-border/50 bg-card transition-all duration-300 active:scale-[0.98] md:hover:-translate-y-1 md:hover:border-primary/20 md:hover:shadow-lg h-full">
                   {/* Image */}
                   <div className="relative aspect-[16/10] overflow-hidden bg-muted shrink-0">

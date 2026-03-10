@@ -54,6 +54,9 @@
   "projects.location": "მდებარეობა",
   "projects.installedCameras": "დამონტაჟებული კამერა",
   "projects.view": "ნახვა",
+  "projects.share": "გაზიარება",
+  "projects.linkCopied": "ბმული დაკოპირდა",
+  "projects.relatedProjects": "სხვა პროექტები",
 
   "blog.badge": "სასარგებლო ინფორმაცია",
   "blog.heading": "სტატიები და რჩევები",
@@ -63,6 +66,9 @@
   "blog.back": "სტატიები",
   "blog.noArticles": "ჯერ სტატიები არ არის.",
   "blog.notFound": "სტატია ვერ მოიძებნა",
+  "blog.share": "გაზიარება",
+  "blog.linkCopied": "ბმული დაკოპირდა",
+  "blog.relatedArticles": "სხვა სტატიები",
 
   "contact.title": "დაგვიკავშირდით",
   "contact.subtitle": "გაქვთ კითხვები? დაგვიკავშირდით და ჩვენ დაგეხმარებით",

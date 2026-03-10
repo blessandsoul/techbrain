@@ -11,8 +11,7 @@ import { useAdminProducts } from '@/features/admin/hooks/useAdminProducts';
 function EditProductContent({ productId }: { productId: string }): React.ReactElement {
   const router = useRouter();
   const { data, isLoading } = useAdminProducts({ limit: 100 });
-  const allProducts = data?.items ?? [];
-  const product = allProducts.find((p) => p.id === productId);
+  const product = (data?.items ?? []).find((p) => p.id === productId);
 
   if (isLoading) {
     return (
@@ -40,7 +39,7 @@ function EditProductContent({ productId }: { productId: string }): React.ReactEl
   return (
     <div className="max-w-screen-2xl mx-auto px-4 md:px-6 py-8">
       <h1 className="text-xl font-semibold text-foreground mb-8">პროდუქტის რედაქტირება</h1>
-      <ProductForm product={product} allProducts={allProducts} />
+      <ProductForm product={product} />
     </div>
   );
 }

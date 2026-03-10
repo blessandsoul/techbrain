@@ -4,10 +4,11 @@ import { useState, useMemo, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
+import { useAdminProducts } from '../hooks/useAdminProducts';
 import type { IProduct } from '@/features/catalog/types/catalog.types';
 
 interface RelatedProductsPickerProps {
-  allProducts: IProduct[];
+  selectedCategorySlugs: string[];
   selectedIds: string[];
   currentProductId?: string;
   onChange: (ids: string[]) => void;
@@ -22,7 +23,7 @@ const categoryLabel: Record<string, string> = {
 };
 
 export function RelatedProductsPicker({
-  allProducts,
+  selectedCategorySlugs,
   selectedIds,
   currentProductId,
   onChange,
@@ -30,9 +31,49 @@ export function RelatedProductsPicker({
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
 
+  const cat1 = selectedCategorySlugs[0];
+  const cat2 = selectedCategorySlugs[1];
+  const cat3 = selectedCategorySlugs[2];
+
+  // Fetch products for each selected category (max 3 queries)
+  const { data: data1, isLoading: loading1 } = useAdminProducts(
+    cat1 ? { category: cat1, limit: 100 } : { limit: 0 },
+  );
+  const { data: data2, isLoading: loading2 } = useAdminProducts(
+    cat2 ? { category: cat2, limit: 100 } : { limit: 0 },
+  );
+  const { data: data3 } = useAdminProducts(
+    cat3 ? { category: cat3, limit: 100 } : { limit: 0 },
+  );
+
+  const categoryLoading = loading1 || loading2;
+
+  // Merge and deduplicate products from all selected categories
+  const categoryProducts = useMemo(() => {
+    const map = new Map<string, IProduct>();
+    for (const item of [...(data1?.items ?? []), ...(data2?.items ?? []), ...(data3?.items ?? [])]) {
+      map.set(item.id, item);
+    }
+    return Array.from(map.values());
+  }, [data1, data2, data3]);
+
+  // Fetch selected products separately so they resolve even if from a different category
+  const { data: allData } = useAdminProducts(
+    selectedIds.length > 0 ? { limit: 100 } : { limit: 0 },
+  );
+  const allProducts = allData?.items ?? [];
+
+  const selectedProducts = useMemo(
+    () =>
+      selectedIds
+        .map((id) => allProducts.find((p) => p.id === id) ?? categoryProducts.find((p) => p.id === id))
+        .filter(Boolean) as IProduct[],
+    [selectedIds, allProducts, categoryProducts],
+  );
+
   const availableProducts = useMemo(
-    () => allProducts.filter((p) => p.id !== currentProductId && !selectedIds.includes(p.id)),
-    [allProducts, currentProductId, selectedIds],
+    () => categoryProducts.filter((p) => p.id !== currentProductId && !selectedIds.includes(p.id)),
+    [categoryProducts, currentProductId, selectedIds],
   );
 
   const filtered = useMemo(() => {
@@ -46,11 +87,6 @@ export function RelatedProductsPicker({
         p.slug.toLowerCase().includes(q),
     );
   }, [availableProducts, search]);
-
-  const selectedProducts = useMemo(
-    () => selectedIds.map((id) => allProducts.find((p) => p.id === id)).filter(Boolean) as IProduct[],
-    [selectedIds, allProducts],
-  );
 
   const handleAdd = useCallback(
     (id: string): void => {
@@ -117,24 +153,33 @@ export function RelatedProductsPicker({
 
       <div className="relative">
         <Input
-          placeholder="პროდუქტის ძებნა დასამატებლად…"
+          placeholder={
+            selectedCategorySlugs.length === 0
+              ? 'ჯერ აირჩიეთ კატეგორია…'
+              : 'პროდუქტის ძებნა დასამატებლად…'
+          }
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
             if (!open) setOpen(true);
           }}
           onFocus={() => setOpen(true)}
+          disabled={selectedCategorySlugs.length === 0}
         />
-        {open && (search.trim() || availableProducts.length > 0) && (
+        {open && selectedCategorySlugs.length > 0 && (search.trim() || availableProducts.length > 0) && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
             <div className="absolute z-20 top-full left-0 right-0 mt-1 rounded-lg border border-border bg-popover shadow-lg max-h-52 overflow-y-auto">
-              {filtered.length === 0 ? (
+              {categoryLoading ? (
+                <p className="text-xs text-muted-foreground px-3 py-4 text-center">
+                  იტვირთება…
+                </p>
+              ) : filtered.length === 0 ? (
                 <p className="text-xs text-muted-foreground px-3 py-4 text-center">
                   პროდუქტები ვერ მოიძებნა
                 </p>
               ) : (
-                filtered.slice(0, 8).map((p) => (
+                filtered.map((p) => (
                   <button
                     key={p.id}
                     type="button"

@@ -44,7 +44,7 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps): Re
   const { t, dateLocale } = useLocale();
 
   return (
-    <Link href={`/blog/${article.slug}`} className="group block">
+    <Link href={`/blog/${article.slug}`} className="group block h-full">
       <article className="flex flex-col h-full rounded-xl overflow-hidden border border-border/50 bg-card transition-all duration-300 active:scale-[0.98] md:hover:-translate-y-1 md:hover:border-primary/20 md:hover:shadow-lg">
         {/* Image */}
         <div className="relative aspect-[16/10] overflow-hidden bg-muted shrink-0">

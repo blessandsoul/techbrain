@@ -27,9 +27,10 @@ function CarouselD({ products, currentIndex, dir, onPrev, onNext, productName }:
 
   return (
     <div className="relative">
-      <AnimatePresence mode="wait">
-        <motion.div key={product.id} initial={{ opacity: 0, x: dir > 0 ? 50 : -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir > 0 ? -50 : 50 }} transition={{ duration: 0.5, ease: 'easeOut' }}>
-          <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden border border-border/50 bg-card group">
+      <div className="overflow-hidden rounded-2xl lg:rounded-3xl">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div key={product.id} initial={{ opacity: 0, x: dir > 0 ? 50 : -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir > 0 ? -50 : 50 }} transition={{ duration: 0.35, ease: 'easeOut' }}>
+          <div className="relative overflow-hidden border border-border/50 bg-card group rounded-2xl lg:rounded-3xl">
             <div className="aspect-[4/3] lg:aspect-square bg-muted relative overflow-hidden flex items-center justify-center">
               {imageSrc ? (
                 <SafeImage src={imageSrc} alt={name} fill className="object-contain object-center motion-safe:group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 600px" priority={currentIndex === 0} />
@@ -40,6 +41,7 @@ function CarouselD({ products, currentIndex, dir, onPrev, onNext, productName }:
           </div>
         </motion.div>
       </AnimatePresence>
+      </div>
 
       {/* Mobile overlay nav arrows on the image */}
       {products.length > 1 && (
@@ -60,9 +62,9 @@ function CarouselD({ products, currentIndex, dir, onPrev, onNext, productName }:
 
 function ProductSpecTagsD({ product, specKeyLocalized }: { product: IProduct; specKeyLocalized: (key: IProduct['specs'][number]['key']) => string }) {
   return (
-    <AnimatePresence mode="popLayout">
+    <AnimatePresence mode="popLayout" initial={false}>
       {product.specs.slice(0, 6).map((spec, i) => (
-        <motion.span key={`${product.id}-${i}`} initial={{ opacity: 0, scale: 0.85, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: -8 }} transition={{ duration: 0.18, delay: i * 0.03, ease: 'easeOut' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-background/50 backdrop-blur-sm border-border/50">
+        <motion.span key={`${product.id}-${i}`} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.15, delay: i * 0.02, ease: 'easeOut' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-background/50 backdrop-blur-sm border-border/50">
           <span className="text-muted-foreground/60 text-[11px]">{specKeyLocalized(spec.key)}:</span>
           <span className="font-semibold">{spec.value}</span>
         </motion.span>
@@ -227,38 +229,44 @@ export function HeroSection(): React.ReactElement {
               {/* Top: title + description + specs */}
               <div className="space-y-4">
                 {/* Product title */}
-                <AnimatePresence mode="wait">
+                <div className="overflow-hidden">
+                <AnimatePresence mode="wait" initial={false}>
                   <motion.h1
                     key={currentProduct.id + '-title'}
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
                     className="text-xl sm:text-2xl lg:text-[34px] xl:text-[42px] font-bold tracking-tight leading-tight text-hero-shimmer line-clamp-2"
                   >
                     {localized(currentProduct.name)}
                   </motion.h1>
                 </AnimatePresence>
+                </div>
 
                 {/* Description + Spec tags */}
                 <div className="space-y-4">
-                  <AnimatePresence mode="wait">
+                  <div className="overflow-hidden">
+                  <AnimatePresence mode="wait" initial={false}>
                     <motion.p
                       key={currentProduct.id + '-desc'}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.5, ease: 'easeOut' }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
                       className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed line-clamp-3"
                     >
                       {localized(currentProduct.description) || t('hero.subtitle')}
                     </motion.p>
                   </AnimatePresence>
+                  </div>
 
                   {/* Spec tags */}
+                  <div className="overflow-hidden">
                   <motion.div className="flex flex-wrap items-center gap-2 min-h-10 content-start" layout>
                     <ProductSpecTagsD product={currentProduct} specKeyLocalized={localized} />
                   </motion.div>
+                  </div>
                 </div>
               </div>
 
