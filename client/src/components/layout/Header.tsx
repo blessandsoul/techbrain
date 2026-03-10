@@ -42,7 +42,7 @@ export function Header(): React.ReactElement {
               className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 rounded-lg"
               aria-label={`TechBrain — ${t('nav.home')}`}
             >
-              <Logo height={48} />
+              <Logo className="h-9" />
             </Link>
 
             {/* Nav */}

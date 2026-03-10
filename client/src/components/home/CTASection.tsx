@@ -39,7 +39,7 @@ export function CTASection(): React.ReactElement {
             aria-label={`WhatsApp — ${phone}`}
           >
             <Phone size={28} weight="fill" aria-hidden="true" />
-            <span className="tabular-nums tracking-tight">{formatPhone(phone)}</span>
+            <span className="tabular-nums tracking-wide">{formatPhone(phone)}</span>
           </a>
         )}
 

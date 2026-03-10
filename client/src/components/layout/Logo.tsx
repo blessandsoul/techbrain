@@ -1,27 +1,21 @@
 import Image from 'next/image';
 
-// Original PNG dimensions: 478 × 128 px
-const LOGO_ASPECT = 478 / 128; // ≈ 3.734
-
 interface LogoProps {
-  height?: number; // logo height in px, default 36
+  className?: string;
 }
 
-export function Logo({ height = 36 }: LogoProps): React.ReactElement {
-  const width = Math.round(height * LOGO_ASPECT);
-
+export function Logo({ className = 'h-9' }: LogoProps): React.ReactElement {
   return (
     <div
-      className="shrink-0 select-none"
+      className={`shrink-0 select-none ${className}`}
       aria-label="TechBrain"
-      style={{ width, height }}
     >
       <Image
         src="/logo-full.png"
         alt="TechBrain"
-        width={width}
-        height={height}
-        className="object-contain w-full h-full"
+        width={478}
+        height={128}
+        className="object-contain w-auto h-full"
         priority
       />
     </div>
