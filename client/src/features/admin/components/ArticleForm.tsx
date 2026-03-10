@@ -24,6 +24,7 @@ import { articleService } from '../services/article.service';
 
 import { getArticleImageUrl } from '@/features/blog/hooks/useBlog';
 import { getErrorMessage } from '@/lib/utils/error';
+import { stripServerBaseUrl, resolveContentImageUrls } from '@/lib/utils/format';
 import { ROUTES } from '@/lib/constants/routes';
 
 import type { IArticle, ArticleCategory } from '@/features/articles/types/article.types';
@@ -107,9 +108,11 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
   const isSubmitting = submitting || updateMutation.isPending;
 
   const initialContent = article?.content
-    ? isHtmlContent(article.content)
-      ? article.content
-      : markdownToBasicHtml(article.content)
+    ? resolveContentImageUrls(
+        isHtmlContent(article.content)
+          ? article.content
+          : markdownToBasicHtml(article.content)
+      )
     : '';
 
   function handleCoverSelect(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -144,7 +147,7 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
     const title = (formData.get('title') as string) || '';
     const excerpt = (formData.get('excerpt') as string) || '';
     const readMin = Number(formData.get('readMin')) || 5;
-    const content = bodyHtml || initialContent;
+    const content = stripServerBaseUrl(bodyHtml || initialContent);
 
     // Client-side validation
     const newErrors: FormErrors = {};
@@ -201,7 +204,7 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
           let updatedContent = content;
           for (const [blobUrl, file] of pendingImagesRef.current) {
             const result = await articleService.uploadContentImage(created.id, file);
-            updatedContent = updatedContent.replaceAll(blobUrl, getArticleImageUrl(result.url));
+            updatedContent = updatedContent.replaceAll(blobUrl, result.url);
           }
           await articleService.updateArticle(created.id, { content: updatedContent });
           pendingImagesRef.current.clear();

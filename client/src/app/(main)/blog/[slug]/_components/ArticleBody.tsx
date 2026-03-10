@@ -2,6 +2,7 @@
 
 import DOMPurify from 'isomorphic-dompurify';
 import ReactMarkdown from 'react-markdown';
+import { resolveContentImageUrls } from '@/lib/utils/format';
 
 /** DOMPurify config — allows alignment attributes, styles, and YouTube iframes from the editor */
 const PURIFY_CONFIG = {
@@ -25,7 +26,8 @@ interface ArticleBodyProps {
 }
 
 export function ArticleBody({ content }: ArticleBodyProps): React.ReactElement {
-  const sanitizedContent = isHtmlContent(content) ? sanitizeHtml(content) : null;
+  const resolvedContent = resolveContentImageUrls(content);
+  const sanitizedContent = isHtmlContent(resolvedContent) ? sanitizeHtml(resolvedContent) : null;
 
   return (
     <div className="article-content max-w-[680px] mx-auto">
@@ -55,7 +57,7 @@ export function ArticleBody({ content }: ArticleBodyProps): React.ReactElement {
               ),
             }}
           >
-            {content}
+            {resolvedContent}
           </ReactMarkdown>
         )}
       </div>

@@ -3,6 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { blogService } from '../services/blog.service';
 
+import { getServerBaseUrl } from '@/lib/utils/format';
+
 import type { Article, ArticleFilters } from '../types/article.types';
 import type { PaginationParams } from '@/lib/api/api.types';
 
@@ -50,8 +52,5 @@ export function useArticle(slug: string): ReturnType<typeof useQuery<Article>> {
 
 export function getArticleImageUrl(relativePath: string): string {
   if (relativePath.startsWith('http')) return relativePath;
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', '') ??
-    'http://localhost:8000';
-  return `${base}${relativePath}`;
+  return `${getServerBaseUrl()}${relativePath}`;
 }

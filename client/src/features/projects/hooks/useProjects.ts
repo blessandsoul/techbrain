@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { getErrorMessage } from '@/lib/utils/error';
+import { getServerBaseUrl } from '@/lib/utils/format';
 import { projectsService } from '../services/projects.service';
 
 import type { IProject, AdminProjectFilters, CreateProjectRequest, UpdateProjectRequest } from '../types/projects.types';
@@ -144,8 +145,5 @@ export function useUploadProjectContentImage() {
 
 export function getProjectImageUrl(relativePath: string): string {
   if (relativePath.startsWith('http')) return relativePath;
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', '') ??
-    'http://localhost:8000';
-  return `${base}${relativePath}`;
+  return `${getServerBaseUrl()}${relativePath}`;
 }

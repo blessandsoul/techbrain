@@ -1,6 +1,7 @@
 'use client';
 
 import DOMPurify from 'isomorphic-dompurify';
+import { resolveContentImageUrls } from '@/lib/utils/format';
 
 const PURIFY_CONFIG = {
   ADD_TAGS: ['iframe'],
@@ -21,8 +22,9 @@ interface ProjectBodyProps {
 export function ProjectBody({ content }: ProjectBodyProps): React.ReactElement | null {
   if (!content.trim()) return null;
 
-  // Content is sanitized via DOMPurify before rendering to prevent XSS
-  const sanitizedContent = sanitizeHtml(content);
+  // Resolve relative image paths to absolute URLs, then sanitize
+  const resolvedContent = resolveContentImageUrls(content);
+  const sanitizedContent = sanitizeHtml(resolvedContent);
 
   return (
     <div className="article-content max-w-[680px] mx-auto">

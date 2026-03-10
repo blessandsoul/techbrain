@@ -36,6 +36,38 @@ export const truncate = (str: string, length: number): string => {
   return str.length > length ? `${str.substring(0, length)}...` : str;
 };
 
+/** Returns the server origin (e.g. "https://api.example.com") derived from NEXT_PUBLIC_API_BASE_URL */
+export function getServerBaseUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', '') ??
+    'http://localhost:8000'
+  );
+}
+
+/** Strip the server base URL from absolute image paths so only relative paths are stored */
+export function stripServerBaseUrl(html: string): string {
+  const base = getServerBaseUrl();
+  let result = html;
+  // Always strip localhost URLs that may have been baked in during dev
+  if (base !== 'http://localhost:8000') {
+    result = result.replaceAll(base, '');
+  }
+  result = result.replaceAll('http://localhost:8000', '');
+  return result;
+}
+
+/** Resolve relative /uploads/ paths in HTML to absolute URLs for rendering */
+export function resolveContentImageUrls(html: string): string {
+  const base = getServerBaseUrl();
+  let result = html;
+  // Replace any baked-in localhost URLs with the correct base
+  if (base !== 'http://localhost:8000') {
+    result = result.replaceAll('http://localhost:8000/uploads/', `${base}/uploads/`);
+  }
+  // Match src="/uploads/..." that aren't already absolute
+  return result.replace(/src="(\/uploads\/[^"]+)"/g, `src="${base}$1"`);
+}
+
 export const stripHtml = (html: string): string => {
   return html.replace(/<[^>]*>/g, '').trim();
 };

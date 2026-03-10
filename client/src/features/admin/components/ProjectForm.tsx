@@ -23,6 +23,7 @@ import {
 import { useUpdateProject, projectKeys, getProjectImageUrl } from '@/features/projects/hooks/useProjects';
 import { projectsService } from '@/features/projects/services/projects.service';
 import { getErrorMessage } from '@/lib/utils/error';
+import { stripServerBaseUrl, resolveContentImageUrls } from '@/lib/utils/format';
 import { ROUTES } from '@/lib/constants/routes';
 
 import type { IProject } from '@/features/projects/types/projects.types';
@@ -89,7 +90,7 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
   const labelClass = 'text-xs text-muted-foreground';
   const isPending = submitting || updateMutation.isPending;
 
-  const initialContent = project?.content ?? '';
+  const initialContent = resolveContentImageUrls(project?.content ?? '');
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>): void {
     const file = e.target.files?.[0];
@@ -164,7 +165,7 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
 
     setErrors({});
 
-    const content = bodyHtml || initialContent;
+    const content = stripServerBaseUrl(bodyHtml || initialContent);
 
     const payload = {
       title: {
@@ -224,7 +225,7 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
           let updatedContent = content;
           for (const [blobUrl, file] of pendingImagesRef.current) {
             const uploadResult = await projectsService.uploadContentImage(created.id, file);
-            updatedContent = updatedContent.replaceAll(blobUrl, getProjectImageUrl(uploadResult.url));
+            updatedContent = updatedContent.replaceAll(blobUrl, uploadResult.url);
           }
           await projectsService.updateProject(created.id, { content: updatedContent });
           pendingImagesRef.current.clear();
