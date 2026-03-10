@@ -59,6 +59,7 @@ async function main(): Promise<void> {
 
   const projectsData = [
     {
+      slug: 'shopping-center-gallery',
       titleKa: 'სავაჭრო ცენტრი "გალერეა"',
       titleRu: 'ТЦ "Галерея"',
       titleEn: 'Shopping Center "Gallery"',
@@ -72,6 +73,7 @@ async function main(): Promise<void> {
       sortOrder: 0,
     },
     {
+      slug: 'residential-complex-new-city',
       titleKa: 'საცხოვრებელი კომპლექსი "ნიუ სითი"',
       titleRu: 'ЖК "Нью Сити"',
       titleEn: 'Residential Complex "New City"',
@@ -85,6 +87,7 @@ async function main(): Promise<void> {
       sortOrder: 1,
     },
     {
+      slug: 'office-center-city-tower',
       titleKa: 'ოფისური ცენტრი "სითი ტაუერი"',
       titleRu: 'Офисный центр "Сити Тауэр"',
       titleEn: 'Office Center "City Tower"',
@@ -98,11 +101,12 @@ async function main(): Promise<void> {
       sortOrder: 2,
     },
     {
+      slug: 'supermarket-chain-smart',
       titleKa: 'სუპერმარკეტების ქსელი "სმარტი"',
       titleRu: 'Сеть супермаркетов "Смарт"',
       titleEn: 'Supermarket Chain "Smart"',
       locationKa: 'მთელი საქართველო',
-      locationRu: 'Вся Грузия',
+      locationRu: 'Вся Грузია',
       locationEn: 'Across Georgia',
       type: 'retail',
       cameras: 120,
