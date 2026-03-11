@@ -192,9 +192,12 @@ export default function CartPage(): React.ReactElement {
                 type="text"
                 required
                 minLength={2}
-                maxLength={100}
+                maxLength={20}
                 value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^a-zA-Z\u10A0-\u10FF\u0400-\u04FF\s]/g, '');
+                  setForm((f) => ({ ...f, name: value }));
+                }}
                 placeholder="თქვენი სახელი"
                 className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
               />
@@ -207,11 +210,16 @@ export default function CartPage(): React.ReactElement {
               <input
                 id="order-phone"
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
                 minLength={1}
                 maxLength={30}
                 value={form.phone}
-                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setForm((f) => ({ ...f, phone: value }));
+                }}
                 placeholder="5XX XXX XXX"
                 className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
               />
