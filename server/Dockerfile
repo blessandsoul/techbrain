@@ -92,6 +92,11 @@ if [ -d /app/uploads.default ] && [ ! -f /app/uploads/.seeded ]; then
   echo "Done."
 fi
 
+# Apply pending database migrations
+echo "Running Prisma migrations..."
+npx prisma migrate deploy
+echo "Migrations applied."
+
 exec node dist/server.js
 EOF
 RUN chmod +x /app/entrypoint.sh
