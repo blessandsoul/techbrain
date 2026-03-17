@@ -5,7 +5,7 @@
 // Also remove <SiteGate> from src/app/(main)/layout.tsx
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useMutation } from '@tanstack/react-query';
 
@@ -22,11 +22,32 @@ import type { ILoginRequest } from '@/features/auth/types/auth.types';
 
 export function SiteGate({ children }: { children: React.ReactNode }): React.ReactElement {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isInitializing } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const [isChecking, setIsChecking] = useState(true);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // On mount, try to rehydrate auth from existing cookies
+  useEffect(() => {
+    if (isAuthenticated) {
+      setIsChecking(false);
+      return;
+    }
+
+    authService
+      .getMe()
+      .then((user) => {
+        dispatch(setUser(user));
+      })
+      .catch(() => {
+        // No valid session — will show login form
+      })
+      .finally(() => {
+        setIsChecking(false);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loginMutation = useMutation({
     mutationFn: (data: ILoginRequest) => authService.login(data),
@@ -44,8 +65,8 @@ export function SiteGate({ children }: { children: React.ReactNode }): React.Rea
     loginMutation.mutate({ email, password });
   }
 
-  // Show spinner while auth is initializing
-  if (isInitializing) {
+  // Show spinner while checking existing session
+  if (isChecking) {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-muted/50">
         <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
