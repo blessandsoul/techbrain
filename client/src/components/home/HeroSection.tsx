@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Phone, SecurityCamera, CaretLeft, CaretRight, Wrench, ShieldCheck, Truck } from '@phosphor-icons/react';
-import { formatPhone, stripHtml } from '@/lib/utils/format';
+import { formatPhone, stripHtml, getWhatsAppUrl } from '@/lib/utils/format';
 import { CategoryNavBar } from '@/components/common/CategoryNavBar';
 import { SafeImage } from '@/components/common/SafeImage';
 import { useFeaturedProducts, useCategoryCounts, getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
@@ -289,7 +289,7 @@ export function HeroSection(): React.ReactElement {
                   <Link href={`/catalog/${currentProduct.slug}`} className="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 lg:px-5 lg:py-3 xl:px-8 xl:py-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm sm:text-base lg:text-sm xl:text-base motion-safe:transition-all duration-200 motion-safe:hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
                     {t('hero.cta')}<ArrowRight size={18} weight="bold" />
                   </Link>
-                  <a href={`https://wa.me/995${phone}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 lg:px-5 lg:py-3 xl:px-8 xl:py-4 rounded-xl border-2 border-border hover:border-primary/40 bg-background/50 backdrop-blur-sm font-bold text-sm sm:text-base lg:text-sm xl:text-base motion-safe:transition-all duration-200 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30">
+                  <a href={getWhatsAppUrl(phone)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-8 sm:py-4 lg:px-5 lg:py-3 xl:px-8 xl:py-4 rounded-xl border-2 border-border hover:border-primary/40 bg-background/50 backdrop-blur-sm font-bold text-sm sm:text-base lg:text-sm xl:text-base motion-safe:transition-all duration-200 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30">
                     <Phone size={18} weight="fill" /><span className="font-noto">{formatPhone(phone)}</span>
                   </a>
                 </div>

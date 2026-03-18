@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { List, X } from '@phosphor-icons/react';
-import { formatPhone } from '@/lib/utils/format';
+import { formatPhone, getWhatsAppUrl } from '@/lib/utils/format';
 
 interface MobileMenuProps {
   links: { href: string; label: string }[];
@@ -97,7 +97,7 @@ export function MobileMenu({ links, phone }: MobileMenuProps): React.ReactElemen
             {/* WhatsApp — visible only when header chip is hidden (<560px) */}
             <div className="mt-auto px-4 pb-6 min-[560px]:hidden">
               <a
-                href={`https://wa.me/995${phone}`}
+                href={getWhatsAppUrl(phone)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-4 py-3 rounded-lg bg-online/10 transition-colors hover:bg-online/15"

@@ -1,6 +1,6 @@
 'use client';
 
-import { formatPhone } from '@/lib/utils/format';
+import { formatPhone, getWhatsAppUrl } from '@/lib/utils/format';
 import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
 import { useLocale } from '@/lib/i18n';
 
@@ -66,7 +66,7 @@ export const Footer = (): React.ReactElement => {
 
           {phone ? (
             <a
-              href={`https://wa.me/995${phone}`}
+              href={getWhatsAppUrl(phone)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-primary hover:text-primary-hover transition-colors duration-200 cursor-pointer group"

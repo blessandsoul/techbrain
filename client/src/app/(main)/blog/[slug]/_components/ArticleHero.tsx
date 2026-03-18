@@ -22,46 +22,43 @@ export function ArticleHero({ article }: ArticleHeroProps): React.ReactElement {
 
   return (
     <div className="mb-10 md:mb-14">
-      {/* Header — centered, text-first like Vercel/Medium */}
-      <header className="text-center max-w-3xl mx-auto pt-4 md:pt-8 mb-8 md:mb-12">
-        {/* Category as breadcrumb */}
-        <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-4 md:mb-6">
-          {t('blog.back')} / {article.category}
-        </p>
+      {/* Category as breadcrumb */}
+      <p className="text-center text-xs font-medium uppercase tracking-widest text-muted-foreground pt-4 md:pt-8 mb-4 md:mb-6">
+        {t('blog.back')} / {article.category}
+      </p>
 
-        {/* Dominant title */}
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[1.15] tracking-tight text-balance mb-5 md:mb-6">
-          {article.title}
-        </h1>
+      {/* Title — UPPERCASE */}
+      <h1 className="text-center text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[1.15] tracking-tight text-balance uppercase max-w-3xl mx-auto mb-6 md:mb-8">
+        {article.title}
+      </h1>
 
-        {/* Excerpt as subtitle */}
-        {article.excerpt && (
-          <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-6 md:mb-8">
-            {article.excerpt}
-          </p>
-        )}
-
-        {/* Metadata row */}
-        <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
-          <span>{dateFormatted}</span>
-          <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
-          <div className="flex items-center gap-1.5">
-            <Clock size={14} weight="regular" />
-            <span>{article.readMin} {t('blog.min')}</span>
-          </div>
+      {/* Metadata row */}
+      <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground mb-8 md:mb-10">
+        <span>{dateFormatted}</span>
+        <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
+        <div className="flex items-center gap-1.5">
+          <Clock size={14} weight="regular" />
+          <span>{article.readMin} {t('blog.min')}</span>
         </div>
-      </header>
+      </div>
 
-      {/* Cover Image — full container width, rounded on desktop */}
+      {/* Cover Image — 1:1 (800x800) */}
       {article.coverImage && (
-        <div className="relative w-full aspect-[2/1] md:aspect-[21/9] rounded-xl md:rounded-2xl overflow-hidden bg-muted">
+        <div className="relative w-full max-w-[600px] mx-auto aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-muted mb-8 md:mb-10">
           <BlogCoverImage
             src={getArticleImageUrl(article.coverImage)}
             alt={article.title}
             priority
-            sizes="(max-width: 768px) 100vw, 1024px"
+            sizes="(max-width: 768px) 100vw, 600px"
           />
         </div>
+      )}
+
+      {/* Description / Excerpt — after cover */}
+      {article.excerpt && (
+        <p className="text-center text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+          {article.excerpt}
+        </p>
       )}
     </div>
   );

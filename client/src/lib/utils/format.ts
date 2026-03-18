@@ -79,3 +79,10 @@ export const formatPhone = (phone: string): string => {
   }
   return phone;
 };
+
+/** Build a full WhatsApp URL from any phone format (with or without country code). */
+export const getWhatsAppUrl = (phone: string): string => {
+  const digits = phone.replace(/\D/g, '');
+  const full = digits.startsWith('995') ? digits : `995${digits}`;
+  return `https://wa.me/${full}`;
+};

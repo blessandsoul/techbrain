@@ -29,57 +29,54 @@ export function ProjectHero({ project }: ProjectHeroProps): React.ReactElement {
 
   return (
     <div className="mb-10 md:mb-14">
-      {/* Header — centered */}
-      <header className="text-center max-w-3xl mx-auto pt-4 md:pt-8 mb-8 md:mb-12">
-        {/* Type breadcrumb */}
-        <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
-          <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-            <Icon size={13} weight="duotone" aria-hidden="true" />
-            {typeLabel}
-          </span>
+      {/* Type breadcrumb */}
+      <div className="flex items-center justify-center gap-2 pt-4 md:pt-8 mb-4 md:mb-6">
+        <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <Icon size={13} weight="duotone" aria-hidden="true" />
+          {typeLabel}
+        </span>
+      </div>
+
+      {/* Title — UPPERCASE */}
+      <h1 className="text-center text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[1.15] tracking-tight text-balance uppercase max-w-3xl mx-auto mb-6 md:mb-8">
+        {title}
+      </h1>
+
+      {/* Metadata row */}
+      <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground flex-wrap mb-8 md:mb-10">
+        <div className="flex items-center gap-1.5">
+          <MapPin size={14} weight="fill" />
+          <span>{location}</span>
         </div>
-
-        {/* Title */}
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[1.15] tracking-tight text-balance mb-5 md:mb-6">
-          {title}
-        </h1>
-
-        {/* Excerpt */}
-        {excerpt && (
-          <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-6 md:mb-8">
-            {excerpt}
-          </p>
-        )}
-
-        {/* Metadata row */}
-        <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <MapPin size={14} weight="fill" />
-            <span>{location}</span>
-          </div>
-          <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
-          <div className="flex items-center gap-1.5">
-            <CalendarBlank size={14} weight="regular" />
-            <span className="tabular-nums">{project.year}</span>
-          </div>
-          <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
-          <div className="flex items-center gap-1.5">
-            <SecurityCamera size={14} weight="duotone" />
-            <span className="tabular-nums">{project.cameras} {t('projects.installedCameras')}</span>
-          </div>
+        <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
+        <div className="flex items-center gap-1.5">
+          <CalendarBlank size={14} weight="regular" />
+          <span className="tabular-nums">{project.year}</span>
         </div>
-      </header>
+        <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
+        <div className="flex items-center gap-1.5">
+          <SecurityCamera size={14} weight="duotone" />
+          <span className="tabular-nums">{project.cameras} {t('projects.installedCameras')}</span>
+        </div>
+      </div>
 
-      {/* Cover Image */}
+      {/* Cover Image — 1:1 (800x800) */}
       {project.image && (
-        <div className="relative w-full aspect-[2/1] md:aspect-[21/9] rounded-xl md:rounded-2xl overflow-hidden bg-muted">
+        <div className="relative w-full max-w-[600px] mx-auto aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-muted mb-8 md:mb-10">
           <SafeImage
             src={getProjectImageUrl(project.image)}
             alt={title}
             priority
-            sizes="(max-width: 768px) 100vw, 1024px"
+            sizes="(max-width: 768px) 100vw, 600px"
           />
         </div>
+      )}
+
+      {/* Description / Excerpt — after cover */}
+      {excerpt && (
+        <p className="text-center text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+          {excerpt}
+        </p>
       )}
     </div>
   );

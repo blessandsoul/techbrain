@@ -8,7 +8,7 @@ import { CartIcon } from '@/components/common/CartIcon';
 import { HeaderScrollWrapper } from './HeaderScrollWrapper';
 import { Logo } from './Logo';
 import { MobileMenu } from './MobileMenu';
-import { formatPhone } from '@/lib/utils/format';
+import { formatPhone, getWhatsAppUrl } from '@/lib/utils/format';
 import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
 import { useLocale } from '@/lib/i18n';
 
@@ -63,7 +63,7 @@ export function Header(): React.ReactElement {
 
               {/* Desktop only — premium signal chip */}
               <a
-                href={`https://wa.me/995${phone}`}
+                href={getWhatsAppUrl(phone)}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`WhatsApp ${phone}`}

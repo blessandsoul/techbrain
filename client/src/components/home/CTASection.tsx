@@ -1,7 +1,7 @@
 'use client';
 
 import { Phone } from '@phosphor-icons/react';
-import { formatPhone } from '@/lib/utils/format';
+import { formatPhone, getWhatsAppUrl } from '@/lib/utils/format';
 import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
 import { useLocale } from '@/lib/i18n';
 
@@ -32,7 +32,7 @@ export function CTASection(): React.ReactElement {
 
         {phone && (
           <a
-            href={`https://wa.me/995${phone}`}
+            href={getWhatsAppUrl(phone)}
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-4 px-10 py-5 rounded-xl bg-white hover:bg-white/95 text-primary font-bold text-xl transition-all duration-300 motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40 active:scale-[0.98]"

@@ -2,7 +2,7 @@
 
 import { Phone, MapPin, Clock, EnvelopeSimple } from '@phosphor-icons/react';
 
-import { formatPhone } from '@/lib/utils/format';
+import { formatPhone, getWhatsAppUrl } from '@/lib/utils/format';
 import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
 import { useLocale } from '@/lib/i18n';
 
@@ -22,7 +22,7 @@ export function ContactInfo(): React.ReactElement {
 
         {phone && (
           <a
-            href={`https://wa.me/995${phone}`}
+            href={getWhatsAppUrl(phone)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"

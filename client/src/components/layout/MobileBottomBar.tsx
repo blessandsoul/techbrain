@@ -1,7 +1,7 @@
 'use client';
 
 import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
-import { formatPhone } from '@/lib/utils/format';
+import { formatPhone, getWhatsAppUrl } from '@/lib/utils/format';
 
 export const MobileBottomBar = (): React.ReactElement | null => {
   const { contact, social } = usePublicSiteSettings();
@@ -15,7 +15,7 @@ export const MobileBottomBar = (): React.ReactElement | null => {
         {/* WhatsApp */}
         {phone && (
           <a
-            href={`https://wa.me/995${phone}`}
+            href={getWhatsAppUrl(phone)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-1 items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-br from-[#25D366] to-[#128C7E] shadow-[0_4px_20px_rgba(37,211,102,0.4)] active:scale-[0.97] transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/50 focus-visible:ring-offset-2"
