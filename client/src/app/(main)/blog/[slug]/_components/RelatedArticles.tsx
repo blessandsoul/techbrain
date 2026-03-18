@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight } from '@phosphor-icons/react/dist/ssr';
+import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { ArticleCard, ArticleCardSkeleton } from '@/components/common/ArticleCard';
 import { useArticles } from '@/features/blog/hooks/useBlog';
 import { useLocale } from '@/lib/i18n';
@@ -13,7 +13,7 @@ interface RelatedArticlesProps {
   category: string;
 }
 
-const DISPLAY_COUNT = 4;
+const DISPLAY_COUNT = 8;
 
 export function RelatedArticles({ currentSlug, category }: RelatedArticlesProps): React.ReactElement | null {
   const { t } = useLocale();

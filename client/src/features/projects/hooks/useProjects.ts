@@ -7,7 +7,7 @@ import { getErrorMessage } from '@/lib/utils/error';
 import { getServerBaseUrl } from '@/lib/utils/format';
 import { projectsService } from '../services/projects.service';
 
-import type { IProject, AdminProjectFilters, CreateProjectRequest, UpdateProjectRequest } from '../types/projects.types';
+import type { IProject, AdminProjectFilters, ProjectFilters, CreateProjectRequest, UpdateProjectRequest } from '../types/projects.types';
 
 // ── Query Key Factory ────────────────────────────────
 
@@ -25,7 +25,19 @@ export const projectKeys = {
 
 // ── Public Queries ───────────────────────────────────
 
-export function useActiveProjects(params?: { type?: string; limit?: number }): ReturnType<typeof useQuery<IProject[]>> {
+interface ProjectsData {
+  items: IProject[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
+export function useActiveProjects(params?: ProjectFilters): ReturnType<typeof useQuery<ProjectsData>> {
   return useQuery({
     queryKey: projectKeys.active(params),
     queryFn: () => projectsService.getActiveProjects(params),

@@ -32,16 +32,28 @@ function toProjectResponse(p: Project): ProjectResponse {
 // ── Repository ──────────────────────────────────────────
 
 class ProjectsRepository {
-  async findActiveOrdered(limit: number = 10, type?: string): Promise<ProjectResponse[]> {
+  async findActivePaginated(
+    page: number = 1,
+    limit: number = 10,
+    type?: string,
+  ): Promise<{ items: ProjectResponse[]; totalItems: number }> {
     const where: Prisma.ProjectWhereInput = { isActive: true };
     if (type) where.type = type;
 
-    const rows = await prisma.project.findMany({
-      where,
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-      take: limit,
-    });
-    return rows.map(toProjectResponse);
+    const [rows, totalItems] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.project.count({ where }),
+    ]);
+
+    return {
+      items: rows.map(toProjectResponse),
+      totalItems,
+    };
   }
 
   async findAllPaginated(

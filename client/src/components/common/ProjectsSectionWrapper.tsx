@@ -19,10 +19,10 @@ interface ProjectForSection {
 }
 
 export function ProjectsSectionWrapper(): React.ReactElement {
-  const { data: projects } = useActiveProjects();
+  const { data } = useActiveProjects({ limit: 4 });
   const { localized } = useLocale();
 
-  const mapped = projects?.slice(0, 4).map((p: IProject): ProjectForSection => ({
+  const mapped = data?.items?.slice(0, 4).map((p: IProject): ProjectForSection => ({
     id: p.id,
     slug: p.slug,
     title: localized(p.title),

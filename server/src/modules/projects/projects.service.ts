@@ -20,8 +20,12 @@ import type {
 class ProjectsService {
   // ── Public Read ───────────────────────────────────
 
-  async getActiveProjects(limit: number = 10, type?: string): Promise<ProjectResponse[]> {
-    return projectsRepository.findActiveOrdered(limit, type);
+  async getActiveProjects(
+    page: number = 1,
+    limit: number = 10,
+    type?: string,
+  ): Promise<{ items: ProjectResponse[]; totalItems: number }> {
+    return projectsRepository.findActivePaginated(page, limit, type);
   }
 
   async getProject(id: string): Promise<ProjectResponse> {

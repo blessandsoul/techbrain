@@ -22,9 +22,15 @@ class ProjectsController {
   // ── Public Endpoints ──────────────────────────────
 
   async getActiveProjects(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { limit, type } = PublicProjectsQuerySchema.parse(request.query);
-    const projects = await projectsService.getActiveProjects(limit, type);
-    return reply.send(successResponse('Active projects retrieved successfully', projects));
+    const { page, limit, type } = PublicProjectsQuerySchema.parse(request.query);
+    const result = await projectsService.getActiveProjects(page, limit, type);
+    return reply.send(paginatedResponse(
+      'Active projects retrieved successfully',
+      result.items,
+      page,
+      limit,
+      result.totalItems,
+    ));
   }
 
   async getProjectBySlug(request: FastifyRequest, reply: FastifyReply): Promise<void> {

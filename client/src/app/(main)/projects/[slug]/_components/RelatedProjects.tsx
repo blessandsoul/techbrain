@@ -2,7 +2,7 @@
 
 import { useRef, useCallback, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, MapPin, SecurityCamera, Buildings, House, Storefront } from '@phosphor-icons/react/dist/ssr';
+import { ArrowLeft, ArrowRight, MapPin, SecurityCamera, Buildings, House, Storefront } from '@phosphor-icons/react';
 import { SafeImage } from '@/components/common/SafeImage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useActiveProjects, getProjectImageUrl } from '@/features/projects/hooks/useProjects';
@@ -22,7 +22,7 @@ interface RelatedProjectsProps {
   type: string;
 }
 
-const DISPLAY_COUNT = 4;
+const DISPLAY_COUNT = 8;
 
 export function RelatedProjects({ currentSlug, type }: RelatedProjectsProps): React.ReactElement | null {
   const { t, localized } = useLocale();
@@ -41,7 +41,7 @@ export function RelatedProjects({ currentSlug, type }: RelatedProjectsProps): Re
     limit: DISPLAY_COUNT + 1,
   });
 
-  const projects = buildProjectList(sameTypeData, recentData, currentSlug);
+  const projects = buildProjectList(sameTypeData?.items, recentData?.items, currentSlug);
   const isLoading = loadingSame || loadingRecent;
 
   const updateScrollButtons = useCallback((): void => {

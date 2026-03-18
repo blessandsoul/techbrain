@@ -2,13 +2,31 @@ import { apiClient } from '@/lib/api/axios.config';
 import { API_ENDPOINTS } from '@/lib/constants/api-endpoints';
 
 import type { ApiResponse, PaginatedApiResponse } from '@/lib/api/api.types';
-import type { IProject, CreateProjectRequest, UpdateProjectRequest, AdminProjectFilters } from '../types/projects.types';
+import type { IProject, CreateProjectRequest, UpdateProjectRequest, AdminProjectFilters, ProjectFilters } from '../types/projects.types';
+
+interface ProjectsResult {
+  items: IProject[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
 
 class ProjectsService {
-  async getActiveProjects(params?: { type?: string; limit?: number }): Promise<IProject[]> {
-    const { data } = await apiClient.get<ApiResponse<IProject[]>>(
+  async getActiveProjects(params?: ProjectFilters): Promise<ProjectsResult> {
+    const query: Record<string, string | number> = {
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 10,
+    };
+    if (params?.type) query.type = params.type;
+
+    const { data } = await apiClient.get<PaginatedApiResponse<IProject>>(
       API_ENDPOINTS.PROJECTS.ACTIVE,
-      { params },
+      { params: query },
     );
     return data.data;
   }

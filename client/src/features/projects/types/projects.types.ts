@@ -41,6 +41,12 @@ export type UpdateProjectRequest = Partial<Omit<CreateProjectRequest, 'image'>> 
   image?: string | null;
 };
 
+export interface ProjectFilters {
+  page?: number;
+  limit?: number;
+  type?: string;
+}
+
 export interface AdminProjectFilters {
   page?: number;
   limit?: number;
