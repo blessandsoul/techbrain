@@ -88,7 +88,7 @@ export function ProjectsSection({ projects, stats, labels }: ProjectsSectionProp
           </div>
 
           {/* Stats + "View all" — desktop */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             <div className="text-right">
               <div className="text-3xl font-black text-foreground tabular-nums">{cameraStat.num}<span className="text-primary">{cameraStat.suffix}</span></div>
               <div className="text-xs text-muted-foreground uppercase tracking-widest">{l.camera}</div>
@@ -115,7 +115,7 @@ export function ProjectsSection({ projects, stats, labels }: ProjectsSectionProp
         </div>
 
         {/* Stats — mobile */}
-        <div className="grid grid-cols-3 gap-3 mb-6 md:hidden">
+        <div className="grid grid-cols-3 gap-3 mb-6 lg:hidden">
           <div className="text-center p-3 rounded-xl bg-card border border-border/50">
             <div className="text-xl font-black text-foreground tabular-nums">{cameraStat.num}<span className="text-primary text-sm">{cameraStat.suffix}</span></div>
             <div className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">{l.camera}</div>
@@ -202,7 +202,7 @@ export function ProjectsSection({ projects, stats, labels }: ProjectsSectionProp
         </div>
 
         {/* Mobile — see all */}
-        <div className="mt-8 flex justify-center md:hidden">
+        <div className="mt-8 flex justify-center lg:hidden">
           <Link
             href="/projects"
             className="flex items-center gap-2 px-6 py-3 rounded-xl border border-primary/30 text-primary text-sm font-semibold hover:bg-primary/5 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"

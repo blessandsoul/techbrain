@@ -153,7 +153,7 @@ function SliderCard({ product }: { product: IProduct }): React.ReactElement {
       className="group shrink-0 w-60 sm:w-65 rounded-xl border border-border/50 bg-card overflow-hidden transition-all duration-300 hover:border-border/80 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
     >
       {/* Image */}
-      <div className="relative aspect-4/3 bg-muted overflow-hidden">
+      <div className="relative aspect-4/3 bg-white overflow-hidden">
         {hasImage ? (
           <SafeImage
             src={imgSrc}

@@ -187,10 +187,6 @@ function ProductDetailContent(): React.ReactElement {
             </h1>
           </div>
 
-          {localized(product.description) && (
-            <ExpandableDescription html={DOMPurify.sanitize(localized(product.description))} />
-          )}
-
           {/* Price + CTA */}
           <div className="flex flex-col gap-4 p-6 rounded-xl bg-muted border border-border">
             {isService ? (
@@ -219,6 +215,14 @@ function ProductDetailContent(): React.ReactElement {
           {product.specs.length > 0 && <SpecsTable specs={product.specs} />}
         </div>
       </div>
+
+      {/* Description — full width below the grid */}
+      {localized(product.description) && (
+        <div className="mt-12">
+          <h2 className="font-semibold text-foreground mb-4">{t('catalog.description')}</h2>
+          <ExpandableDescription html={DOMPurify.sanitize(localized(product.description))} />
+        </div>
+      )}
 
       {/* Popular products slider */}
       {popularProducts.length > 0 && (

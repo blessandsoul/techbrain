@@ -38,7 +38,7 @@ export function ProductCard({ product }: ProductCardProps): React.ReactElement {
       {/* Image */}
       <Link
         href={`/catalog/${product.slug}`}
-        className="block relative aspect-4/3 overflow-hidden bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        className="block relative aspect-4/3 overflow-hidden bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         aria-label={name}
       >
         {hasImage ? (

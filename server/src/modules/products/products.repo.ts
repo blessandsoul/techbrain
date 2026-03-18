@@ -657,7 +657,22 @@ class ProductsRepository {
       keyMap.get(mapKey)!.values.push(group.value);
     }
 
-    return Array.from(keyMap.values());
+    // Natural sort: order values by leading number, then alphabetically
+    const naturalCompare = (a: string, b: string): number => {
+      const numA = parseFloat(a);
+      const numB = parseFloat(b);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      if (!isNaN(numA)) return -1;
+      if (!isNaN(numB)) return 1;
+      return a.localeCompare(b);
+    };
+
+    const results = Array.from(keyMap.values());
+    for (const entry of results) {
+      entry.values.sort(naturalCompare);
+    }
+
+    return results;
   }
 
   // ── Catalog Config ────────────────────────────────

@@ -7,7 +7,7 @@
 
   "hero.title": "Cameras & Security Systems",
   "hero.subtitle": "Professional monitoring for your home and business",
-  "hero.cta": "View Catalog",
+  "hero.cta": "View Products",
   "hero.install": "Installation",
   "hero.installDesc": "Professional camera installation",
   "hero.guarantee": "Warranty",
@@ -126,6 +126,7 @@
   "catalog.boughtTogether": "Bought Together",
   "catalog.total": "Total ({count} product)",
   "catalog.buyAll": "Buy All",
+  "catalog.description": "Description",
   "catalog.readMore": "Read more",
   "catalog.readLess": "Read less",
   "catalog.recommended": "Recommended",

@@ -49,7 +49,6 @@ export function ProductMiniCard({ product, inStockLabel, priceOnRequestLabel, ca
   const name = product.name;
   const hasImage = product.images.length > 0;
   const isService = product.categories.includes('services');
-  const topSpecs = product.specs.slice(0, 2);
   const imageSrc = hasImage
     ? product.images[0].startsWith('http')
       ? product.images[0]
@@ -72,7 +71,7 @@ export function ProductMiniCard({ product, inStockLabel, priceOnRequestLabel, ca
       aria-label={name}
     >
       {/* Image */}
-      <div className="relative aspect-16/10 bg-muted overflow-hidden shrink-0">
+      <div className="relative aspect-16/10 bg-white overflow-hidden shrink-0">
         {imageSrc ? (
           <>
             <SafeImage
@@ -80,10 +79,6 @@ export function ProductMiniCard({ product, inStockLabel, priceOnRequestLabel, ca
               alt={name}
               className="object-contain transition-transform duration-500 motion-safe:group-hover:scale-105"
               sizes="(max-width: 639px) 33vw, 20vw"
-            />
-            <div
-              className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none"
-              aria-hidden="true"
             />
           </>
         ) : (
@@ -95,11 +90,11 @@ export function ProductMiniCard({ product, inStockLabel, priceOnRequestLabel, ca
         {/* Category badge only */}
         <div className="absolute top-2 right-2">
           <div
-            className="inline-flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-md border border-border/60 shrink-0 px-1.5 py-1 sm:px-2"
+            className="inline-flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-md border border-border/60 shrink-0 px-1.5 py-1.5 sm:px-2"
             title={categoryLabel}
           >
             <span className="text-muted-foreground shrink-0">{categoryIcon}</span>
-            <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-none max-w-22.5 truncate">
+            <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-tight max-w-22.5 truncate">
               {categoryLabel}
             </span>
           </div>
@@ -111,19 +106,6 @@ export function ProductMiniCard({ product, inStockLabel, priceOnRequestLabel, ca
         <p className="text-[12px] font-semibold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-150">
           {name}
         </p>
-
-        {topSpecs.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {topSpecs.map((spec, i) => (
-              <span
-                key={i}
-                className="inline-block px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-muted text-muted-foreground border border-border leading-none"
-              >
-                {spec.value}
-              </span>
-            ))}
-          </div>
-        )}
 
         <div className="mt-auto pt-1 flex items-end justify-between gap-2">
           {isService ? (

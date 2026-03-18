@@ -31,7 +31,7 @@ function CarouselD({ products, currentIndex, dir, onPrev, onNext, productName }:
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={product.id} initial={{ opacity: 0, x: dir > 0 ? 50 : -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir > 0 ? -50 : 50 }} transition={{ duration: 0.35, ease: 'easeOut' }}>
           <div className="relative overflow-hidden border border-border/50 bg-card group rounded-2xl lg:rounded-3xl">
-            <div className="aspect-[4/3] lg:aspect-square bg-muted relative overflow-hidden flex items-center justify-center">
+            <div className="aspect-[4/3] lg:aspect-square bg-white relative overflow-hidden flex items-center justify-center">
               {imageSrc ? (
                 <SafeImage src={imageSrc} alt={name} fill className="object-contain object-center motion-safe:group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 600px" priority={currentIndex === 0} />
               ) : (
@@ -141,7 +141,7 @@ function DotIndicators({ count, current, onDotClick }: { count: number; current:
 function HeroSkeleton(): React.ReactElement {
   return (
     <section className="hero-bg relative -mt-17 flex flex-col overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10 pt-20 pb-3 md:pt-28 lg:pt-24 lg:pb-3">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10 pt-25 pb-3 md:pt-32 lg:pt-28 lg:pb-3">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center">
           {/* Text skeleton */}
           <div className="flex flex-col gap-4 order-2 lg:order-1">
@@ -209,7 +209,7 @@ export function HeroSection(): React.ReactElement {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-background to-transparent pointer-events-none" aria-hidden="true" />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10 pt-20 pb-3 md:pt-28 lg:pt-24 lg:pb-3">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10 pt-25 pb-3 md:pt-32 lg:pt-28 lg:pb-3">
         <div
           className="flex items-center gap-4 lg:gap-6"
           onMouseEnter={() => setIsHovered(true)}
@@ -250,7 +250,7 @@ export function HeroSection(): React.ReactElement {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.3, ease: 'easeOut' }}
-                    className="text-xl sm:text-2xl lg:text-[34px] xl:text-[42px] font-bold tracking-tight leading-tight text-hero-shimmer line-clamp-2"
+                    className="text-xl sm:text-2xl lg:text-[34px] xl:text-[42px] font-bold tracking-tight leading-tight text-hero-shimmer line-clamp-2 uppercase"
                   >
                     {localized(currentProduct.name)}
                   </motion.h1>

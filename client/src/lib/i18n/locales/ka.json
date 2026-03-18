@@ -7,7 +7,7 @@
 
   "hero.title": "კამერები და უსაფრთხოების სისტემები",
   "hero.subtitle": "პროფესიონალური მონიტორინგი თქვენი სახლისა და ბიზნესისთვის",
-  "hero.cta": "კატალოგის ნახვა",
+  "hero.cta": "პროდუქტების ნახვა",
   "hero.install": "მონტაჟი",
   "hero.installDesc": "პროფესიონალური კამერების მონტაჟი",
   "hero.guarantee": "გარანტია",
@@ -126,6 +126,7 @@
   "catalog.boughtTogether": "ერთად იყიდება",
   "catalog.total": "სულ ({count} პროდუქტი)",
   "catalog.buyAll": "ყველას ყიდვა",
+  "catalog.description": "აღწერა",
   "catalog.readMore": "სრულად ნახვა",
   "catalog.readLess": "აკეცვა",
   "catalog.recommended": "რეკომენდებული",

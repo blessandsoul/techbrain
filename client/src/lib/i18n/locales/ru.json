@@ -7,7 +7,7 @@
 
   "hero.title": "Камеры и системы безопасности",
   "hero.subtitle": "Профессиональный мониторинг для вашего дома и бизнеса",
-  "hero.cta": "Смотреть каталог",
+  "hero.cta": "Смотреть продукты",
   "hero.install": "Монтаж",
   "hero.installDesc": "Профессиональный монтаж камер",
   "hero.guarantee": "Гарантия",
@@ -126,6 +126,7 @@
   "catalog.boughtTogether": "Покупают вместе",
   "catalog.total": "Итого ({count} товар)",
   "catalog.buyAll": "Купить всё",
+  "catalog.description": "Описание",
   "catalog.readMore": "Читать полностью",
   "catalog.readLess": "Свернуть",
   "catalog.recommended": "Рекомендуемые",
