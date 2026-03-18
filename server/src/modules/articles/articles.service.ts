@@ -5,6 +5,7 @@
  */
 
 import { NotFoundError, ConflictError } from '@shared/errors/errors.js';
+import { generateUniqueSlug } from '@libs/slugify.js';
 import { articlesRepository } from './articles.repo.js';
 import { fileStorageService } from '@libs/storage/file-storage.service.js';
 import { imageOptimizerService } from '@libs/storage/image-optimizer.service.js';
@@ -54,13 +55,12 @@ class ArticlesService {
   }
 
   async createArticle(input: CreateArticleInput, authorId: string): Promise<ArticleResponse> {
-    const slugExists = await articlesRepository.existsBySlug(input.slug);
-    if (slugExists) {
-      throw new ConflictError('Article with this slug already exists', 'SLUG_ALREADY_EXISTS');
-    }
+    // Auto-generate slug from title if not provided; resolve conflicts with -2, -3, etc.
+    const sourceText = input.slug || input.title;
+    const slug = await generateUniqueSlug(sourceText, (s) => articlesRepository.existsBySlug(s));
 
     return articlesRepository.create({
-      slug: input.slug,
+      slug,
       title: input.title,
       excerpt: input.excerpt,
       content: input.content,

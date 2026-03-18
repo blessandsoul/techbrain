@@ -28,7 +28,7 @@ export interface ProjectResponse {
 }
 
 export interface CreateProjectInput {
-  slug: string;
+  slug?: string;
   title: LocalizedString;
   excerpt?: { ka?: string; ru?: string; en?: string };
   location: LocalizedString;

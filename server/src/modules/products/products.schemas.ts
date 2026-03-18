@@ -67,7 +67,7 @@ const SpecInputSchema = z.object({
 // ── Create / Update Schemas ─────────────────────────────
 
 export const CreateProductSchema = z.object({
-  slug: z.string().min(1).max(300).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  slug: z.string().min(1).max(300).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens').optional(),
   categoryIds: z.array(z.string().uuid()).min(1),
   price: z.number().min(0),
   originalPrice: z.number().min(0).optional(),

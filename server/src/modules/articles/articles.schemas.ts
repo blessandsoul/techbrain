@@ -38,9 +38,9 @@ export type AdminArticlesQuery = z.infer<typeof AdminArticlesQuerySchema>;
 const ARTICLE_CATEGORIES = ['cameras', 'nvr', 'installation', 'news', 'guides'] as const;
 
 export const CreateArticleSchema = z.object({
-  slug: z.string().min(1).max(300).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+  slug: z.string().min(1).max(300).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only').optional(),
   title: z.string().min(1).max(500),
-  excerpt: z.string().min(1).max(2000),
+  excerpt: z.string().min(1),
   content: z.string().min(1),
   category: z.enum(ARTICLE_CATEGORIES),
   readMin: z.number().int().min(1).max(120).default(5),
@@ -51,7 +51,7 @@ export type CreateArticleSchemaInput = z.infer<typeof CreateArticleSchema>;
 export const UpdateArticleSchema = z.object({
   slug: z.string().min(1).max(300).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only').optional(),
   title: z.string().min(1).max(500).optional(),
-  excerpt: z.string().min(1).max(2000).optional(),
+  excerpt: z.string().min(1).optional(),
   content: z.string().min(1).optional(),
   category: z.enum(ARTICLE_CATEGORIES).optional(),
   readMin: z.number().int().min(1).max(120).optional(),

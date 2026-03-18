@@ -54,7 +54,7 @@ const LocalizedStringOptionalSchema = z.object({
 });
 
 export const CreateProjectSchema = z.object({
-  slug: z.string().min(1).max(300).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  slug: z.string().min(1).max(300).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase alphanumeric with hyphens').optional(),
   title: LocalizedStringSchema,
   excerpt: LocalizedStringOptionalSchema.default({ ka: '', ru: '', en: '' }),
   location: LocalizedStringSchema,

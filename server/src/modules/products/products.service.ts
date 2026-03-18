@@ -5,6 +5,7 @@
  */
 
 import { NotFoundError, ConflictError } from '@shared/errors/errors.js';
+import { generateUniqueSlug } from '@libs/slugify.js';
 import { imageOptimizerService } from '@libs/storage/image-optimizer.service.js';
 import { fileStorageService } from '@libs/storage/file-storage.service.js';
 import { logger } from '@libs/logger.js';
@@ -142,13 +143,12 @@ class ProductsService {
   // ── Admin CRUD ────────────────────────────────────
 
   async createProduct(input: CreateProductInput): Promise<ProductResponse> {
-    const slugExists = await productsRepository.existsBySlug(input.slug);
-    if (slugExists) {
-      throw new ConflictError('Product with this slug already exists', 'PRODUCT_SLUG_EXISTS');
-    }
+    // Auto-generate slug from name if not provided; resolve conflicts with -2, -3, etc.
+    const sourceText = input.slug || input.name.en || input.name.ka;
+    const slug = await generateUniqueSlug(sourceText, (s) => productsRepository.existsBySlug(s));
 
     return productsRepository.create({
-      slug: input.slug,
+      slug,
       categoryIds: input.categoryIds,
       price: input.price,
       originalPrice: input.originalPrice,

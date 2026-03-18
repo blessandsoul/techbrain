@@ -191,9 +191,9 @@ model Project {
   titleKa    String   @db.VarChar(500)
   titleRu    String   @default("") @db.VarChar(500)
   titleEn    String   @default("") @db.VarChar(500)
-  excerptKa  String   @default("") @db.VarChar(1000)
-  excerptRu  String   @default("") @db.VarChar(1000)
-  excerptEn  String   @default("") @db.VarChar(1000)
+  excerptKa  String   @default("") @db.Text
+  excerptRu  String   @default("") @db.Text
+  excerptEn  String   @default("") @db.Text
   locationKa String   @db.VarChar(500)
   locationRu String   @default("") @db.VarChar(500)
   locationEn String   @default("") @db.VarChar(500)

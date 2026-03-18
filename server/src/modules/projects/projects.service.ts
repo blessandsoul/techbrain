@@ -5,6 +5,7 @@
  */
 
 import { NotFoundError, ConflictError } from '@shared/errors/errors.js';
+import { generateUniqueSlug } from '@libs/slugify.js';
 import { projectsRepository } from './projects.repo.js';
 import { fileStorageService } from '@libs/storage/file-storage.service.js';
 import { imageOptimizerService } from '@libs/storage/image-optimizer.service.js';
@@ -50,13 +51,14 @@ class ProjectsService {
   }
 
   async createProject(input: CreateProjectInput): Promise<ProjectResponse> {
-    const slugExists = await projectsRepository.existsBySlug(input.slug);
-    if (slugExists) {
-      throw new ConflictError('Project with this slug already exists', 'SLUG_ALREADY_EXISTS');
-    }
+    // Auto-generate slug from title if not provided; resolve conflicts with -2, -3, etc.
+    const sourceText = input.slug || input.title.en || input.title.ka;
+    const slug = input.slug
+      ? await generateUniqueSlug(input.slug, (s) => projectsRepository.existsBySlug(s))
+      : await generateUniqueSlug(sourceText, (s) => projectsRepository.existsBySlug(s));
 
     return projectsRepository.create({
-      slug: input.slug,
+      slug,
       titleKa: input.title.ka,
       titleRu: input.title.ru ?? '',
       titleEn: input.title.en ?? '',

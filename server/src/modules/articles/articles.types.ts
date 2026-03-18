@@ -20,7 +20,7 @@ export interface ArticleResponse {
 }
 
 export interface CreateArticleInput {
-  slug: string;
+  slug?: string;
   title: string;
   excerpt: string;
   content: string;

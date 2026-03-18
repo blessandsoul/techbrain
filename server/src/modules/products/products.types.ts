@@ -82,7 +82,7 @@ export interface CatalogConfigResponse {
 }
 
 export interface CreateProductInput {
-  slug: string;
+  slug?: string;
   categoryIds: string[];
   price: number;
   originalPrice?: number;
