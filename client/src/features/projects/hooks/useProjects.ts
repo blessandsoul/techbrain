@@ -143,7 +143,8 @@ export function useUploadProjectContentImage() {
 
 // ── Helpers ──────────────────────────────────────────
 
-export function getProjectImageUrl(relativePath: string): string {
+export function getProjectImageUrl(relativePath: string, updatedAt?: string): string {
   if (relativePath.startsWith('http')) return relativePath;
-  return `${getServerBaseUrl()}${relativePath}`;
+  const base = `${getServerBaseUrl()}${relativePath}`;
+  return updatedAt ? `${base}?v=${new Date(updatedAt).getTime()}` : base;
 }

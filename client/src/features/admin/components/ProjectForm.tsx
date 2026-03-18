@@ -80,7 +80,7 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
 
   // Cover image state
   const [imagePreview, setImagePreview] = useState(
-    project?.image ? getProjectImageUrl(project.image) : '',
+    project?.image ? getProjectImageUrl(project.image, project.updatedAt) : '',
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageRemoved, setImageRemoved] = useState(false);

@@ -73,7 +73,7 @@ export default function ProjectsPage(): React.ReactElement {
                   <div className="relative aspect-[16/10] overflow-hidden bg-muted shrink-0">
                     {project.image ? (
                       <SafeImage
-                        src={getProjectImageUrl(project.image)}
+                        src={getProjectImageUrl(project.image, project.updatedAt)}
                         alt={title}
                         priority={i < 3}
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

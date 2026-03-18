@@ -64,7 +64,7 @@ export function ProjectHero({ project }: ProjectHeroProps): React.ReactElement {
       {project.image && (
         <div className="relative w-full max-w-[600px] mx-auto aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-muted mb-8 md:mb-10">
           <SafeImage
-            src={getProjectImageUrl(project.image)}
+            src={getProjectImageUrl(project.image, project.updatedAt)}
             alt={title}
             priority
             sizes="(max-width: 768px) 100vw, 600px"

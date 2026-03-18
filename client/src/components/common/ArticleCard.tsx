@@ -50,7 +50,7 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps): Re
         <div className="relative aspect-[16/10] overflow-hidden bg-muted shrink-0">
           {article.coverImage ? (
             <SafeImage
-              src={getArticleImageUrl(article.coverImage)}
+              src={getArticleImageUrl(article.coverImage, article.updatedAt)}
               alt={article.title}
               priority={priority}
               className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

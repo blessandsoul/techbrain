@@ -150,7 +150,7 @@ function RelatedProjectCard({ project }: {
         <div className="relative aspect-[16/10] overflow-hidden bg-muted shrink-0">
           {project.image ? (
             <SafeImage
-              src={getProjectImageUrl(project.image)}
+              src={getProjectImageUrl(project.image, project.updatedAt)}
               alt={title}
               className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
             />

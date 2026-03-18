@@ -15,6 +15,7 @@ interface ProjectForSection {
   cameras: number;
   image: string;
   year: string;
+  updatedAt?: string;
 }
 
 export function ProjectsSectionWrapper(): React.ReactElement {
@@ -30,6 +31,7 @@ export function ProjectsSectionWrapper(): React.ReactElement {
     cameras: p.cameras,
     image: p.image ?? '',
     year: p.year,
+    updatedAt: p.updatedAt,
   })) ?? [];
 
   // TODO: Wire stats to real site settings API

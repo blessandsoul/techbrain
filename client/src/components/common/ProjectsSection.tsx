@@ -12,6 +12,7 @@ interface Project {
   cameras: number;
   image: string;
   year: string;
+  updatedAt?: string;
 }
 
 interface Stats {
@@ -144,7 +145,7 @@ export function ProjectsSection({ projects, stats, labels }: ProjectsSectionProp
                   <div className="relative aspect-[16/10] overflow-hidden bg-muted">
                     {project.image ? (
                       <SafeImage
-                        src={getProjectImageUrl(project.image)}
+                        src={getProjectImageUrl(project.image, project.updatedAt)}
                         alt={project.title}
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

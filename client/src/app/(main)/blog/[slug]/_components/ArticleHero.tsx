@@ -46,7 +46,7 @@ export function ArticleHero({ article }: ArticleHeroProps): React.ReactElement {
       {article.coverImage && (
         <div className="relative w-full max-w-[600px] mx-auto aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-muted mb-8 md:mb-10">
           <BlogCoverImage
-            src={getArticleImageUrl(article.coverImage)}
+            src={getArticleImageUrl(article.coverImage, article.updatedAt)}
             alt={article.title}
             priority
             sizes="(max-width: 768px) 100vw, 600px"

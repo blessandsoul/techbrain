@@ -91,7 +91,7 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
 
   const [isPublished, setIsPublished] = useState(article?.isPublished ?? false);
   const [coverPreview, setCoverPreview] = useState(
-    article?.coverImage ? getArticleImageUrl(article.coverImage) : '',
+    article?.coverImage ? getArticleImageUrl(article.coverImage, article.updatedAt) : '',
   );
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);

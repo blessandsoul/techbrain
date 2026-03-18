@@ -50,7 +50,8 @@ export function useArticle(slug: string): ReturnType<typeof useQuery<Article>> {
 
 // ── Helpers ──
 
-export function getArticleImageUrl(relativePath: string): string {
+export function getArticleImageUrl(relativePath: string, updatedAt?: string): string {
   if (relativePath.startsWith('http')) return relativePath;
-  return `${getServerBaseUrl()}${relativePath}`;
+  const base = `${getServerBaseUrl()}${relativePath}`;
+  return updatedAt ? `${base}?v=${new Date(updatedAt).getTime()}` : base;
 }
