@@ -91,7 +91,7 @@ export function RelatedArticles({ currentSlug, category }: RelatedArticlesProps)
             onClick={() => scroll('left')}
             disabled={!canScrollLeft}
             aria-label="Scroll left"
-            className="p-2 rounded-full border border-border bg-card text-muted-foreground transition-all active:scale-95 md:hover:text-foreground md:hover:border-foreground/20 disabled:opacity-30 disabled:pointer-events-none"
+            className="p-2 rounded-full border border-border bg-card text-muted-foreground transition-all cursor-pointer active:scale-95 md:hover:text-foreground md:hover:border-foreground/20 disabled:opacity-30 disabled:pointer-events-none"
           >
             <ArrowLeft size={16} weight="bold" />
           </button>
@@ -100,7 +100,7 @@ export function RelatedArticles({ currentSlug, category }: RelatedArticlesProps)
             onClick={() => scroll('right')}
             disabled={!canScrollRight}
             aria-label="Scroll right"
-            className="p-2 rounded-full border border-border bg-card text-muted-foreground transition-all active:scale-95 md:hover:text-foreground md:hover:border-foreground/20 disabled:opacity-30 disabled:pointer-events-none"
+            className="p-2 rounded-full border border-border bg-card text-muted-foreground transition-all cursor-pointer active:scale-95 md:hover:text-foreground md:hover:border-foreground/20 disabled:opacity-30 disabled:pointer-events-none"
           >
             <ArrowRight size={16} weight="bold" />
           </button>

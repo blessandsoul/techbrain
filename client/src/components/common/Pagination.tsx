@@ -20,13 +20,17 @@ export const Pagination = ({ page, totalPages }: PaginationProps): React.ReactEl
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const createPageUrl = useCallback(
-    (pageNumber: number): string => {
+  const handlePageChange = useCallback(
+    (pageNumber: number): void => {
       const params = new URLSearchParams(searchParams.toString());
       params.set('page', pageNumber.toString());
-      return `${pathname}?${params.toString()}`;
+      const url = `${pathname}?${params.toString()}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        router.push(url);
+      }, 400);
     },
-    [pathname, searchParams]
+    [pathname, searchParams, router]
   );
 
   return (
@@ -34,9 +38,10 @@ export const Pagination = ({ page, totalPages }: PaginationProps): React.ReactEl
       <Button
         variant="outline"
         size="sm"
-        onClick={() => router.push(createPageUrl(page - 1))}
+        onClick={() => handlePageChange(page - 1)}
         disabled={page <= 1}
         aria-label={t('catalog.prevPage')}
+        className="cursor-pointer"
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
@@ -46,9 +51,10 @@ export const Pagination = ({ page, totalPages }: PaginationProps): React.ReactEl
       <Button
         variant="outline"
         size="sm"
-        onClick={() => router.push(createPageUrl(page + 1))}
+        onClick={() => handlePageChange(page + 1)}
         disabled={page >= totalPages}
         aria-label={t('catalog.nextPage')}
+        className="cursor-pointer"
       >
         <ChevronRight className="h-4 w-4" />
       </Button>

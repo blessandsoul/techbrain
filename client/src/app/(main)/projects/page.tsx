@@ -39,7 +39,7 @@ export default function ProjectsPage(): React.ReactElement {
   const searchParams = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
 
-  const { data, isLoading } = useActiveProjects({ page, limit: 10 });
+  const { data, isLoading } = useActiveProjects({ page, limit: 12 });
   const projects = data?.items ?? [];
   const pagination = data?.pagination;
 

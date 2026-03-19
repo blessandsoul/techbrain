@@ -71,8 +71,15 @@ export function DiscountedProductsBlock(): React.ReactElement {
     };
   }, [checkScroll]);
 
+  // Re-check scroll state when products load/change
+  useEffect(() => {
+    checkScroll();
+  }, [saleProducts, checkScroll]);
+
   const scroll = (dir: 'left' | 'right'): void => {
     cardsRef.current?.scrollBy({ left: dir === 'left' ? -280 : 280, behavior: 'smooth' });
+    // Re-check after smooth scroll completes (scroll event may not fire reliably)
+    setTimeout(checkScroll, 350);
   };
 
   if (!isLoading && saleProducts.length === 0) return <></>;

@@ -38,8 +38,8 @@ export function ProjectHero({ project }: ProjectHeroProps): React.ReactElement {
       </div>
 
       {/* Title — UPPERCASE */}
-      <h1 className="text-center text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[1.15] tracking-tight text-balance uppercase max-w-3xl mx-auto mb-6 md:mb-8">
-        {title}
+      <h1 className="text-center text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[1.15] tracking-tight text-balance max-w-3xl mx-auto mb-6 md:mb-8">
+        {title.toUpperCase()}
       </h1>
 
       {/* Metadata row */}
