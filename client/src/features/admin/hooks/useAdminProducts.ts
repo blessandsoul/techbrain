@@ -72,6 +72,24 @@ export function useDeleteProductImage() {
   });
 }
 
+export function useUploadProductVideo() {
+  return useMutation({
+    mutationFn: (file: File) => adminProductService.uploadVideo(file),
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+}
+
+export function useDeleteProductVideo() {
+  return useMutation({
+    mutationFn: (url: string) => adminProductService.deleteVideo(url),
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+}
+
 export function useCreateProduct() {
   const queryClient = useQueryClient();
   return useMutation({

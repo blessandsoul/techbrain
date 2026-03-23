@@ -47,7 +47,9 @@ export interface IProduct {
   currency: string;
   isActive: boolean;
   isFeatured: boolean;
+  inStock: boolean;
   images: string[];
+  videoUrl: string | null;
   name: LocalizedString;
   description: LocalizedString;
   specs: IProductSpec[];

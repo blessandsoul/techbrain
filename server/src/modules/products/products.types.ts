@@ -27,7 +27,9 @@ export interface ProductResponse {
   currency: string;
   isActive: boolean;
   isFeatured: boolean;
+  inStock: boolean;
   images: string[];
+  videoUrl: string | null;
   name: LocalizedString;
   description: LocalizedString;
   specs: ProductSpecResponse[];
@@ -43,6 +45,7 @@ export interface CatalogFiltersInput {
   minPrice?: number;
   maxPrice?: number;
   hasDiscount?: boolean;
+  inStock?: boolean;
   sort?: SortOption;
   page: number;
   limit: number;
@@ -89,7 +92,9 @@ export interface CreateProductInput {
   currency?: string;
   isActive?: boolean;
   isFeatured?: boolean;
+  inStock?: boolean;
   images?: string[];
+  videoUrl?: string | null;
   name: LocalizedString;
   description?: { ka?: string; ru?: string; en?: string };
   content?: string;
@@ -110,7 +115,9 @@ export interface UpdateProductInput {
   currency?: string;
   isActive?: boolean;
   isFeatured?: boolean;
+  inStock?: boolean;
   images?: string[];
+  videoUrl?: string | null;
   name?: { ka?: string; ru?: string; en?: string };
   description?: { ka?: string; ru?: string; en?: string };
   content?: string | null;

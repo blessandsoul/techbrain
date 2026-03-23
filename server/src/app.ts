@@ -125,7 +125,7 @@ export async function buildApp() {
   // File upload handling (multipart/form-data)
   await app.register(multipart, {
     limits: {
-      fileSize: env.MAX_FILE_SIZE_MB * 1024 * 1024, // ENV-configurable (default 10MB)
+      fileSize: Math.max(env.MAX_FILE_SIZE_MB, env.MAX_VIDEO_FILE_SIZE_MB) * 1024 * 1024,
       files: 1, // Only one file per request
     },
   });

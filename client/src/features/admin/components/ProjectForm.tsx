@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 
 import { RichTextEditor } from './RichTextEditor';
+import { VideoUploader } from './VideoUploader';
 import { InfoTooltip } from './InfoTooltip';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -84,6 +85,9 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageRemoved, setImageRemoved] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(project?.videoUrl ?? null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUploading, setVideoUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const pendingImagesRef = useRef<Map<string, File>>(new Map());
 
@@ -196,9 +200,14 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
           await projectsService.uploadProjectImage(project.id, imageFile);
         }
 
-        const updatePayload = imageRemoved && !imageFile
+        let updatePayload = imageRemoved && !imageFile
           ? { ...payload, image: null as string | null }
           : payload;
+
+        // If video was removed (was set before but now null), include videoUrl: null
+        if (project.videoUrl && !videoUrl) {
+          updatePayload = { ...updatePayload, videoUrl: null as string | null };
+        }
 
         await updateMutation.mutateAsync({ id: project.id, data: updatePayload });
         router.push(ROUTES.ADMIN.PROJECTS);
@@ -218,6 +227,11 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
         // Upload cover image after creation
         if (imageFile) {
           await projectsService.uploadProjectImage(created.id, imageFile);
+        }
+
+        // Upload video after creation
+        if (videoFile) {
+          await projectsService.uploadProjectVideo(created.id, videoFile);
         }
 
         // Upload pending content images and replace blob URLs
@@ -277,6 +291,36 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileSelect} />
           </div>
         </div>
+
+        {/* Video */}
+        <VideoUploader
+          videoUrl={videoUrl}
+          resolveUrl={(url) => getProjectImageUrl(url, project?.updatedAt)}
+          onUpload={async (file) => {
+            if (isEdit && project?.id) {
+              setVideoUploading(true);
+              try {
+                const updated = await projectsService.uploadProjectVideo(project.id, file);
+                setVideoUrl(updated.videoUrl);
+              } catch (error) {
+                toast.error(getErrorMessage(error));
+              } finally {
+                setVideoUploading(false);
+              }
+            } else {
+              setVideoFile(file);
+              setVideoUrl(URL.createObjectURL(file));
+            }
+          }}
+          onRemove={() => {
+            if (videoUrl?.startsWith('blob:')) {
+              URL.revokeObjectURL(videoUrl);
+            }
+            setVideoUrl(null);
+            setVideoFile(null);
+          }}
+          isPending={videoUploading}
+        />
 
         {/* Title (3 languages) */}
         <div className="p-4">

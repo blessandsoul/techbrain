@@ -121,7 +121,9 @@ model Product {
   currency      String    @default("GEL") @db.VarChar(10)
   isActive      Boolean   @default(true)
   isFeatured    Boolean   @default(false)
+  inStock       Boolean   @default(true)
   images        Json      @default("[]")
+  videoUrl      String?   @db.VarChar(500)
   nameKa        String    @db.VarChar(500)
   nameRu        String    @default("") @db.VarChar(500)
   nameEn        String    @default("") @db.VarChar(500)
@@ -139,7 +141,9 @@ model Product {
 
   @@index([isActive])
   @@index([isFeatured])
+  @@index([inStock])
   @@index([isActive, isFeatured])
+  @@index([isActive, inStock])
   @@index([price])
   @@map("products")
 }
@@ -200,6 +204,7 @@ model Project {
   type       String   @db.VarChar(50)
   cameras    Int      @default(0)
   image      String?  @db.VarChar(500)
+  videoUrl   String?  @db.VarChar(500)
   content    String   @default("") @db.LongText
   year       String   @db.VarChar(10)
   isActive   Boolean  @default(true)
@@ -303,6 +308,7 @@ model Article {
   content     String   @db.LongText              // raw MDX
   category    String   @db.VarChar(50)           // cameras | nvr | installation | news | guides
   coverImage  String?  @db.VarChar(500)          // /uploads/articles/{id}/cover.webp
+  videoUrl    String?  @db.VarChar(500)
   isPublished Boolean  @default(false)
   readMin     Int      @default(5)
   authorId    String

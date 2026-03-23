@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               `img-src 'self' blob: data: https: ${apiOrigin}`,
               "font-src 'self'",
+              `media-src 'self' blob: ${apiOrigin}`,
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

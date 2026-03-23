@@ -24,6 +24,7 @@
 
   "products.discounted": "Товары со скидкой",
   "products.inStock": "В наличии",
+  "products.outOfStock": "Нет в наличии",
   "products.priceOnRequest": "Цена по запросу",
   "products.bestSellers": "Самые продаваемые товары",
   "products.popular": "Популярные товары",
@@ -132,5 +133,6 @@
   "catalog.recommended": "Рекомендуемые",
   "catalog.page": "Страница {page} из {totalPages}",
   "catalog.prevPage": "Предыдущая страница",
-  "catalog.nextPage": "Следующая страница"
+  "catalog.nextPage": "Следующая страница",
+  "catalog.inStockOnly": "Только в наличии"
 }

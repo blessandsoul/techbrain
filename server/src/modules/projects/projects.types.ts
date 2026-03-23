@@ -19,6 +19,7 @@ export interface ProjectResponse {
   type: ProjectType;
   cameras: number;
   image: string | null;
+  videoUrl: string | null;
   content: string;
   year: string;
   isActive: boolean;
@@ -35,6 +36,7 @@ export interface CreateProjectInput {
   type: ProjectType;
   cameras: number;
   image?: string;
+  videoUrl?: string | null;
   content?: string;
   year: string;
   isActive?: boolean;
@@ -49,6 +51,7 @@ export interface UpdateProjectInput {
   type?: ProjectType;
   cameras?: number;
   image?: string | null;
+  videoUrl?: string | null;
   content?: string;
   year?: string;
   isActive?: boolean;

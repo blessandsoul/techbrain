@@ -7,6 +7,7 @@ export interface Article {
   excerpt: string;
   category: ArticleCategory;
   coverImage: string | null;
+  videoUrl: string | null;
   isPublished: boolean;
   readMin: number;
   authorId: string;

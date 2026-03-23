@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { RichTextEditor } from './RichTextEditor';
+import { VideoUploader } from './VideoUploader';
 import { InfoTooltip } from './InfoTooltip';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -94,6 +95,10 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
     article?.coverImage ? getArticleImageUrl(article.coverImage, article.updatedAt) : '',
   );
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverRemoved, setCoverRemoved] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(article?.videoUrl ?? null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUploading, setVideoUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [bodyHtml, setBodyHtml] = useState('');
   const [categoryValue, setCategoryValue] = useState<ArticleCategory>(article?.category ?? 'guides');
@@ -120,6 +125,7 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
     if (!file) return;
     setCoverFile(file);
     setCoverPreview(URL.createObjectURL(file));
+    setCoverRemoved(false);
     if (fileRef.current) fileRef.current.value = '';
   }
 
@@ -171,12 +177,19 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
           category: categoryValue,
           readMin,
           isPublished,
+          // If cover was removed and no new file selected, set coverImage to null
+          ...(coverRemoved && !coverFile ? { coverImage: null } : {}),
         },
       });
 
       // Upload cover if a new file was selected
       if (coverFile) {
         await uploadCoverMutation.mutateAsync({ id: article.id, file: coverFile });
+      }
+
+      // Upload video if a new file was selected in edit mode
+      if (videoFile) {
+        await articleService.uploadVideo(article.id, videoFile);
       }
     } else {
       // Create new article — handle directly to support pending image uploads
@@ -197,6 +210,11 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
         // Upload cover after creation
         if (coverFile) {
           await articleService.uploadCover(created.id, coverFile);
+        }
+
+        // Upload video after creation
+        if (videoFile) {
+          await articleService.uploadVideo(created.id, videoFile);
         }
 
         // Upload pending content images and replace blob URLs
@@ -236,7 +254,7 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
                 <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
                 <button
                   type="button"
-                  onClick={() => { setCoverPreview(''); setCoverFile(null); }}
+                  onClick={() => { setCoverPreview(''); setCoverFile(null); setCoverRemoved(true); }}
                   className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-black/80 transition-colors"
                   aria-label="გარეკანის წაშლა"
                 >
@@ -258,6 +276,36 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleCoverSelect} />
           </div>
         </div>
+
+        {/* Video */}
+        <VideoUploader
+          videoUrl={videoUrl}
+          resolveUrl={(url) => getArticleImageUrl(url, article?.updatedAt)}
+          onUpload={async (file) => {
+            if (isEdit && article?.id) {
+              setVideoUploading(true);
+              try {
+                const updated = await articleService.uploadVideo(article.id, file);
+                setVideoUrl(updated.videoUrl);
+              } catch (error) {
+                toast.error(getErrorMessage(error));
+              } finally {
+                setVideoUploading(false);
+              }
+            } else {
+              setVideoFile(file);
+              setVideoUrl(URL.createObjectURL(file));
+            }
+          }}
+          onRemove={() => {
+            if (videoUrl?.startsWith('blob:')) {
+              URL.revokeObjectURL(videoUrl);
+            }
+            setVideoUrl(null);
+            setVideoFile(null);
+          }}
+          isPending={videoUploading}
+        />
 
         {/* Meta */}
         <div className="p-4">

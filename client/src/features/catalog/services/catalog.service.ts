@@ -16,6 +16,7 @@ interface CatalogProductsParams {
   minPrice?: number;
   maxPrice?: number;
   hasDiscount?: boolean;
+  inStock?: boolean;
   sort?: string;
   page: number;
   limit: number;
@@ -48,6 +49,7 @@ class CatalogService {
     if (params.maxPrice !== undefined) query.maxPrice = params.maxPrice;
     if (params.locale) query.locale = params.locale;
     if (params.hasDiscount) query.hasDiscount = 'true';
+    if (params.inStock !== undefined) query.inStock = String(params.inStock);
 
     if (params.subcategorySpecFilter) {
       query.subcategorySpecFilter = JSON.stringify(params.subcategorySpecFilter);

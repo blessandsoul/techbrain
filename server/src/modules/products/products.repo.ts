@@ -41,7 +41,9 @@ function toProductResponse(p: ProductWithRelations): ProductResponse {
     currency: p.currency,
     isActive: p.isActive,
     isFeatured: p.isFeatured,
+    inStock: p.inStock,
     images: p.images as string[],
+    videoUrl: p.videoUrl,
     name: { ka: p.nameKa, ru: p.nameRu, en: p.nameEn },
     description: {
       ka: p.descriptionKa ?? p.nameKa,
@@ -117,6 +119,7 @@ class ProductsRepository {
     minPrice?: number;
     maxPrice?: number;
     hasDiscount?: boolean;
+    inStock?: boolean;
     sort: SortOption;
     page: number;
     limit: number;
@@ -165,6 +168,11 @@ class ProductsRepository {
     // Discount filter (pre-filter: originalPrice must exist)
     if (params.hasDiscount) {
       andConditions.push({ originalPrice: { not: null } });
+    }
+
+    // In-stock filter
+    if (params.inStock !== undefined) {
+      andConditions.push({ inStock: params.inStock });
     }
 
     const baseWhere: Prisma.ProductWhereInput = {
@@ -430,12 +438,16 @@ class ProductsRepository {
   async findAllPaginated(
     page: number,
     limit: number,
-    filters?: { isActive?: boolean; category?: string; search?: string },
+    filters?: { isActive?: boolean; inStock?: boolean; category?: string; search?: string },
   ): Promise<{ items: ProductResponse[]; totalItems: number }> {
     const where: Prisma.ProductWhereInput = {};
 
     if (filters?.isActive !== undefined) {
       where.isActive = filters.isActive;
+    }
+
+    if (filters?.inStock !== undefined) {
+      where.inStock = filters.inStock;
     }
 
     if (filters?.category) {
@@ -499,7 +511,9 @@ class ProductsRepository {
     currency: string;
     isActive: boolean;
     isFeatured: boolean;
+    inStock: boolean;
     images: string[];
+    videoUrl?: string | null;
     nameKa: string;
     nameRu: string;
     nameEn: string;
@@ -518,7 +532,9 @@ class ProductsRepository {
         currency: data.currency,
         isActive: data.isActive,
         isFeatured: data.isFeatured,
+        inStock: data.inStock,
         images: data.images,
+        videoUrl: data.videoUrl ?? null,
         nameKa: data.nameKa,
         nameRu: data.nameRu,
         nameEn: data.nameEn,
@@ -547,7 +563,9 @@ class ProductsRepository {
     currency?: string;
     isActive?: boolean;
     isFeatured?: boolean;
+    inStock?: boolean;
     images?: string[];
+    videoUrl?: string | null;
     nameKa?: string;
     nameRu?: string;
     nameEn?: string;
@@ -584,7 +602,9 @@ class ProductsRepository {
       if (updateFields.currency !== undefined) updateData.currency = updateFields.currency;
       if (updateFields.isActive !== undefined) updateData.isActive = updateFields.isActive;
       if (updateFields.isFeatured !== undefined) updateData.isFeatured = updateFields.isFeatured;
+      if (updateFields.inStock !== undefined) updateData.inStock = updateFields.inStock;
       if (updateFields.images !== undefined) updateData.images = updateFields.images;
+      if (updateFields.videoUrl !== undefined) updateData.videoUrl = updateFields.videoUrl;
       if (updateFields.nameKa !== undefined) updateData.nameKa = updateFields.nameKa;
       if (updateFields.nameRu !== undefined) updateData.nameRu = updateFields.nameRu;
       if (updateFields.nameEn !== undefined) updateData.nameEn = updateFields.nameEn;

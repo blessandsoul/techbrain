@@ -12,6 +12,7 @@ export interface ArticleResponse {
   content: string;
   category: ArticleCategory;
   coverImage: string | null;
+  videoUrl: string | null;
   isPublished: boolean;
   readMin: number;
   authorId: string;
@@ -35,6 +36,7 @@ export interface UpdateArticleInput {
   excerpt?: string;
   content?: string;
   category?: ArticleCategory;
+  coverImage?: string | null;
   readMin?: number;
   isPublished?: boolean;
 }

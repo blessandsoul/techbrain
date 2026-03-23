@@ -88,6 +88,17 @@ class ProjectsService {
     return data.data;
   }
 
+  async uploadProjectVideo(id: string, file: File): Promise<IProject> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await apiClient.post<ApiResponse<IProject>>(
+      API_ENDPOINTS.PROJECTS.UPLOAD_VIDEO(id),
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
+    return data.data;
+  }
+
   async uploadContentImage(id: string, file: File): Promise<{ url: string }> {
     const formData = new FormData();
     formData.append('file', file);

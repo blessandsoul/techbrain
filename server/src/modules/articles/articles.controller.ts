@@ -88,6 +88,16 @@ class ArticlesController {
     return reply.send(successResponse('Article cover image uploaded successfully', article));
   }
 
+  async uploadVideo(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { id } = ArticleIdParamSchema.parse(request.params);
+    const file = await request.file();
+    if (!file) {
+      throw new BadRequestError('No file uploaded', 'NO_FILE');
+    }
+    const article = await articlesService.uploadVideo(id, file);
+    return reply.send(successResponse('Article video uploaded successfully', article));
+  }
+
   async uploadContentImage(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = ArticleIdParamSchema.parse(request.params);
     const file = await request.file();

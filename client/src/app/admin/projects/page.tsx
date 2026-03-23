@@ -89,7 +89,7 @@ function ProjectsContent(): React.ReactElement {
               <TableRow className="bg-muted/50">
                 <TableHead className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">სათაური <InfoTooltip text="პროექტის სახელი" /></TableHead>
                 <TableHead className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">ტიპი <InfoTooltip text="პროექტის ტიპი" /></TableHead>
-                <TableHead className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">კამერები <InfoTooltip text="დამონტაჟებული კამერების რაოდენობა" /></TableHead>
+                <TableHead className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">კამერები ({projects.reduce((sum, p) => sum + (p.cameras ?? 0), 0)}) <InfoTooltip text="დამონტაჟებული კამერების რაოდენობა" /></TableHead>
                 <TableHead className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">წელი <InfoTooltip text="მონტაჟის / დასრულების წელი" /></TableHead>
                 <TableHead className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">სტატუსი <InfoTooltip text="აქტიური = ხილულია საიტზე, მონახაზი = მხოლოდ ადმინში" /></TableHead>
                 <TableHead className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider"></TableHead>

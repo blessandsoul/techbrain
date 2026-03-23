@@ -37,6 +37,23 @@ class AdminProductService {
     });
   }
 
+  async uploadVideo(file: File): Promise<{ filename: string; url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post<ApiResponse<{ filename: string; url: string }>>(
+      API_ENDPOINTS.PRODUCTS.UPLOAD_VIDEO,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
+    return response.data.data;
+  }
+
+  async deleteVideo(url: string): Promise<void> {
+    await apiClient.delete(API_ENDPOINTS.PRODUCTS.DELETE_VIDEO, {
+      data: { url },
+    });
+  }
+
   async createProduct(data: CreateProductInput): Promise<IProduct> {
     const response = await apiClient.post<ApiResponse<IProduct>>(
       API_ENDPOINTS.PRODUCTS.CREATE,

@@ -10,6 +10,7 @@ import { articlesRepository } from './articles.repo.js';
 import { fileStorageService } from '@libs/storage/file-storage.service.js';
 import { imageOptimizerService } from '@libs/storage/image-optimizer.service.js';
 import { validateImageFile, validateFileSize } from '@libs/storage/file-validator.js';
+import { validateVideoFile, validateVideoFileSize } from '@libs/storage/video-validator.js';
 import type { MultipartFile } from '@fastify/multipart';
 import type {
   ArticleResponse,
@@ -93,6 +94,7 @@ class ArticlesService {
       excerpt: input.excerpt,
       content: input.content,
       category: input.category,
+      coverImage: input.coverImage,
       readMin: input.readMin,
       isPublished: input.isPublished,
     });
@@ -138,6 +140,29 @@ class ArticlesService {
     const { url } = await fileStorageService.saveArticleCoverImage(id, optimized);
 
     return articlesRepository.update(id, { coverImage: url });
+  }
+
+  // ── Video Upload ───────────────────────────────────
+
+  async uploadVideo(id: string, file: MultipartFile): Promise<ArticleResponse> {
+    const article = await articlesRepository.findById(id);
+    if (!article) {
+      throw new NotFoundError('Article not found', 'ARTICLE_NOT_FOUND');
+    }
+
+    validateVideoFile(file);
+    const buffer = await file.toBuffer();
+    validateVideoFileSize(buffer);
+
+    const extension = '.' + file.filename.split('.').pop()!.toLowerCase();
+
+    if (article.videoUrl) {
+      await fileStorageService.deleteArticleVideo(article.videoUrl);
+    }
+
+    const { url } = await fileStorageService.saveArticleVideo(id, buffer, extension);
+
+    return articlesRepository.update(id, { videoUrl: url });
   }
 
   // ── Content Image Upload ────────────────────────────

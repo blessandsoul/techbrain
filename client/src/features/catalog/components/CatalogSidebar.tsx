@@ -1,6 +1,8 @@
 'use client';
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { CategoryTree } from './CategoryTree';
 import { DynamicFilterSection } from './DynamicFilterSection';
 import { PriceRangeFilter } from './PriceRangeFilter';
@@ -29,7 +31,8 @@ export function CatalogSidebar({
 
   const hasActiveSpecFilters = filterConfigs.some((c) => searchParams.get(c.id));
   const hasPriceFilter = searchParams.get('minPrice') || searchParams.get('maxPrice');
-  const hasFilters = hasActiveSpecFilters || hasPriceFilter;
+  const hasInStockFilter = searchParams.get('inStock') === 'true';
+  const hasFilters = hasActiveSpecFilters || hasPriceFilter || hasInStockFilter;
 
   function clearAllFilters(): void {
     const params = new URLSearchParams();
@@ -37,6 +40,17 @@ export function CatalogSidebar({
     const subcategory = searchParams.get('subcategory');
     if (category) params.set('category', category);
     if (subcategory) params.set('subcategory', subcategory);
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  function toggleInStock(checked: boolean): void {
+    const params = new URLSearchParams(searchParams.toString());
+    if (checked) {
+      params.set('inStock', 'true');
+    } else {
+      params.delete('inStock');
+    }
+    params.delete('page');
     router.push(`${pathname}?${params.toString()}`);
   }
 
@@ -82,6 +96,21 @@ export function CatalogSidebar({
           </div>
         </>
       )}
+
+      {/* In stock filter */}
+      <div className="border-t border-border" />
+      <div className="px-3">
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="inStock-filter"
+            checked={hasInStockFilter}
+            onCheckedChange={(checked) => toggleInStock(checked === true)}
+          />
+          <Label htmlFor="inStock-filter" className="text-sm text-foreground cursor-pointer">
+            {t('catalog.inStockOnly')}
+          </Label>
+        </div>
+      </div>
     </div>
   );
 }

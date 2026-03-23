@@ -26,6 +26,7 @@ export function MobileFilterDrawer({
   }
   if (searchParams.get('minPrice')) activeFilterCount++;
   if (searchParams.get('maxPrice')) activeFilterCount++;
+  if (searchParams.get('inStock') === 'true') activeFilterCount++;
 
   const close = useCallback(() => setIsOpen(false), []);
 

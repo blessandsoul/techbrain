@@ -20,6 +20,7 @@ function toProjectResponse(p: Project): ProjectResponse {
     type: p.type as ProjectResponse['type'],
     cameras: p.cameras,
     image: p.image,
+    videoUrl: p.videoUrl,
     content: p.content,
     year: p.year,
     isActive: p.isActive,
@@ -110,6 +111,7 @@ class ProjectsRepository {
     type: string;
     cameras: number;
     image?: string;
+    videoUrl?: string | null;
     content: string;
     year: string;
     isActive: boolean;
@@ -130,6 +132,7 @@ class ProjectsRepository {
         type: data.type,
         cameras: data.cameras,
         image: data.image ?? null,
+        videoUrl: data.videoUrl ?? null,
         content: data.content,
         year: data.year,
         isActive: data.isActive,
@@ -153,6 +156,7 @@ class ProjectsRepository {
     type?: string;
     cameras?: number;
     image?: string | null;
+    videoUrl?: string | null;
     content?: string;
     year?: string;
     isActive?: boolean;
@@ -172,6 +176,7 @@ class ProjectsRepository {
     if (data.type !== undefined) updateData.type = data.type;
     if (data.cameras !== undefined) updateData.cameras = data.cameras;
     if (data.image !== undefined) updateData.image = data.image;
+    if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
     if (data.content !== undefined) updateData.content = data.content;
     if (data.year !== undefined) updateData.year = data.year;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;

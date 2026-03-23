@@ -159,6 +159,28 @@ export async function productsRoutes(fastify: FastifyInstance): Promise<void> {
   );
 
   fastify.post(
+    '/products/admin/upload-video',
+    {
+      preValidation: [authenticate, authorize('ADMIN')],
+      config: {
+        rateLimit: RATE_LIMITS.ADMIN_DEFAULT,
+      },
+    },
+    productsController.uploadProductVideo.bind(productsController),
+  );
+
+  fastify.delete(
+    '/products/admin/delete-video',
+    {
+      preValidation: [authenticate, authorize('ADMIN')],
+      config: {
+        rateLimit: RATE_LIMITS.ADMIN_DEFAULT,
+      },
+    },
+    productsController.deleteProductVideo.bind(productsController),
+  );
+
+  fastify.post(
     '/products/admin/batch-toggle',
     {
       preValidation: [authenticate, authorize('ADMIN')],

@@ -6,9 +6,11 @@
 
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { productsService } from './products.service.js';
+import { BadRequestError } from '@shared/errors/errors.js';
 import { successResponse } from '@shared/responses/successResponse.js';
 import { paginatedResponse } from '@shared/responses/paginatedResponse.js';
 import { validateImageFile, validateFileSize } from '@libs/storage/file-validator.js';
+import { validateVideoFile, validateVideoFileSize } from '@libs/storage/video-validator.js';
 import {
   CatalogQuerySchema,
   SpecValuesQuerySchema,
@@ -22,6 +24,7 @@ import {
   BatchToggleSchema,
   BatchDeleteSchema,
   DeleteImageSchema,
+  DeleteVideoSchema,
 } from './products.schemas.js';
 import type { SortOption } from './products.types.js';
 
@@ -47,6 +50,7 @@ class ProductsController {
       minPrice: query.minPrice,
       maxPrice: query.maxPrice,
       hasDiscount: query.hasDiscount,
+      inStock: query.inStock,
       sort: query.sort as SortOption,
       page: query.page,
       limit: query.limit,
@@ -122,8 +126,8 @@ class ProductsController {
   // ── Admin Endpoints ───────────────────────────────
 
   async getAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { page, limit, isActive, category, search } = AdminProductsQuerySchema.parse(request.query);
-    const result = await productsService.getAllProducts(page, limit, { isActive, category, search });
+    const { page, limit, isActive, inStock, category, search } = AdminProductsQuerySchema.parse(request.query);
+    const result = await productsService.getAllProducts(page, limit, { isActive, inStock, category, search });
     return reply.send(paginatedResponse(
       'Products retrieved successfully',
       result.items,
@@ -189,7 +193,7 @@ class ProductsController {
   async uploadProductImage(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const file = await request.file();
     if (!file) {
-      return reply.status(400).send(successResponse('No file uploaded', null));
+      throw new BadRequestError('No file uploaded', 'NO_FILE');
     }
 
     validateImageFile(file);
@@ -204,6 +208,27 @@ class ProductsController {
     const { url } = DeleteImageSchema.parse(request.body);
     await productsService.deleteProductImage(url);
     return reply.send(successResponse('Image deleted successfully', null));
+  }
+
+  async uploadProductVideo(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const file = await request.file();
+    if (!file) {
+      throw new BadRequestError('No file uploaded', 'NO_FILE');
+    }
+
+    validateVideoFile(file);
+    const buffer = await file.toBuffer();
+    validateVideoFileSize(buffer);
+
+    const extension = '.' + file.filename.split('.').pop()!.toLowerCase();
+    const result = await productsService.uploadProductVideo(buffer, extension);
+    return reply.status(201).send(successResponse('Video uploaded successfully', result));
+  }
+
+  async deleteProductVideo(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { url } = DeleteVideoSchema.parse(request.body);
+    await productsService.deleteProductVideo(url);
+    return reply.send(successResponse('Video deleted successfully', null));
   }
 }
 

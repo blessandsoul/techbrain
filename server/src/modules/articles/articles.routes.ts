@@ -121,6 +121,17 @@ export async function articlesRoutes(fastify: FastifyInstance): Promise<void> {
   );
 
   fastify.post(
+    '/articles/:id/video',
+    {
+      preValidation: [authenticate, authorize('ADMIN')],
+      config: {
+        rateLimit: RATE_LIMITS.ADMIN_DEFAULT,
+      },
+    },
+    articlesController.uploadVideo.bind(articlesController),
+  );
+
+  fastify.post(
     '/articles/:id/content-image',
     {
       preValidation: [authenticate, authorize('ADMIN')],

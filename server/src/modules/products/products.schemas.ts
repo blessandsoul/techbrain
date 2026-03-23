@@ -26,6 +26,7 @@ export const CatalogQuerySchema = z.object({
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().min(0).optional(),
   hasDiscount: z.coerce.boolean().optional(),
+  inStock: z.coerce.boolean().optional(),
   sort: z.enum(['newest', 'price-asc', 'price-desc', 'name-asc']).default('newest'),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
@@ -74,7 +75,9 @@ export const CreateProductSchema = z.object({
   currency: z.string().max(10).default('GEL'),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
+  inStock: z.boolean().default(true),
   images: z.array(z.string()).default([]),
+  videoUrl: z.string().max(500).nullable().optional(),
   name: LocalizedStringSchema,
   description: LocalizedStringPartialSchema.optional(),
   content: z.string().optional(),
@@ -94,7 +97,9 @@ export const UpdateProductSchema = z.object({
   currency: z.string().max(10).optional(),
   isActive: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
+  inStock: z.boolean().optional(),
   images: z.array(z.string()).optional(),
+  videoUrl: z.string().max(500).nullable().optional(),
   name: LocalizedStringPartialSchema.optional(),
   description: LocalizedStringPartialSchema.optional(),
   content: z.string().nullable().optional(),
@@ -149,6 +154,9 @@ export const AdminProductsQuerySchema = z.object({
   isActive: z.enum(['true', 'false']).optional().transform((v) =>
     v === 'true' ? true : v === 'false' ? false : undefined,
   ),
+  inStock: z.enum(['true', 'false']).optional().transform((v) =>
+    v === 'true' ? true : v === 'false' ? false : undefined,
+  ),
   category: z.string().optional(),
   search: z.string().max(200).optional(),
 });
@@ -169,3 +177,8 @@ export const DeleteImageSchema = z.object({
   url: z.string().startsWith('/uploads/products/'),
 });
 export type DeleteImageInput = z.infer<typeof DeleteImageSchema>;
+
+export const DeleteVideoSchema = z.object({
+  url: z.string().startsWith('/uploads/products/'),
+});
+export type DeleteVideoInput = z.infer<typeof DeleteVideoSchema>;

@@ -24,6 +24,7 @@
 
   "products.discounted": "Discounted Products",
   "products.inStock": "In Stock",
+  "products.outOfStock": "Out of Stock",
   "products.priceOnRequest": "Price on Request",
   "products.bestSellers": "Best Selling Products",
   "products.popular": "Popular Products",
@@ -132,5 +133,6 @@
   "catalog.recommended": "Recommended",
   "catalog.page": "Page {page} of {totalPages}",
   "catalog.prevPage": "Previous page",
-  "catalog.nextPage": "Next page"
+  "catalog.nextPage": "Next page",
+  "catalog.inStockOnly": "In Stock Only"
 }

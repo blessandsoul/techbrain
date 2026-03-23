@@ -121,6 +121,17 @@ export async function projectsRoutes(fastify: FastifyInstance): Promise<void> {
   );
 
   fastify.post(
+    '/projects/:id/video',
+    {
+      preValidation: [authenticate, authorize('ADMIN')],
+      config: {
+        rateLimit: RATE_LIMITS.ADMIN_DEFAULT,
+      },
+    },
+    projectsController.uploadVideo.bind(projectsController),
+  );
+
+  fastify.post(
     '/projects/:id/content-image',
     {
       preValidation: [authenticate, authorize('ADMIN')],

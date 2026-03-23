@@ -7,7 +7,7 @@
 
   "hero.title": "კამერები და უსაფრთხოების სისტემები",
   "hero.subtitle": "პროფესიონალური მონიტორინგი თქვენი სახლისა და ბიზნესისთვის",
-  "hero.cta": "პროდუქტების ნახვა",
+  "hero.cta": "პროდუქტის ნახვა",
   "hero.install": "მონტაჟი",
   "hero.installDesc": "პროფესიონალური კამერების მონტაჟი",
   "hero.guarantee": "გარანტია",
@@ -24,6 +24,7 @@
 
   "products.discounted": "ფასდაკლებული პროდუქტები",
   "products.inStock": "მარაგშია",
+  "products.outOfStock": "არ არის მარაგში",
   "products.priceOnRequest": "ფასი შეკითხვით",
   "products.bestSellers": "ყველაზე გაყიდვადი პროდუქტები",
   "products.popular": "პოპულარული პროდუქტები",
@@ -132,5 +133,6 @@
   "catalog.recommended": "რეკომენდებული",
   "catalog.page": "გვერდი {page} / {totalPages}",
   "catalog.prevPage": "წინა გვერდი",
-  "catalog.nextPage": "შემდეგი გვერდი"
+  "catalog.nextPage": "შემდეგი გვერდი",
+  "catalog.inStockOnly": "მხოლოდ მარაგში"
 }

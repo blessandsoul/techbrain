@@ -10,6 +10,7 @@ import { projectsRepository } from './projects.repo.js';
 import { fileStorageService } from '@libs/storage/file-storage.service.js';
 import { imageOptimizerService } from '@libs/storage/image-optimizer.service.js';
 import { validateImageFile, validateFileSize } from '@libs/storage/file-validator.js';
+import { validateVideoFile, validateVideoFileSize } from '@libs/storage/video-validator.js';
 import type { MultipartFile } from '@fastify/multipart';
 import type {
   ProjectResponse,
@@ -152,6 +153,29 @@ class ProjectsService {
     const { url } = await fileStorageService.saveProjectImage(id, optimized);
 
     return projectsRepository.update(id, { image: url });
+  }
+
+  // ── Video Upload ───────────────────────────────────
+
+  async uploadProjectVideo(id: string, file: MultipartFile): Promise<ProjectResponse> {
+    const project = await projectsRepository.findById(id);
+    if (!project) {
+      throw new NotFoundError('Project not found', 'PROJECT_NOT_FOUND');
+    }
+
+    validateVideoFile(file);
+    const buffer = await file.toBuffer();
+    validateVideoFileSize(buffer);
+
+    const extension = '.' + file.filename.split('.').pop()!.toLowerCase();
+
+    if (project.videoUrl) {
+      await fileStorageService.deleteProjectVideo(project.videoUrl);
+    }
+
+    const { url } = await fileStorageService.saveProjectVideo(id, buffer, extension);
+
+    return projectsRepository.update(id, { videoUrl: url });
   }
 
   // ── Content Image Upload ────────────────────────────

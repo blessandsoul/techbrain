@@ -54,6 +54,7 @@ export const UpdateArticleSchema = z.object({
   excerpt: z.string().min(1).optional(),
   content: z.string().min(1).optional(),
   category: z.enum(ARTICLE_CATEGORIES).optional(),
+  coverImage: z.string().max(500).nullable().optional(),
   readMin: z.number().int().min(1).max(120).optional(),
   isPublished: z.boolean().optional(),
 });

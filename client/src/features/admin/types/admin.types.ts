@@ -48,7 +48,9 @@ export interface CreateProductInput {
   currency?: string;
   isActive: boolean;
   isFeatured: boolean;
+  inStock: boolean;
   images: string[];
+  videoUrl?: string | null;
   name: LocalizedString;
   description?: Partial<LocalizedString>;
   specs: Array<{ key: LocalizedString; value: string }>;
@@ -63,7 +65,9 @@ export interface UpdateProductInput {
   currency?: string;
   isActive?: boolean;
   isFeatured?: boolean;
+  inStock?: boolean;
   images?: string[];
+  videoUrl?: string | null;
   name?: Partial<LocalizedString>;
   description?: Partial<LocalizedString>;
   specs?: Array<{ key: LocalizedString; value: string }>;

@@ -27,9 +27,9 @@ export function ArticleHero({ article }: ArticleHeroProps): React.ReactElement {
         {t('blog.back')} / {article.category}
       </p>
 
-      {/* Title — UPPERCASE */}
-      <h1 className="text-center text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[1.15] tracking-tight text-balance max-w-3xl mx-auto mb-6 md:mb-8">
-        {article.title.toUpperCase()}
+      {/* Title — uppercase via CSS (preserves Georgian script) */}
+      <h1 className="text-center text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-[1.15] tracking-tight text-balance max-w-3xl mx-auto mb-6 md:mb-8 uppercase">
+        {article.title}
       </h1>
 
       {/* Metadata row */}
@@ -51,6 +51,22 @@ export function ArticleHero({ article }: ArticleHeroProps): React.ReactElement {
             priority
             sizes="(max-width: 768px) 100vw, 600px"
           />
+        </div>
+      )}
+
+      {/* Video */}
+      {article.videoUrl && (
+        <div className="relative w-full max-w-[600px] mx-auto aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-black mb-8 md:mb-10">
+          <video
+            key={article.videoUrl}
+            poster={article.coverImage ? getArticleImageUrl(article.coverImage, article.updatedAt) : undefined}
+            controls
+            preload="metadata"
+            playsInline
+            className="absolute inset-0 w-full h-full object-contain"
+          >
+            <source src={getArticleImageUrl(article.videoUrl, article.updatedAt)} />
+          </video>
         </div>
       )}
 

@@ -89,13 +89,18 @@ export function CatalogToolbar({
     activeChips.push({ label: t('catalog.chipPriceMax', { value: maxPrice }), paramKey: 'maxPrice', value: '' });
   }
 
+  const inStock = searchParams.get('inStock');
+  if (inStock === 'true') {
+    activeChips.push({ label: t('catalog.inStockOnly'), paramKey: 'inStock', value: '' });
+  }
+
   function removeChip(paramKey: string, value: string): void {
     const params = new URLSearchParams(searchParams.toString());
 
     if (paramKey === 'search') {
       params.delete('search');
       setSearchInput('');
-    } else if (paramKey === 'minPrice' || paramKey === 'maxPrice') {
+    } else if (paramKey === 'minPrice' || paramKey === 'maxPrice' || paramKey === 'inStock') {
       params.delete(paramKey);
     } else {
       const raw = params.get(paramKey) ?? '';

@@ -17,6 +17,7 @@ interface ProductCardProduct {
   price: number;
   originalPrice?: number;
   discount?: number | null;
+  inStock?: boolean;
   images: string[];
 }
 
@@ -72,6 +73,15 @@ export function ProductCard({ product }: ProductCardProps): React.ReactElement {
             {categoryLabel}
           </span>
         </div>
+
+        {/* Out of stock badge */}
+        {product.inStock === false && (
+          <div className="absolute top-3 right-3">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-background/90 backdrop-blur-sm border border-border/60 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              {t('products.outOfStock')}
+            </span>
+          </div>
+        )}
 
         {/* Discount badge */}
         {product.discount != null && product.discount > 0 && (

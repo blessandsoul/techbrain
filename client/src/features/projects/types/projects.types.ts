@@ -15,6 +15,7 @@ export interface IProject {
   type: ProjectType;
   cameras: number;
   image: string | null;
+  videoUrl: string | null;
   content: string;
   year: string;
   isActive: boolean;

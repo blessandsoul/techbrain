@@ -88,6 +88,16 @@ class ProjectsController {
     return reply.send(successResponse('Project image uploaded successfully', project));
   }
 
+  async uploadVideo(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { id } = ProjectIdParamSchema.parse(request.params);
+    const file = await request.file();
+    if (!file) {
+      throw new BadRequestError('No file uploaded', 'NO_FILE');
+    }
+    const project = await projectsService.uploadProjectVideo(id, file);
+    return reply.send(successResponse('Project video uploaded successfully', project));
+  }
+
   async uploadContentImage(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = ProjectIdParamSchema.parse(request.params);
     const file = await request.file();

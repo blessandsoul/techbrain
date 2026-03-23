@@ -187,6 +187,23 @@ function ProductDetailContent(): React.ReactElement {
             </h1>
           </div>
 
+          {/* Stock badge */}
+          {product.inStock ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-success/10 text-success text-sm font-medium w-fit">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              {t('products.inStock')}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm font-medium w-fit border border-border">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              {t('products.outOfStock')}
+            </span>
+          )}
+
           {/* Price + CTA */}
           <div className="flex flex-col gap-4 p-6 rounded-xl bg-muted border border-border">
             {isService ? (

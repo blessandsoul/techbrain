@@ -19,6 +19,7 @@ function toArticleResponse(a: Article): ArticleResponse {
     content: a.content,
     category: a.category as ArticleResponse['category'],
     coverImage: a.coverImage,
+    videoUrl: a.videoUrl,
     isPublished: a.isPublished,
     readMin: a.readMin,
     authorId: a.authorId,
@@ -119,6 +120,7 @@ class ArticlesRepository {
     content?: string;
     category?: string;
     coverImage?: string | null;
+    videoUrl?: string | null;
     readMin?: number;
     isPublished?: boolean;
   }): Promise<ArticleResponse> {
@@ -129,6 +131,7 @@ class ArticlesRepository {
     if (data.content !== undefined) updateData.content = data.content;
     if (data.category !== undefined) updateData.category = data.category;
     if (data.coverImage !== undefined) updateData.coverImage = data.coverImage;
+    if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
     if (data.readMin !== undefined) updateData.readMin = data.readMin;
     if (data.isPublished !== undefined) updateData.isPublished = data.isPublished;
 

@@ -378,9 +378,18 @@
 
 /* ── Editor: visible cell outlines so admin knows where to click ── */
 .ProseMirror .image-grid {
+  position: relative;
   border: 2px dashed oklch(0.75 0.1 260 / 0.4);
   border-radius: var(--radius-lg);
   padding: 0.5rem;
+}
+
+/* Widget decoration wrapper must not participate in grid layout */
+.ProseMirror .image-grid > .ProseMirror-widget {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block;
 }
 
 .ProseMirror .image-grid-cell {

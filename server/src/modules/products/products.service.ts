@@ -52,6 +52,7 @@ class ProductsService {
       minPrice: input.minPrice,
       maxPrice: input.maxPrice,
       hasDiscount: input.hasDiscount,
+      inStock: input.inStock,
       sort: input.sort ?? 'newest',
       page: input.page,
       limit: input.limit,
@@ -112,7 +113,7 @@ class ProductsService {
   async getAllProducts(
     page: number,
     limit: number,
-    filters?: { isActive?: boolean; category?: string; search?: string },
+    filters?: { isActive?: boolean; inStock?: boolean; category?: string; search?: string },
   ): Promise<{ items: ProductResponse[]; totalItems: number }> {
     return productsRepository.findAllPaginated(page, limit, filters);
   }
@@ -155,7 +156,9 @@ class ProductsService {
       currency: input.currency ?? 'GEL',
       isActive: input.isActive ?? true,
       isFeatured: input.isFeatured ?? false,
+      inStock: input.inStock ?? true,
       images: input.images ?? [],
+      videoUrl: input.videoUrl,
       nameKa: input.name.ka,
       nameRu: input.name.ru ?? '',
       nameEn: input.name.en ?? '',
@@ -195,7 +198,9 @@ class ProductsService {
       currency: input.currency,
       isActive: input.isActive,
       isFeatured: input.isFeatured,
+      inStock: input.inStock,
       images: input.images,
+      videoUrl: input.videoUrl,
       nameKa: input.name?.ka,
       nameRu: input.name?.ru,
       nameEn: input.name?.en,
@@ -239,6 +244,17 @@ class ProductsService {
 
   async deleteProductImage(url: string): Promise<void> {
     await fileStorageService.deleteProductImage(url);
+  }
+
+  // ── Admin Video Management ─────────────────────────
+
+  async uploadProductVideo(buffer: Buffer, extension: string): Promise<{ url: string }> {
+    const { url } = await fileStorageService.saveProductVideo('temp', buffer, extension);
+    return { url };
+  }
+
+  async deleteProductVideo(url: string): Promise<void> {
+    await fileStorageService.deleteProductVideo(url);
   }
 
   // ── Private Helpers ───────────────────────────────

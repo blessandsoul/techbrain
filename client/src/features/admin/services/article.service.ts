@@ -59,6 +59,17 @@ class ArticleService {
     return response.data.data;
   }
 
+  async uploadVideo(id: string, file: File): Promise<IArticle> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post<ApiResponse<IArticle>>(
+      API_ENDPOINTS.ARTICLES.UPLOAD_VIDEO(id),
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
+    return response.data.data;
+  }
+
   async uploadContentImage(id: string, file: File): Promise<{ url: string }> {
     const formData = new FormData();
     formData.append('file', file);

@@ -8,7 +8,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { logger } from '@libs/logger.js';
-import { InternalError } from '@shared/errors/errors.js';
+import { BadRequestError, InternalError } from '@shared/errors/errors.js';
 import { generateAvatarFilename } from './filename-sanitizer.js';
 
 /**
@@ -336,6 +336,7 @@ class FileStorageService {
       // Convert URL to file system path: /uploads/products/... → uploads/products/...
       const relativePath = imageUrl.startsWith('/') ? imageUrl.slice(1) : imageUrl;
       const filePath = path.join(process.cwd(), relativePath);
+      this.assertPathWithinUploads(filePath);
 
       const exists = await this.fileExists(filePath);
       if (!exists) {
@@ -370,6 +371,163 @@ class FileStorageService {
     } catch (error) {
       logger.error({ err: error, msg: 'Failed to delete product image directory', productId });
       throw new InternalError('Failed to delete product image directory', 'FILE_DELETE_FAILED');
+    }
+  }
+
+  // ── Product Video Methods ───────────────────────
+
+  async saveProductVideo(
+    productId: string,
+    buffer: Buffer,
+    extension: string,
+  ): Promise<{ filename: string; url: string }> {
+    try {
+      const imageDir = this.getProductImageDir(productId);
+      await this.ensureDirectoryExists(imageDir);
+
+      const timestamp = Date.now();
+      const filename = `video-${timestamp}${extension}`;
+      const filePath = path.join(imageDir, filename);
+
+      await fs.writeFile(filePath, buffer);
+
+      const url = `/uploads/products/${productId}/${filename}`;
+
+      logger.info({
+        msg: 'Product video saved successfully',
+        productId,
+        filename,
+        fileSize: buffer.length,
+      });
+
+      return { filename, url };
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to save product video', productId });
+      throw new InternalError('Failed to save product video', 'FILE_SAVE_FAILED');
+    }
+  }
+
+  async deleteProductVideo(videoUrl: string): Promise<void> {
+    try {
+      const relativePath = videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl;
+      const filePath = path.join(process.cwd(), relativePath);
+      this.assertPathWithinUploads(filePath);
+
+      const exists = await this.fileExists(filePath);
+      if (!exists) {
+        logger.info({ msg: 'Product video does not exist, nothing to delete', videoUrl });
+        return;
+      }
+
+      await fs.unlink(filePath);
+      logger.info({ msg: 'Product video deleted successfully', videoUrl });
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to delete product video', videoUrl });
+      throw new InternalError('Failed to delete product video', 'FILE_DELETE_FAILED');
+    }
+  }
+
+  // ── Project Video Methods ──────────────────────
+
+  async saveProjectVideo(
+    projectId: string,
+    buffer: Buffer,
+    extension: string,
+  ): Promise<{ filename: string; url: string }> {
+    try {
+      const videoDir = this.getProjectImageDir(projectId);
+      await this.ensureDirectoryExists(videoDir);
+
+      const filename = `video-${projectId.slice(0, 8)}${extension}`;
+      const filePath = path.join(videoDir, filename);
+
+      await fs.writeFile(filePath, buffer);
+
+      const url = `/uploads/projects/${projectId}/${filename}`;
+
+      logger.info({
+        msg: 'Project video saved successfully',
+        projectId,
+        filename,
+        fileSize: buffer.length,
+      });
+
+      return { filename, url };
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to save project video', projectId });
+      throw new InternalError('Failed to save project video', 'FILE_SAVE_FAILED');
+    }
+  }
+
+  async deleteProjectVideo(videoUrl: string): Promise<void> {
+    try {
+      const relativePath = videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl;
+      const filePath = path.join(process.cwd(), relativePath);
+      this.assertPathWithinUploads(filePath);
+
+      const exists = await this.fileExists(filePath);
+      if (!exists) {
+        logger.info({ msg: 'Project video does not exist, nothing to delete', videoUrl });
+        return;
+      }
+
+      await fs.unlink(filePath);
+      logger.info({ msg: 'Project video deleted successfully', videoUrl });
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to delete project video', videoUrl });
+      throw new InternalError('Failed to delete project video', 'FILE_DELETE_FAILED');
+    }
+  }
+
+  // ── Article Video Methods ─────────────────────
+
+  async saveArticleVideo(
+    articleId: string,
+    buffer: Buffer,
+    extension: string,
+  ): Promise<{ filename: string; url: string }> {
+    try {
+      const videoDir = this.getArticleCoverDir(articleId);
+      await this.ensureDirectoryExists(videoDir);
+
+      const filename = `video-${articleId.slice(0, 8)}${extension}`;
+      const filePath = path.join(videoDir, filename);
+
+      await fs.writeFile(filePath, buffer);
+
+      const url = `/uploads/articles/${articleId}/${filename}`;
+
+      logger.info({
+        msg: 'Article video saved successfully',
+        articleId,
+        filename,
+        fileSize: buffer.length,
+      });
+
+      return { filename, url };
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to save article video', articleId });
+      throw new InternalError('Failed to save article video', 'FILE_SAVE_FAILED');
+    }
+  }
+
+  async deleteArticleVideo(videoUrl: string): Promise<void> {
+    try {
+      const relativePath = videoUrl.startsWith('/') ? videoUrl.slice(1) : videoUrl;
+      const filePath = path.join(process.cwd(), relativePath);
+      this.assertPathWithinUploads(filePath);
+
+      const exists = await this.fileExists(filePath);
+      if (!exists) {
+        logger.info({ msg: 'Article video does not exist, nothing to delete', videoUrl });
+        return;
+      }
+
+      await fs.unlink(filePath);
+      logger.info({ msg: 'Article video deleted successfully', videoUrl });
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to delete article video', videoUrl });
+      throw new InternalError('Failed to delete article video', 'FILE_DELETE_FAILED');
     }
   }
 
@@ -482,6 +640,17 @@ class FileStorageService {
    */
   getAvatarUrl(userId: string, filename: string): string {
     return `/uploads/users/${userId}/avatar/${filename}`;
+  }
+
+  /**
+   * Validates that a resolved file path stays within the uploads directory.
+   * Prevents path traversal attacks via `..` segments in user-supplied URLs.
+   */
+  private assertPathWithinUploads(filePath: string): void {
+    const resolved = path.resolve(filePath);
+    if (!resolved.startsWith(this.uploadDir + path.sep) && resolved !== this.uploadDir) {
+      throw new BadRequestError('Invalid file path', 'PATH_TRAVERSAL');
+    }
   }
 
   /**

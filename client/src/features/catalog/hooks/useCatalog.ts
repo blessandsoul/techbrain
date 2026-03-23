@@ -75,6 +75,20 @@ export function useFeaturedProducts(): ReturnType<typeof useQuery<IProduct[]>> {
   });
 }
 
+export function useAllProducts(limit = 12): ReturnType<typeof useQuery<IProduct[]>> {
+  return useQuery({
+    queryKey: [...catalogKeys.products(), 'all', limit] as const,
+    queryFn: async () => {
+      const result = await catalogService.getProducts({
+        page: 1,
+        limit,
+        sort: 'newest',
+      });
+      return result.items;
+    },
+  });
+}
+
 export function useDiscountedProducts(): ReturnType<typeof useQuery<IProduct[]>> {
   return useQuery({
     queryKey: catalogKeys.discounted(),
@@ -153,6 +167,7 @@ export function useCatalogPageData(): CatalogPageData {
   const maxPrice = searchParams.get('maxPrice')
     ? Number(searchParams.get('maxPrice'))
     : undefined;
+  const inStock = searchParams.get('inStock') === 'true' ? true : undefined;
 
   // 1. Fetch config (categories + filters)
   const configQuery = useCatalogConfig();
@@ -183,6 +198,7 @@ export function useCatalogPageData(): CatalogPageData {
       search,
       minPrice,
       maxPrice,
+      inStock,
       sort,
       page,
       limit,
@@ -195,6 +211,7 @@ export function useCatalogPageData(): CatalogPageData {
         search,
         minPrice,
         maxPrice,
+        inStock,
         sort,
         page,
         limit,

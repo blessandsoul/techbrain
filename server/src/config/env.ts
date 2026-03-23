@@ -29,6 +29,7 @@ const envSchema = z.object({
 
   // --- File Upload ---
   MAX_FILE_SIZE_MB: z.coerce.number().min(1).max(100).default(10),
+  MAX_VIDEO_FILE_SIZE_MB: z.coerce.number().min(1).max(500).default(50),
 
   // --- JWT Authentication ---
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),

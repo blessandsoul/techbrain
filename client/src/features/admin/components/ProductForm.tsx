@@ -54,6 +54,7 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
   const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [isActiveChecked, setIsActiveChecked] = useState<boolean>(product?.isActive ?? true);
   const [isFeaturedChecked, setIsFeaturedChecked] = useState<boolean>(product?.isFeatured ?? false);
+  const [inStockChecked, setInStockChecked] = useState<boolean>(product?.inStock ?? true);
   const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<string[]>(product?.categories ?? []);
   const [relatedIds, setRelatedIds] = useState<string[]>(product?.relatedProducts ?? []);
   const [nameKa, setNameKa] = useState(product?.name.ka ?? '');
@@ -170,6 +171,7 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
         originalPrice: parsedOrig > 0 ? parsedOrig : undefined,
         isActive: isActiveChecked,
         isFeatured: isFeaturedChecked,
+        inStock: inStockChecked,
         images,
         name: { ka: nameKa, ru: '', en: '' },
         description: descriptionKa ? { ka: descriptionKa } : undefined,
@@ -290,6 +292,14 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
                   onCheckedChange={(checked) => setIsFeaturedChecked(checked === true)}
                 />
                 <Label htmlFor="isFeatured" className="text-xs text-muted-foreground cursor-pointer">გამორჩეული <InfoTooltip text="ჩართვისას პროდუქტი გამოჩნდება მთავარ გვერდზე" /></Label>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Checkbox
+                  id="inStock"
+                  checked={inStockChecked}
+                  onCheckedChange={(checked) => setInStockChecked(checked === true)}
+                />
+                <Label htmlFor="inStock" className="text-xs text-muted-foreground cursor-pointer">მარაგშია <InfoTooltip text="გამორთვისას პროდუქტი გამოჩნდება როგორც 'არ არის მარაგში'" /></Label>
               </div>
             </div>
           </div>

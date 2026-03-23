@@ -4,7 +4,7 @@ import Link from 'next/link';
 import type { ReactElement } from 'react';
 import { SafeImage } from '@/components/common/SafeImage';
 import { cn } from '@/lib/utils';
-import { useFeaturedProducts, getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
+import { useAllProducts, getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
 import { useLocale } from '@/lib/i18n';
 
 import type { IProduct } from '@/features/catalog/types/catalog.types';
@@ -32,9 +32,9 @@ function toFlatProduct(product: IProduct, localized: (field: { ka: string; ru: s
 }
 
 export function PopularProductsSlider(): ReactElement | null {
-  const { data: featuredProducts, isLoading } = useFeaturedProducts();
+  const { data: allProducts, isLoading } = useAllProducts();
   const { t, localized } = useLocale();
-  const products = featuredProducts?.map((p) => toFlatProduct(p, localized)) ?? [];
+  const products = allProducts?.map((p) => toFlatProduct(p, localized)) ?? [];
 
   const categoryLabels: Record<string, string> = {
     cameras: t('category.cameras'),
