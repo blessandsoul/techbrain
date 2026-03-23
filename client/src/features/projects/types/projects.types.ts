@@ -40,6 +40,7 @@ export interface CreateProjectRequest {
 
 export type UpdateProjectRequest = Partial<Omit<CreateProjectRequest, 'image'>> & {
   image?: string | null;
+  videoUrl?: string | null;
 };
 
 export interface ProjectFilters {
