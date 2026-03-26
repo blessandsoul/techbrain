@@ -86,7 +86,7 @@ export function ProjectHero({ project }: ProjectHeroProps): React.ReactElement {
             preload="metadata"
             className="absolute inset-0 w-full h-full object-contain"
           >
-            <source src={getProjectImageUrl(project.videoUrl, project.updatedAt)} />
+            <source src={getProjectImageUrl(project.videoUrl, project.updatedAt)} type={`video/${project.videoUrl.split('.').pop()}`} />
           </video>
         </div>
       )}
