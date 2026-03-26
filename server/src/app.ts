@@ -45,7 +45,7 @@ export async function buildApp() {
     trustProxy: env.NODE_ENV === 'production',
     // Graceful shutdown configuration
     forceCloseConnections: true, // Force close idle connections on shutdown
-    requestTimeout: 30000, // 30s request timeout
+    requestTimeout: 600000, // 10min request timeout (allows large video uploads)
     connectionTimeout: 60000, // 60s connection timeout
     keepAliveTimeout: 5000, // 5s keep-alive timeout
     // Request body size limits (prevent DoS attacks)
