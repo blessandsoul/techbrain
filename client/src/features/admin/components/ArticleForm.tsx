@@ -99,6 +99,7 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
   const [videoUrl, setVideoUrl] = useState<string | null>(article?.videoUrl ?? null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUploading, setVideoUploading] = useState(false);
+  const [videoVersion, setVideoVersion] = useState<string>(article?.updatedAt ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [bodyHtml, setBodyHtml] = useState('');
   const [categoryValue, setCategoryValue] = useState<ArticleCategory>(article?.category ?? 'guides');
@@ -280,13 +281,14 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
         {/* Video */}
         <VideoUploader
           videoUrl={videoUrl}
-          resolveUrl={(url) => getArticleImageUrl(url, article?.updatedAt)}
+          resolveUrl={(url) => getArticleImageUrl(url, videoVersion)}
           onUpload={async (file) => {
             if (isEdit && article?.id) {
               setVideoUploading(true);
               try {
                 const updated = await articleService.uploadVideo(article.id, file);
                 setVideoUrl(updated.videoUrl);
+                setVideoVersion(updated.updatedAt);
               } catch (error) {
                 toast.error(getErrorMessage(error));
               } finally {

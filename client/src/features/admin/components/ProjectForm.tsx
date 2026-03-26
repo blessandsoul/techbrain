@@ -88,6 +88,7 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
   const [videoUrl, setVideoUrl] = useState<string | null>(project?.videoUrl ?? null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUploading, setVideoUploading] = useState(false);
+  const [videoVersion, setVideoVersion] = useState<string>(project?.updatedAt ?? '');
   const fileRef = useRef<HTMLInputElement>(null);
   const pendingImagesRef = useRef<Map<string, File>>(new Map());
 
@@ -295,13 +296,14 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
         {/* Video */}
         <VideoUploader
           videoUrl={videoUrl}
-          resolveUrl={(url) => getProjectImageUrl(url, project?.updatedAt)}
+          resolveUrl={(url) => getProjectImageUrl(url, videoVersion)}
           onUpload={async (file) => {
             if (isEdit && project?.id) {
               setVideoUploading(true);
               try {
                 const updated = await projectsService.uploadProjectVideo(project.id, file);
                 setVideoUrl(updated.videoUrl);
+                setVideoVersion(updated.updatedAt);
               } catch (error) {
                 toast.error(getErrorMessage(error));
               } finally {

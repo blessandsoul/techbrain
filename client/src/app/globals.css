@@ -155,10 +155,25 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: oklch(from var(--foreground) l c h / 0.15) transparent;
+  }
+  *:hover {
+    scrollbar-color: oklch(from var(--foreground) l c h / 0.25) transparent;
   }
   *::-webkit-scrollbar {
-    display: none;
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: oklch(from var(--foreground) l c h / 0.15);
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: oklch(from var(--foreground) l c h / 0.25);
   }
   body {
     @apply bg-background text-foreground;
