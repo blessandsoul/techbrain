@@ -59,13 +59,25 @@ class ArticleService {
     return response.data.data;
   }
 
-  async uploadVideo(id: string, file: File): Promise<IArticle> {
+  async uploadVideo(
+    id: string,
+    file: File,
+    onUploadProgress?: (percent: number) => void,
+  ): Promise<IArticle> {
     const formData = new FormData();
     formData.append('file', file);
     const response = await apiClient.post<ApiResponse<IArticle>>(
       API_ENDPOINTS.ARTICLES.UPLOAD_VIDEO(id),
       formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 0, // No timeout for video uploads
+        onUploadProgress: (e) => {
+          if (onUploadProgress && e.total) {
+            onUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        },
+      },
     );
     return response.data.data;
   }

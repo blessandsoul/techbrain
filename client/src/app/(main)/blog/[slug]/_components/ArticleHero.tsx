@@ -68,7 +68,7 @@ export function ArticleHero({ article }: ArticleHeroProps): React.ReactElement {
             preload="metadata"
             className="absolute inset-0 w-full h-full object-contain"
           >
-            <source src={getArticleImageUrl(article.videoUrl, article.updatedAt)} />
+            <source src={getArticleImageUrl(article.videoUrl, article.updatedAt)} type={`video/${article.videoUrl.split('?')[0].split('.').pop()}`} />
           </video>
         </div>
       )}

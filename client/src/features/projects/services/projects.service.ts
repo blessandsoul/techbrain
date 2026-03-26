@@ -88,13 +88,25 @@ class ProjectsService {
     return data.data;
   }
 
-  async uploadProjectVideo(id: string, file: File): Promise<IProject> {
+  async uploadProjectVideo(
+    id: string,
+    file: File,
+    onUploadProgress?: (percent: number) => void,
+  ): Promise<IProject> {
     const formData = new FormData();
     formData.append('file', file);
     const { data } = await apiClient.post<ApiResponse<IProject>>(
       API_ENDPOINTS.PROJECTS.UPLOAD_VIDEO(id),
       formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 0, // No timeout for video uploads
+        onUploadProgress: (e) => {
+          if (onUploadProgress && e.total) {
+            onUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        },
+      },
     );
     return data.data;
   }

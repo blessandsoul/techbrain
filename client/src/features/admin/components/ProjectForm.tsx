@@ -297,13 +297,15 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
         <VideoUploader
           videoUrl={videoUrl}
           resolveUrl={(url) => getProjectImageUrl(url, videoVersion)}
-          onUpload={async (file) => {
+          onUpload={async (file, onProgress) => {
             if (isEdit && project?.id) {
               setVideoUploading(true);
               try {
-                const updated = await projectsService.uploadProjectVideo(project.id, file);
-                setVideoUrl(updated.videoUrl);
-                setVideoVersion(updated.updatedAt);
+                await projectsService.uploadProjectVideo(project.id, file, onProgress);
+                // Revoke previous blob URL to avoid memory leak
+                if (videoUrl?.startsWith('blob:')) URL.revokeObjectURL(videoUrl);
+                // Use blob URL for instant preview; server URL is already persisted in DB
+                setVideoUrl(URL.createObjectURL(file));
               } catch (error) {
                 toast.error(getErrorMessage(error));
               } finally {
@@ -311,6 +313,7 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
               }
             } else {
               setVideoFile(file);
+              if (videoUrl?.startsWith('blob:')) URL.revokeObjectURL(videoUrl);
               setVideoUrl(URL.createObjectURL(file));
             }
           }}

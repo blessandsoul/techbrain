@@ -180,6 +180,8 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
           isPublished,
           // If cover was removed and no new file selected, set coverImage to null
           ...(coverRemoved && !coverFile ? { coverImage: null } : {}),
+          // If video was removed (was set before but now null), set videoUrl to null
+          ...(article?.videoUrl && !videoUrl ? { videoUrl: null } : {}),
         },
       });
 
@@ -282,13 +284,15 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
         <VideoUploader
           videoUrl={videoUrl}
           resolveUrl={(url) => getArticleImageUrl(url, videoVersion)}
-          onUpload={async (file) => {
+          onUpload={async (file, onProgress) => {
             if (isEdit && article?.id) {
               setVideoUploading(true);
               try {
-                const updated = await articleService.uploadVideo(article.id, file);
-                setVideoUrl(updated.videoUrl);
-                setVideoVersion(updated.updatedAt);
+                await articleService.uploadVideo(article.id, file, onProgress);
+                // Revoke previous blob URL to avoid memory leak
+                if (videoUrl?.startsWith('blob:')) URL.revokeObjectURL(videoUrl);
+                // Use blob URL for instant preview; server URL is already persisted in DB
+                setVideoUrl(URL.createObjectURL(file));
               } catch (error) {
                 toast.error(getErrorMessage(error));
               } finally {
@@ -296,6 +300,7 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
               }
             } else {
               setVideoFile(file);
+              if (videoUrl?.startsWith('blob:')) URL.revokeObjectURL(videoUrl);
               setVideoUrl(URL.createObjectURL(file));
             }
           }}

@@ -88,6 +88,14 @@ class ArticlesService {
       }
     }
 
+    // If videoUrl is being set to null, delete the video file from storage
+    if (input.videoUrl === null) {
+      const article = await articlesRepository.findById(id);
+      if (article?.videoUrl) {
+        await fileStorageService.deleteArticleVideo(article.videoUrl);
+      }
+    }
+
     return articlesRepository.update(id, {
       slug: input.slug,
       title: input.title,
@@ -95,6 +103,7 @@ class ArticlesService {
       content: input.content,
       category: input.category,
       coverImage: input.coverImage,
+      videoUrl: input.videoUrl,
       readMin: input.readMin,
       isPublished: input.isPublished,
     });

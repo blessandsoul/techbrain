@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -11,13 +11,22 @@ const ACCEPTED_VIDEO_TYPES = 'video/mp4,video/webm,video/quicktime';
 interface VideoUploaderProps {
   videoUrl: string | null;
   resolveUrl: (url: string) => string;
-  onUpload: (file: File) => Promise<void>;
+  onUpload: (file: File, onProgress: (percent: number) => void) => Promise<void>;
   onRemove: () => void;
   isPending: boolean;
 }
 
 export function VideoUploader({ videoUrl, resolveUrl, onUpload, onRemove, isPending }: VideoUploaderProps): React.ReactElement {
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [progress, setProgress] = useState<number | null>(null);
+
+  const isUploading = isPending || progress !== null;
+
+  // Blob URLs play instantly; server paths go through resolveUrl for cache-busting
+  const resolvedSrc = videoUrl
+    ? (videoUrl.startsWith('blob:') ? videoUrl : resolveUrl(videoUrl))
+    : '';
 
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
@@ -29,10 +38,13 @@ export function VideoUploader({ videoUrl, resolveUrl, onUpload, onRemove, isPend
       return;
     }
 
+    setProgress(0);
     try {
-      await onUpload(file);
+      await onUpload(file, (percent) => setProgress(percent));
     } catch {
-      // Error handled by mutation hook
+      // Error handled by caller
+    } finally {
+      setProgress(null);
     }
 
     if (fileRef.current) fileRef.current.value = '';
@@ -44,25 +56,26 @@ export function VideoUploader({ videoUrl, resolveUrl, onUpload, onRemove, isPend
         <span className="text-xs font-medium text-foreground uppercase tracking-wider">ვიდეო</span>
       </div>
 
-      {videoUrl ? (
+      {videoUrl && !isUploading ? (
         <div className="space-y-2">
           <div className="relative rounded-lg overflow-hidden bg-black max-w-xs h-48">
             <video
-              key={videoUrl}
+              ref={videoRef}
+              key={resolvedSrc}
+              src={resolvedSrc}
               controls
               preload="metadata"
               playsInline
+              onLoadedData={() => videoRef.current?.play().catch(() => {})}
               className="w-full h-full object-contain rounded-lg"
-            >
-              <source src={resolveUrl(videoUrl)} />
-            </video>
+            />
           </div>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={onRemove}
-            disabled={isPending}
+            disabled={isUploading}
             className="text-destructive hover:text-destructive"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5 mr-1">
@@ -71,24 +84,41 @@ export function VideoUploader({ videoUrl, resolveUrl, onUpload, onRemove, isPend
             წაშლა
           </Button>
         </div>
+      ) : isUploading ? (
+        <div className="w-full max-w-xs space-y-2">
+          <div className="flex items-center gap-3 h-16 px-4 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5">
+            <svg className="w-5 h-5 text-primary animate-spin shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">იტვირთება...</p>
+              <p className="text-xs text-muted-foreground">{progress !== null ? `${progress}%` : 'მზადდება...'}</p>
+            </div>
+          </div>
+          {progress !== null && (
+            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
+        </div>
       ) : (
         <Button
           type="button"
           variant="outline"
           onClick={() => fileRef.current?.click()}
-          disabled={isPending}
+          disabled={isUploading}
           className="h-16 w-full max-w-xs rounded-lg border-2 border-dashed"
         >
-          {isPending ? (
-            <span className="text-sm text-muted-foreground">იტვირთება...</span>
-          ) : (
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
-              </svg>
-              ვიდეოს ატვირთვა
-            </span>
-          )}
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>
+            ვიდეოს ატვირთვა
+          </span>
         </Button>
       )}
 

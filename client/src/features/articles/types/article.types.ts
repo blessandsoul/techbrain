@@ -33,6 +33,7 @@ export interface UpdateArticleInput {
   content?: string;
   category?: ArticleCategory;
   coverImage?: string | null;
+  videoUrl?: string | null;
   readMin?: number;
   isPublished?: boolean;
 }
