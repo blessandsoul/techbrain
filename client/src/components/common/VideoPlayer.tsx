@@ -12,9 +12,12 @@ export function VideoPlayer({ src, poster, className }: VideoPlayerProps): React
       <video
         key={src}
         poster={poster}
+        autoPlay
+        muted
+        loop
+        playsInline
         controls
         preload="metadata"
-        playsInline
         className="w-full"
       >
         <source src={src} />

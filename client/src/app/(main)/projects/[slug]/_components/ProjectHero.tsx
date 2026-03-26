@@ -78,9 +78,12 @@ export function ProjectHero({ project }: ProjectHeroProps): React.ReactElement {
           <video
             key={project.videoUrl}
             poster={project.image ? getProjectImageUrl(project.image, project.updatedAt) : undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
             controls
             preload="metadata"
-            playsInline
             className="absolute inset-0 w-full h-full object-contain"
           >
             <source src={getProjectImageUrl(project.videoUrl, project.updatedAt)} />

@@ -60,9 +60,12 @@ export function ArticleHero({ article }: ArticleHeroProps): React.ReactElement {
           <video
             key={article.videoUrl}
             poster={article.coverImage ? getArticleImageUrl(article.coverImage, article.updatedAt) : undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
             controls
             preload="metadata"
-            playsInline
             className="absolute inset-0 w-full h-full object-contain"
           >
             <source src={getArticleImageUrl(article.videoUrl, article.updatedAt)} />
