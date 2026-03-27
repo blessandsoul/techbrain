@@ -126,8 +126,8 @@ class ProjectsService {
       throw new NotFoundError('Project not found', 'PROJECT_NOT_FOUND');
     }
 
-    // Delete associated image files
-    await fileStorageService.deleteProjectImage(id);
+    // Delete entire project directory (cover + content images)
+    await fileStorageService.deleteProjectDir(id);
 
     await projectsRepository.delete(id);
   }

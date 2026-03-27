@@ -115,7 +115,7 @@ class ArticlesService {
       throw new NotFoundError('Article not found', 'ARTICLE_NOT_FOUND');
     }
 
-    await fileStorageService.deleteArticleCoverImage(id);
+    await fileStorageService.deleteArticleDir(id);
     await articlesRepository.delete(id);
   }
 

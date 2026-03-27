@@ -235,12 +235,39 @@ class FileStorageService {
         return;
       }
 
-      await fs.rm(imageDir, { recursive: true, force: true });
+      // Only delete the cover image file, NOT the entire directory
+      // (the directory also contains content/ subdirectory with TipTap images)
+      const coverFilename = `project-${projectId.slice(0, 8)}.webp`;
+      const coverPath = path.join(imageDir, coverFilename);
+
+      try {
+        await fs.unlink(coverPath);
+      } catch {
+        // Cover file may not exist, that's fine
+      }
 
       logger.info({ msg: 'Project image deleted successfully', projectId });
     } catch (error) {
       logger.error({ err: error, msg: 'Failed to delete project image', projectId });
       throw new InternalError('Failed to delete project image', 'FILE_DELETE_FAILED');
+    }
+  }
+
+  async deleteProjectDir(projectId: string): Promise<void> {
+    try {
+      const projectDir = this.getProjectImageDir(projectId);
+
+      const exists = await this.directoryExists(projectDir);
+      if (!exists) {
+        return;
+      }
+
+      await fs.rm(projectDir, { recursive: true, force: true });
+
+      logger.info({ msg: 'Project directory deleted successfully', projectId });
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to delete project directory', projectId });
+      throw new InternalError('Failed to delete project directory', 'FILE_DELETE_FAILED');
     }
   }
 
@@ -611,12 +638,39 @@ class FileStorageService {
         return;
       }
 
-      await fs.rm(imageDir, { recursive: true, force: true });
+      // Only delete the cover image file, NOT the entire directory
+      // (the directory also contains content/ subdirectory with TipTap images)
+      const coverFilename = `article-${articleId.slice(0, 8)}.webp`;
+      const coverPath = path.join(imageDir, coverFilename);
+
+      try {
+        await fs.unlink(coverPath);
+      } catch {
+        // Cover file may not exist, that's fine
+      }
 
       logger.info({ msg: 'Article cover image deleted successfully', articleId });
     } catch (error) {
       logger.error({ err: error, msg: 'Failed to delete article cover image', articleId });
       throw new InternalError('Failed to delete article cover image', 'FILE_DELETE_FAILED');
+    }
+  }
+
+  async deleteArticleDir(articleId: string): Promise<void> {
+    try {
+      const articleDir = this.getArticleCoverDir(articleId);
+
+      const exists = await this.directoryExists(articleDir);
+      if (!exists) {
+        return;
+      }
+
+      await fs.rm(articleDir, { recursive: true, force: true });
+
+      logger.info({ msg: 'Article directory deleted successfully', articleId });
+    } catch (error) {
+      logger.error({ err: error, msg: 'Failed to delete article directory', articleId });
+      throw new InternalError('Failed to delete article directory', 'FILE_DELETE_FAILED');
     }
   }
 
