@@ -20,6 +20,7 @@ export function ProductCTA({ product }: ProductCTAProps): React.ReactElement {
   const addItem = useCartStore((s) => s.addItem);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const outOfStock = !product.inStock;
 
   function handleDecrement(): void {
     setQuantity((prev) => Math.max(1, prev - 1));
@@ -49,7 +50,7 @@ export function ProductCTA({ product }: ProductCTAProps): React.ReactElement {
       <div className="flex items-center rounded-xl border border-border bg-background shrink-0">
         <button
           onClick={handleDecrement}
-          disabled={quantity <= 1 || added}
+          disabled={quantity <= 1 || added || outOfStock}
           className="flex items-center justify-center w-10 h-10 rounded-l-xl text-muted-foreground transition-colors duration-150 cursor-pointer hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:scale-[0.95]"
           aria-label="Quantity -"
         >
@@ -64,7 +65,7 @@ export function ProductCTA({ product }: ProductCTAProps): React.ReactElement {
 
         <button
           onClick={handleIncrement}
-          disabled={quantity >= 99 || added}
+          disabled={quantity >= 99 || added || outOfStock}
           className="flex items-center justify-center w-10 h-10 rounded-r-xl text-muted-foreground transition-colors duration-150 cursor-pointer hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:scale-[0.95]"
           aria-label="Quantity +"
         >
@@ -77,11 +78,13 @@ export function ProductCTA({ product }: ProductCTAProps): React.ReactElement {
       {/* Add to cart button */}
       <button
         onClick={handleAdd}
-        disabled={added}
-        className={`flex-1 flex items-center justify-center gap-2 h-10 px-4 rounded-xl border text-sm font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:scale-[0.98] ${
-          added
-            ? 'bg-green-600/10 text-green-500 border-green-600/30'
-            : 'bg-background border-border text-foreground hover:border-primary hover:text-primary'
+        disabled={added || outOfStock}
+        className={`flex-1 flex items-center justify-center gap-2 h-10 px-4 rounded-xl border text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:scale-[0.98] ${
+          outOfStock
+            ? 'opacity-50 cursor-not-allowed bg-muted border-border text-muted-foreground'
+            : added
+              ? 'bg-green-600/10 text-green-500 border-green-600/30 cursor-pointer'
+              : 'bg-background border-border text-foreground hover:border-primary hover:text-primary cursor-pointer'
         }`}
         aria-label="Add to cart"
       >
@@ -102,7 +105,12 @@ export function ProductCTA({ product }: ProductCTAProps): React.ReactElement {
       {/* Buy now button */}
       <button
         onClick={handleBuyNow}
-        className="flex items-center justify-center gap-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 hover:brightness-110 active:scale-[0.98]"
+        disabled={outOfStock}
+        className={`flex items-center justify-center gap-2 h-10 px-5 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:scale-[0.98] ${
+          outOfStock
+            ? 'opacity-50 cursor-not-allowed bg-primary/50 text-primary-foreground'
+            : 'bg-primary text-primary-foreground cursor-pointer hover:brightness-110'
+        }`}
       >
         {t('catalog.buy')}
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">

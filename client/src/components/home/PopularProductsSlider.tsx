@@ -17,6 +17,7 @@ interface FlatProduct {
   originalPrice?: number;
   images: string[];
   name: string;
+  inStock: boolean;
 }
 
 function toFlatProduct(product: IProduct, localized: (field: { ka: string; ru: string; en: string } | string) => string): FlatProduct {
@@ -28,6 +29,7 @@ function toFlatProduct(product: IProduct, localized: (field: { ka: string; ru: s
     originalPrice: product.originalPrice,
     images: product.images.map(getProductImageUrl),
     name: localized(product.name),
+    inStock: product.inStock,
   };
 }
 
@@ -103,7 +105,7 @@ export function PopularProductsSlider(): ReactElement | null {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} categoryLabels={categoryLabels} byOrderLabel={t('products.byOrder')} learnMoreLabel={t('products.learnMore')} />
+            <ProductCard key={product.id} product={product} categoryLabels={categoryLabels} byOrderLabel={t('products.byOrder')} learnMoreLabel={t('products.learnMore')} outOfStockLabel={t('products.outOfStock')} />
           ))}
         </div>
 
@@ -114,7 +116,7 @@ export function PopularProductsSlider(): ReactElement | null {
 
 /* -- Product card (matches reference ProductCard design) -- */
 
-function ProductCard({ product, categoryLabels, byOrderLabel, learnMoreLabel }: { product: FlatProduct; categoryLabels: Record<string, string>; byOrderLabel: string; learnMoreLabel: string }): ReactElement {
+function ProductCard({ product, categoryLabels, byOrderLabel, learnMoreLabel, outOfStockLabel }: { product: FlatProduct; categoryLabels: Record<string, string>; byOrderLabel: string; learnMoreLabel: string; outOfStockLabel: string }): ReactElement {
   const name = product.name;
   const hasImage = product.images.length > 0;
   const isService = product.categories.includes('services');
@@ -161,6 +163,15 @@ function ProductCard({ product, categoryLabels, byOrderLabel, learnMoreLabel }: 
             {categoryLabel}
           </span>
         </div>
+
+        {/* Out of stock badge */}
+        {product.inStock === false && (
+          <div className="absolute top-3 right-3">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-background/90 backdrop-blur-sm border border-border/60 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              {outOfStockLabel}
+            </span>
+          </div>
+        )}
 
         {/* Discount badge */}
         {hasDiscount && (
