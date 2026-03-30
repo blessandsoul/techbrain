@@ -33,6 +33,22 @@ export const AdminArticlesQuerySchema = z.object({
 });
 export type AdminArticlesQuery = z.infer<typeof AdminArticlesQuerySchema>;
 
+// ── FAQ Sub-Schema ──────────────────────────────────────
+
+const FaqInputSchema = z.object({
+  question: z.object({
+    ka: z.string().min(1),
+    ru: z.string().default(''),
+    en: z.string().default(''),
+  }),
+  answer: z.object({
+    ka: z.string().min(1),
+    ru: z.string().default(''),
+    en: z.string().default(''),
+  }),
+  sortOrder: z.number().int().min(0).default(0),
+});
+
 // ── Create / Update Schemas ─────────────────────────────
 
 const ARTICLE_CATEGORIES = ['cameras', 'nvr', 'installation', 'news', 'guides'] as const;
@@ -45,6 +61,8 @@ export const CreateArticleSchema = z.object({
   category: z.enum(ARTICLE_CATEGORIES),
   readMin: z.number().int().min(1).max(120).default(5),
   isPublished: z.boolean().default(false),
+  tagIds: z.array(z.string().uuid()).default([]),
+  faqs: z.array(FaqInputSchema).default([]),
 });
 export type CreateArticleSchemaInput = z.infer<typeof CreateArticleSchema>;
 
@@ -58,5 +76,7 @@ export const UpdateArticleSchema = z.object({
   videoUrl: z.string().max(500).nullable().optional(),
   readMin: z.number().int().min(1).max(120).optional(),
   isPublished: z.boolean().optional(),
+  tagIds: z.array(z.string().uuid()).optional(),
+  faqs: z.array(FaqInputSchema).optional(),
 });
 export type UpdateArticleSchemaInput = z.infer<typeof UpdateArticleSchema>;

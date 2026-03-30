@@ -212,6 +212,9 @@ model Project {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  tags ProjectTag[]
+  faqs ProjectFaq[]
+
   @@index([isActive, sortOrder])
   @@index([sortOrder])
   @@index([slug])
@@ -316,10 +319,92 @@ model Article {
   updatedAt   DateTime @updatedAt
 
   author User @relation(fields: [authorId], references: [id])
+  tags   ArticleTag[]
+  faqs   ArticleFaq[]
 
   @@index([isPublished, createdAt])
   @@index([slug])
   @@index([category])
   @@index([authorId])
   @@map("articles")
+}
+
+// ── Tags ────────────────────────────────────────────────
+
+model Tag {
+  id        String   @id @default(uuid())
+  slug      String   @unique @db.VarChar(300)
+  nameKa    String   @db.VarChar(200)
+  nameRu    String   @default("") @db.VarChar(200)
+  nameEn    String   @default("") @db.VarChar(200)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles  ArticleTag[]
+  projects  ProjectTag[]
+
+  @@index([slug])
+  @@map("tags")
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+  @@map("article_tags")
+}
+
+model ProjectTag {
+  projectId String
+  tagId     String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, tagId])
+  @@index([tagId])
+  @@map("project_tags")
+}
+
+// ── FAQs ────────────────────────────────────────────────
+
+model ArticleFaq {
+  id         String   @id @default(uuid())
+  articleId  String
+  questionKa String   @db.Text
+  questionRu String   @default("") @db.Text
+  questionEn String   @default("") @db.Text
+  answerKa   String   @db.Text
+  answerRu   String   @default("") @db.Text
+  answerEn   String   @default("") @db.Text
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId, sortOrder])
+  @@map("article_faqs")
+}
+
+model ProjectFaq {
+  id         String   @id @default(uuid())
+  projectId  String
+  questionKa String   @db.Text
+  questionRu String   @default("") @db.Text
+  questionEn String   @default("") @db.Text
+  answerKa   String   @db.Text
+  answerRu   String   @default("") @db.Text
+  answerEn   String   @default("") @db.Text
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, sortOrder])
+  @@map("project_faqs")
 }

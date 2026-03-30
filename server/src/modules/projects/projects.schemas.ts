@@ -46,6 +46,22 @@ const LocalizedStringPartialSchema = z.object({
   en: z.string().optional(),
 });
 
+// ── FAQ Sub-Schema ──────────────────────────────────────
+
+const FaqInputSchema = z.object({
+  question: z.object({
+    ka: z.string().min(1),
+    ru: z.string().default(''),
+    en: z.string().default(''),
+  }),
+  answer: z.object({
+    ka: z.string().min(1),
+    ru: z.string().default(''),
+    en: z.string().default(''),
+  }),
+  sortOrder: z.number().int().min(0).default(0),
+});
+
 // ── Create / Update Schemas ─────────────────────────────
 
 const LocalizedStringOptionalSchema = z.object({
@@ -67,6 +83,8 @@ export const CreateProjectSchema = z.object({
   year: z.string().min(4).max(10),
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
+  tagIds: z.array(z.string().uuid()).default([]),
+  faqs: z.array(FaqInputSchema).default([]),
 });
 export type CreateProjectSchemaInput = z.infer<typeof CreateProjectSchema>;
 
@@ -83,5 +101,7 @@ export const UpdateProjectSchema = z.object({
   year: z.string().min(4).max(10).optional(),
   isActive: z.boolean().optional(),
   sortOrder: z.number().int().optional(),
+  tagIds: z.array(z.string().uuid()).optional(),
+  faqs: z.array(FaqInputSchema).optional(),
 });
 export type UpdateProjectSchemaInput = z.infer<typeof UpdateProjectSchema>;

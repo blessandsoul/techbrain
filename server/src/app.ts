@@ -22,6 +22,7 @@ import { productsRoutes } from '@modules/products/products.routes.js';
 import { projectsRoutes } from '@modules/projects/projects.routes.js';
 import { siteSettingsRoutes } from '@modules/site-settings/site-settings.routes.js';
 import { articlesRoutes } from '@modules/articles/articles.routes.js';
+import { tagsRoutes } from '@modules/tags/tags.routes.js';
 import { ordersRoutes } from '@modules/orders/orders.routes.js';
 import { inquiriesRoutes } from '@modules/inquiries/inquiries.routes.js';
 import { fileStorageService } from '@libs/storage/file-storage.service.js';
@@ -297,6 +298,7 @@ export async function buildApp() {
   await app.register(projectsRoutes, { prefix: '/api/v1' });
   await app.register(siteSettingsRoutes, { prefix: '/api/v1' });
   await app.register(articlesRoutes, { prefix: '/api/v1' });
+  await app.register(tagsRoutes, { prefix: '/api/v1' });
   await app.register(ordersRoutes, { prefix: '/api/v1' });
   await app.register(inquiriesRoutes, { prefix: '/api/v1' });
 

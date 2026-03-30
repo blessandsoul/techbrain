@@ -5,12 +5,31 @@
  */
 
 import { prisma } from '@libs/prisma.js';
-import type { Project, Prisma } from '@prisma/client';
-import type { ProjectResponse } from './projects.types.js';
+import type { Project, ProjectTag, Tag, ProjectFaq, Prisma } from '@prisma/client';
+import type { ProjectResponse, FaqInput } from './projects.types.js';
+
+// ── Types for Prisma includes ───────────────────────────
+
+type ProjectWithRelations = Project & {
+  tags: (ProjectTag & { tag: Tag })[];
+  faqs: ProjectFaq[];
+};
+
+// ── Include clause reused across queries ────────────────
+
+const PROJECT_INCLUDE = {
+  tags: {
+    include: { tag: true },
+    orderBy: { tag: { nameKa: 'asc' as const } },
+  },
+  faqs: {
+    orderBy: { sortOrder: 'asc' as const },
+  },
+};
 
 // ── DB → Response Mapper ────────────────────────────────
 
-function toProjectResponse(p: Project): ProjectResponse {
+function toProjectResponse(p: ProjectWithRelations): ProjectResponse {
   return {
     id: p.id,
     slug: p.slug,
@@ -25,6 +44,17 @@ function toProjectResponse(p: Project): ProjectResponse {
     year: p.year,
     isActive: p.isActive,
     sortOrder: p.sortOrder,
+    tags: p.tags.map((pt) => ({
+      id: pt.tag.id,
+      slug: pt.tag.slug,
+      name: { ka: pt.tag.nameKa, ru: pt.tag.nameRu, en: pt.tag.nameEn },
+    })),
+    faqs: p.faqs.map((f) => ({
+      id: f.id,
+      question: { ka: f.questionKa, ru: f.questionRu, en: f.questionEn },
+      answer: { ka: f.answerKa, ru: f.answerRu, en: f.answerEn },
+      sortOrder: f.sortOrder,
+    })),
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   };
@@ -44,6 +74,7 @@ class ProjectsRepository {
     const [rows, totalItems] = await Promise.all([
       prisma.project.findMany({
         where,
+        include: PROJECT_INCLUDE,
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
         skip: (page - 1) * limit,
         take: limit,
@@ -52,7 +83,7 @@ class ProjectsRepository {
     ]);
 
     return {
-      items: rows.map(toProjectResponse),
+      items: (rows as ProjectWithRelations[]).map(toProjectResponse),
       totalItems,
     };
   }
@@ -67,6 +98,7 @@ class ProjectsRepository {
     const [rows, totalItems] = await Promise.all([
       prisma.project.findMany({
         where,
+        include: PROJECT_INCLUDE,
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
         skip: (page - 1) * limit,
         take: limit,
@@ -75,21 +107,25 @@ class ProjectsRepository {
     ]);
 
     return {
-      items: rows.map(toProjectResponse),
+      items: (rows as ProjectWithRelations[]).map(toProjectResponse),
       totalItems,
     };
   }
 
   async findById(id: string): Promise<ProjectResponse | null> {
-    const row = await prisma.project.findUnique({ where: { id } });
-    return row ? toProjectResponse(row) : null;
+    const row = await prisma.project.findUnique({
+      where: { id },
+      include: PROJECT_INCLUDE,
+    });
+    return row ? toProjectResponse(row as ProjectWithRelations) : null;
   }
 
   async findBySlug(slug: string): Promise<ProjectResponse | null> {
     const row = await prisma.project.findUnique({
       where: { slug, isActive: true },
+      include: PROJECT_INCLUDE,
     });
-    return row ? toProjectResponse(row) : null;
+    return row ? toProjectResponse(row as ProjectWithRelations) : null;
   }
 
   async existsBySlug(slug: string): Promise<boolean> {
@@ -116,6 +152,8 @@ class ProjectsRepository {
     year: string;
     isActive: boolean;
     sortOrder: number;
+    tagIds: string[];
+    faqs: FaqInput[];
   }): Promise<ProjectResponse> {
     const row = await prisma.project.create({
       data: {
@@ -137,9 +175,24 @@ class ProjectsRepository {
         year: data.year,
         isActive: data.isActive,
         sortOrder: data.sortOrder,
+        tags: {
+          create: data.tagIds.map((tagId) => ({ tagId })),
+        },
+        faqs: {
+          create: data.faqs.map((faq, index) => ({
+            questionKa: faq.question.ka,
+            questionRu: faq.question.ru ?? '',
+            questionEn: faq.question.en ?? '',
+            answerKa: faq.answer.ka,
+            answerRu: faq.answer.ru ?? '',
+            answerEn: faq.answer.en ?? '',
+            sortOrder: faq.sortOrder ?? index,
+          })),
+        },
       },
+      include: PROJECT_INCLUDE,
     });
-    return toProjectResponse(row);
+    return toProjectResponse(row as ProjectWithRelations);
   }
 
   async update(id: string, data: {
@@ -161,6 +214,8 @@ class ProjectsRepository {
     year?: string;
     isActive?: boolean;
     sortOrder?: number;
+    tagIds?: string[];
+    faqs?: FaqInput[];
   }): Promise<ProjectResponse> {
     const updateData: Record<string, unknown> = {};
     if (data.slug !== undefined) updateData.slug = data.slug;
@@ -182,11 +237,36 @@ class ProjectsRepository {
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
     if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
 
+    // Replace-all for tags if provided
+    if (data.tagIds !== undefined) {
+      updateData.tags = {
+        deleteMany: {},
+        create: data.tagIds.map((tagId: string) => ({ tagId })),
+      };
+    }
+
+    // Replace-all for FAQs if provided
+    if (data.faqs !== undefined) {
+      updateData.faqs = {
+        deleteMany: {},
+        create: data.faqs.map((faq: FaqInput, index: number) => ({
+          questionKa: faq.question.ka,
+          questionRu: faq.question.ru ?? '',
+          questionEn: faq.question.en ?? '',
+          answerKa: faq.answer.ka,
+          answerRu: faq.answer.ru ?? '',
+          answerEn: faq.answer.en ?? '',
+          sortOrder: faq.sortOrder ?? index,
+        })),
+      };
+    }
+
     const row = await prisma.project.update({
       where: { id },
       data: updateData,
+      include: PROJECT_INCLUDE,
     });
-    return toProjectResponse(row);
+    return toProjectResponse(row as ProjectWithRelations);
   }
 
   async delete(id: string): Promise<void> {

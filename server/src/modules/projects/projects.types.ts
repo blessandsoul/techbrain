@@ -10,6 +10,19 @@ export interface LocalizedString {
   en: string;
 }
 
+export interface ProjectTagResponse {
+  id: string;
+  slug: string;
+  name: LocalizedString;
+}
+
+export interface ProjectFaqResponse {
+  id: string;
+  question: LocalizedString;
+  answer: LocalizedString;
+  sortOrder: number;
+}
+
 export interface ProjectResponse {
   id: string;
   slug: string;
@@ -24,8 +37,16 @@ export interface ProjectResponse {
   year: string;
   isActive: boolean;
   sortOrder: number;
+  tags: ProjectTagResponse[];
+  faqs: ProjectFaqResponse[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface FaqInput {
+  question: { ka: string; ru?: string; en?: string };
+  answer: { ka: string; ru?: string; en?: string };
+  sortOrder?: number;
 }
 
 export interface CreateProjectInput {
@@ -41,6 +62,8 @@ export interface CreateProjectInput {
   year: string;
   isActive?: boolean;
   sortOrder?: number;
+  tagIds?: string[];
+  faqs?: FaqInput[];
 }
 
 export interface UpdateProjectInput {
@@ -56,4 +79,6 @@ export interface UpdateProjectInput {
   year?: string;
   isActive?: boolean;
   sortOrder?: number;
+  tagIds?: string[];
+  faqs?: FaqInput[];
 }

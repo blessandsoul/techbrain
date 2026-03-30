@@ -69,6 +69,8 @@ class ArticlesService {
       readMin: input.readMin ?? 5,
       isPublished: input.isPublished ?? false,
       authorId,
+      tagIds: input.tagIds ?? [],
+      faqs: input.faqs ?? [],
     });
   }
 
@@ -106,6 +108,8 @@ class ArticlesService {
       videoUrl: input.videoUrl,
       readMin: input.readMin,
       isPublished: input.isPublished,
+      tagIds: input.tagIds,
+      faqs: input.faqs,
     });
   }
 

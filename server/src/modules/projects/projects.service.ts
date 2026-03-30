@@ -80,6 +80,8 @@ class ProjectsService {
       year: input.year,
       isActive: input.isActive ?? true,
       sortOrder: input.sortOrder ?? 0,
+      tagIds: input.tagIds ?? [],
+      faqs: input.faqs ?? [],
     });
   }
 
@@ -117,6 +119,8 @@ class ProjectsService {
       year: input.year,
       isActive: input.isActive,
       sortOrder: input.sortOrder,
+      tagIds: input.tagIds,
+      faqs: input.faqs,
     });
   }
 

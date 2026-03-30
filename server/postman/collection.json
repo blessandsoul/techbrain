@@ -59,6 +59,10 @@
     {
       "key": "inquiryId",
       "value": ""
+    },
+    {
+      "key": "tagId",
+      "value": ""
     }
   ],
   "item": [
@@ -890,7 +894,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"title\": { \"ka\": \"ტესტ პროექტი\", \"ru\": \"\", \"en\": \"Test Project\" },\n  \"location\": { \"ka\": \"თბილისი\", \"ru\": \"\", \"en\": \"Tbilisi\" },\n  \"type\": \"commercial\",\n  \"cameras\": 24,\n  \"year\": \"2024\",\n  \"isActive\": true,\n  \"sortOrder\": 0\n}"
+                  "raw": "{\n  \"title\": { \"ka\": \"ტესტ პროექტი\", \"ru\": \"\", \"en\": \"Test Project\" },\n  \"location\": { \"ka\": \"თბილისი\", \"ru\": \"\", \"en\": \"Tbilisi\" },\n  \"type\": \"commercial\",\n  \"cameras\": 24,\n  \"year\": \"2024\",\n  \"isActive\": true,\n  \"sortOrder\": 0,\n  \"tagIds\": [],\n  \"faqs\": [\n    {\n      \"question\": { \"ka\": \"რა სისტემა დაიმონტაჟა?\", \"en\": \"What system was installed?\" },\n      \"answer\": { \"ka\": \"24 კამერიანი IP სისტემა\", \"en\": \"24-camera IP system\" },\n      \"sortOrder\": 0\n    }\n  ]\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/projects",
@@ -1192,6 +1196,151 @@
       ]
     },
     {
+      "name": "Tags",
+      "description": "Tag management endpoints.\n\nPublic: list all tags.\nAdmin: create, update, delete tags.",
+      "item": [
+        {
+          "name": "List All Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags?search=test",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "test"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const res = pm.response.json();",
+                  "  pm.collectionVariables.set('tagId', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": {\n    \"ka\": \"ეკონომიკა\",\n    \"ru\": \"Экономика\",\n    \"en\": \"Economics\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tag (Anthropic)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const res = pm.response.json();",
+                  "  pm.collectionVariables.set('tagId', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": {\n    \"ka\": \"Anthropic\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tag",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": {\n    \"en\": \"Anthropic AI\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tags/{{tagId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags", "{{tagId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Tag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags/{{tagId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags", "{{tagId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Articles",
       "description": "Blog article endpoints.\n\nPublic: list published, get by slug.\nAdmin: full CRUD, cover upload, toggle publish.",
       "item": [
@@ -1288,7 +1437,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"slug\": \"how-to-choose-security-camera\",\n  \"title\": \"როგორ ავირჩიოთ სახლისთვის სათვალთვალო კამერა 2025 წელს\",\n  \"excerpt\": \"IP კამერა, WiFi კამერა თუ ანალოგური? განვიხილოთ მთავარი განსხვავებები.\",\n  \"content\": \"# როგორ ავირჩიოთ სახლისთვის სათვალთვალო კამერა\\n\\nსათვალთვალო კამერის შერჩევა ბევრ ფაქტორზეა დამოკიდებული.\",\n  \"category\": \"guides\",\n  \"readMin\": 5,\n  \"isPublished\": true\n}"
+              "raw": "{\n  \"slug\": \"how-to-choose-security-camera\",\n  \"title\": \"როგორ ავირჩიოთ სახლისთვის სათვალთვალო კამერა 2025 წელს\",\n  \"excerpt\": \"IP კამერა, WiFi კამერა თუ ანალოგური? განვიხილოთ მთავარი განსხვავებები.\",\n  \"content\": \"# როგორ ავირჩიოთ სახლისთვის სათვალთვალო კამერა\\n\\nსათვალთვალო კამერის შერჩევა ბევრ ფაქტორზეა დამოკიდებული.\",\n  \"category\": \"guides\",\n  \"readMin\": 5,\n  \"isPublished\": true,\n  \"tagIds\": [],\n  \"faqs\": [\n    {\n      \"question\": { \"ka\": \"რომელი კამერა ჯობია სახლისთვის?\", \"en\": \"Which camera is best for home?\" },\n      \"answer\": { \"ka\": \"IP კამერა საუკეთესო არჩევანია სახლისთვის\", \"en\": \"IP camera is the best choice for home\" },\n      \"sortOrder\": 0\n    },\n    {\n      \"question\": { \"ka\": \"რამდენი კამერაა საჭირო?\", \"en\": \"How many cameras are needed?\" },\n      \"answer\": { \"ka\": \"დამოკიდებულია ტერიტორიის ზომაზე\", \"en\": \"Depends on the area size\" },\n      \"sortOrder\": 1\n    }\n  ]\n}"
             },
             "description": "Create a new article. Admin only. Sets {{articleId}} on success."
           },
