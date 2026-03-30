@@ -9,6 +9,8 @@ import { z } from 'zod';
 import { RichTextEditor } from './RichTextEditor';
 import { VideoUploader } from './VideoUploader';
 import { InfoTooltip } from './InfoTooltip';
+import { TagSelect } from './TagSelect';
+import { FaqFormArray } from './FaqFormArray';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -28,6 +30,7 @@ import { stripServerBaseUrl, resolveContentImageUrls } from '@/lib/utils/format'
 import { ROUTES } from '@/lib/constants/routes';
 
 import type { IProject, UpdateProjectRequest } from '@/features/projects/types/projects.types';
+import type { TagResponse, FaqInput } from '@/features/tags/types/tag.types';
 
 const KA_TO_LATIN: Record<string, string> = {
   'ა': 'a', 'ბ': 'b', 'გ': 'g', 'დ': 'd', 'ე': 'e', 'ვ': 'v', 'ზ': 'z',
@@ -75,6 +78,13 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
 
   const [isActive, setIsActive] = useState(project?.isActive ?? true);
   const [typeValue, setTypeValue] = useState<string>(project?.type ?? 'commercial');
+  const [selectedTags, setSelectedTags] = useState<TagResponse[]>(project?.tags ?? []);
+  const [faqs, setFaqs] = useState<FaqInput[]>(
+    project?.faqs?.map((f) => ({
+      question: { ka: f.question.ka, ru: f.question.ru, en: f.question.en },
+      answer: { ka: f.answer.ka, ru: f.answer.ru, en: f.answer.en },
+    })) ?? [],
+  );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [bodyHtml, setBodyHtml] = useState('');
@@ -201,9 +211,16 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
           await projectsService.uploadProjectImage(project.id, imageFile);
         }
 
+        const tagsAndFaqs = {
+          tagIds: selectedTags.map((t) => t.id),
+          faqs: faqs
+            .filter((f) => f.question.ka.trim())
+            .map((f, i) => ({ ...f, sortOrder: i })),
+        };
+
         let updatePayload: UpdateProjectRequest = imageRemoved && !imageFile
-          ? { ...payload, image: null as string | null }
-          : payload;
+          ? { ...payload, ...tagsAndFaqs, image: null as string | null }
+          : { ...payload, ...tagsAndFaqs };
 
         // If video was removed (was set before but now null), include videoUrl: null
         if (project.videoUrl && !videoUrl) {
@@ -223,6 +240,10 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
         const created = await projectsService.createProject({
           ...payload,
           slug,
+          tagIds: selectedTags.map((t) => t.id),
+          faqs: faqs
+            .filter((f) => f.question.ka.trim())
+            .map((f, i) => ({ ...f, sortOrder: i })),
         });
 
         // Upload cover image after creation
@@ -435,6 +456,18 @@ export function ProjectForm({ project }: ProjectFormProps): React.ReactElement {
             onChange={setBodyHtml}
             onImageUpload={handleImageUpload}
           />
+        </div>
+
+        {/* Tags */}
+        <div className="p-4">
+          <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-2">თეგები <InfoTooltip text="აირჩიეთ არსებული თეგები ან შექმენით ახალი. თეგები გამოჩნდება პროექტის გვერდზე" /></span>
+          <TagSelect selected={selectedTags} onChange={setSelectedTags} />
+        </div>
+
+        {/* FAQs */}
+        <div className="p-4">
+          <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-2">FAQ <InfoTooltip text="ხშირად დასმული კითხვები — გამოჩნდება პროექტის ბოლოს და გააუმჯობესებს SEO-ს" /></span>
+          <FaqFormArray faqs={faqs} onChange={setFaqs} />
         </div>
       </div>
 

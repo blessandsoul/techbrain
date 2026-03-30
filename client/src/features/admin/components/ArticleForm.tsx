@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { RichTextEditor } from './RichTextEditor';
 import { VideoUploader } from './VideoUploader';
 import { InfoTooltip } from './InfoTooltip';
+import { TagSelect } from './TagSelect';
+import { FaqFormArray } from './FaqFormArray';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -29,6 +31,7 @@ import { stripServerBaseUrl, resolveContentImageUrls } from '@/lib/utils/format'
 import { ROUTES } from '@/lib/constants/routes';
 
 import type { IArticle, ArticleCategory } from '@/features/articles/types/article.types';
+import type { TagResponse, FaqInput } from '@/features/tags/types/tag.types';
 
 interface ArticleFormProps {
   article?: IArticle;
@@ -103,6 +106,13 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
   const [submitting, setSubmitting] = useState(false);
   const [bodyHtml, setBodyHtml] = useState('');
   const [categoryValue, setCategoryValue] = useState<ArticleCategory>(article?.category ?? 'guides');
+  const [selectedTags, setSelectedTags] = useState<TagResponse[]>(article?.tags ?? []);
+  const [faqs, setFaqs] = useState<FaqInput[]>(
+    article?.faqs?.map((f) => ({
+      question: { ka: f.question.ka, ru: f.question.ru, en: f.question.en },
+      answer: { ka: f.answer.ka, ru: f.answer.ru, en: f.answer.en },
+    })) ?? [],
+  );
   const [errors, setErrors] = useState<FormErrors>({});
   const fileRef = useRef<HTMLInputElement>(null);
   const pendingImagesRef = useRef<Map<string, File>>(new Map());
@@ -178,6 +188,10 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
           category: categoryValue,
           readMin,
           isPublished,
+          tagIds: selectedTags.map((t) => t.id),
+          faqs: faqs
+            .filter((f) => f.question.ka.trim())
+            .map((f, i) => ({ ...f, sortOrder: i })),
           // If cover was removed and no new file selected, set coverImage to null
           ...(coverRemoved && !coverFile ? { coverImage: null } : {}),
           // If video was removed (was set before but now null), set videoUrl to null
@@ -208,6 +222,10 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
           category: categoryValue,
           readMin,
           isPublished,
+          tagIds: selectedTags.map((t) => t.id),
+          faqs: faqs
+            .filter((f) => f.question.ka.trim())
+            .map((f, i) => ({ ...f, sortOrder: i })),
         });
 
         // Upload cover after creation
@@ -370,6 +388,18 @@ export function ArticleForm({ article }: ArticleFormProps): React.ReactElement {
             />
           </div>
           {errors.content && <p className="text-destructive text-xs mt-1">{errors.content}</p>}
+        </div>
+
+        {/* Tags */}
+        <div className="p-4">
+          <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-2">თეგები <InfoTooltip text="აირჩიეთ არსებული თეგები ან შექმენით ახალი. თეგები გამოჩნდება სტატიის გვერდზე" /></span>
+          <TagSelect selected={selectedTags} onChange={setSelectedTags} />
+        </div>
+
+        {/* FAQs */}
+        <div className="p-4">
+          <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-2">FAQ <InfoTooltip text="ხშირად დასმული კითხვები — გამოჩნდება სტატიის ბოლოს და გააუმჯობესებს SEO-ს" /></span>
+          <FaqFormArray faqs={faqs} onChange={setFaqs} />
         </div>
       </div>
 

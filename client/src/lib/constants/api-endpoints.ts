@@ -82,6 +82,12 @@ export const API_ENDPOINTS = {
     ADMIN_LIST: '/inquiries/admin',
     ADMIN_DELETE: (id: string) => `/inquiries/admin/${id}` as const,
   },
+  TAGS: {
+    LIST: '/tags',
+    CREATE: '/tags',
+    UPDATE: (id: string) => `/tags/${id}` as const,
+    DELETE: (id: string) => `/tags/${id}` as const,
+  },
   SITE_SETTINGS: {
     GET: '/site-settings',
     UPDATE: '/site-settings',

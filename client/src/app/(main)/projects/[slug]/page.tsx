@@ -10,9 +10,12 @@ import { ProjectBody } from './_components/ProjectBody';
 import { ProjectFooter } from './_components/ProjectFooter';
 import { RelatedProjects } from './_components/RelatedProjects';
 import { ProjectDetailSkeleton } from './_components/ProjectDetailSkeleton';
+import { FaqAccordion } from '@/components/common/FaqAccordion';
+import { TagsCloud } from '@/components/common/TagsCloud';
+import { FaqJsonLd } from '@/components/common/FaqJsonLd';
 
 export default function ProjectDetailPage(): React.ReactElement {
-  const { t, localized } = useLocale();
+  const { t, localized, locale } = useLocale();
   const { slug } = useParams<{ slug: string }>();
   const { data: project, isLoading, error } = useProjectBySlug(slug);
 
@@ -34,6 +37,9 @@ export default function ProjectDetailPage(): React.ReactElement {
             <ProjectHero project={project} />
             <ProjectBody content={project.content} />
             <ProjectFooter title={localized(project.title)} />
+            <FaqAccordion faqs={project.faqs} />
+            <TagsCloud tags={project.tags} />
+            <FaqJsonLd faqs={project.faqs} locale={locale} />
             <RelatedProjects currentSlug={slug} type={project.type} />
           </article>
         )}

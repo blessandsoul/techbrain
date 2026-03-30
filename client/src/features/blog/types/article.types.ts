@@ -1,3 +1,5 @@
+import type { TagResponse, FaqResponse } from '@/features/tags/types/tag.types';
+
 export type ArticleCategory = 'cameras' | 'nvr' | 'installation' | 'news' | 'guides';
 
 export interface Article {
@@ -11,6 +13,8 @@ export interface Article {
   isPublished: boolean;
   readMin: number;
   authorId: string;
+  tags: TagResponse[];
+  faqs: FaqResponse[];
   createdAt: string;
   updatedAt: string;
   content: string; // raw MDX body

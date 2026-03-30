@@ -1,3 +1,5 @@
+import type { TagResponse, FaqResponse, FaqInput } from '@/features/tags/types/tag.types';
+
 export type ArticleCategory = 'cameras' | 'nvr' | 'installation' | 'news' | 'guides';
 
 export interface IArticle {
@@ -12,6 +14,8 @@ export interface IArticle {
   isPublished: boolean;
   readMin: number;
   authorId: string;
+  tags: TagResponse[];
+  faqs: FaqResponse[];
   createdAt: string;
   updatedAt: string;
 }
@@ -24,6 +28,8 @@ export interface CreateArticleInput {
   category: ArticleCategory;
   readMin?: number;
   isPublished?: boolean;
+  tagIds?: string[];
+  faqs?: FaqInput[];
 }
 
 export interface UpdateArticleInput {
@@ -36,4 +42,6 @@ export interface UpdateArticleInput {
   videoUrl?: string | null;
   readMin?: number;
   isPublished?: boolean;
+  tagIds?: string[];
+  faqs?: FaqInput[];
 }

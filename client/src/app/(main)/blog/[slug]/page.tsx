@@ -10,9 +10,12 @@ import { ArticleBody } from './_components/ArticleBody';
 import { ArticleFooter } from './_components/ArticleFooter';
 import { RelatedArticles } from './_components/RelatedArticles';
 import { ArticleDetailSkeleton } from './_components/ArticleDetailSkeleton';
+import { FaqAccordion } from '@/components/common/FaqAccordion';
+import { TagsCloud } from '@/components/common/TagsCloud';
+import { FaqJsonLd } from '@/components/common/FaqJsonLd';
 
 export default function BlogPostPage(): React.ReactElement {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { slug } = useParams<{ slug: string }>();
   const { data: article, isLoading, error } = useArticle(slug);
 
@@ -34,6 +37,9 @@ export default function BlogPostPage(): React.ReactElement {
             <ArticleHero article={article} />
             <ArticleBody content={article.content} />
             <ArticleFooter title={article.title} />
+            <FaqAccordion faqs={article.faqs} />
+            <TagsCloud tags={article.tags} />
+            <FaqJsonLd faqs={article.faqs} locale={locale} />
             <RelatedArticles currentSlug={slug} category={article.category} />
           </article>
         )}

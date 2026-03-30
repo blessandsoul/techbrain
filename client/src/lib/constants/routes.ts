@@ -25,6 +25,7 @@ export const ROUTES = {
     ARTICLES: '/admin/articles',
     ARTICLES_NEW: '/admin/articles/new',
     ARTICLES_EDIT: (id: string) => `/admin/articles/${id}/edit`,
+    TAGS: '/admin/tags',
     INQUIRIES: '/admin/inquiries',
     SITE_SETTINGS: '/admin/site-settings',
   },

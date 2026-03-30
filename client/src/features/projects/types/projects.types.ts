@@ -1,3 +1,5 @@
+import type { TagResponse, FaqResponse, FaqInput } from '@/features/tags/types/tag.types';
+
 export type ProjectType = 'commercial' | 'residential' | 'retail' | 'office';
 
 export interface LocalizedString {
@@ -20,6 +22,8 @@ export interface IProject {
   year: string;
   isActive: boolean;
   sortOrder: number;
+  tags: TagResponse[];
+  faqs: FaqResponse[];
   createdAt: string;
   updatedAt: string;
 }
@@ -36,6 +40,8 @@ export interface CreateProjectRequest {
   year: string;
   isActive: boolean;
   sortOrder?: number;
+  tagIds?: string[];
+  faqs?: FaqInput[];
 }
 
 export type UpdateProjectRequest = Partial<Omit<CreateProjectRequest, 'image'>> & {

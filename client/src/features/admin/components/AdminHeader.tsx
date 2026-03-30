@@ -21,10 +21,11 @@ export function AdminHeader(): React.ReactElement {
   const isInquiries = pathname.startsWith('/admin/inquiries');
   const isArticles = pathname.startsWith('/admin/articles');
   const isProjects = pathname.startsWith('/admin/projects');
+  const isTags = pathname.startsWith('/admin/tags');
   // TODO: reactivate catalog-settings when needed
   // const isCatalog = pathname.startsWith('/admin/catalog-settings');
   const isSiteSettings = pathname.startsWith('/admin/site-settings');
-  const isProducts = !isOrders && !isInquiries && !isArticles && !isProjects && !isSiteSettings && (pathname.startsWith('/admin/dashboard') || pathname.startsWith('/admin/products'));
+  const isProducts = !isOrders && !isInquiries && !isArticles && !isProjects && !isTags && !isSiteSettings && (pathname.startsWith('/admin/dashboard') || pathname.startsWith('/admin/products'));
 
   const handleLogout = useCallback(async (): Promise<void> => {
     dispatch(setLoggingOut(true));
@@ -85,6 +86,7 @@ export function AdminHeader(): React.ReactElement {
           {navLink(ROUTES.ADMIN.INQUIRIES, isInquiries, 'მოთხოვნები')}
           {navLink(ROUTES.ADMIN.ARTICLES, isArticles, 'სტატიები')}
           {navLink(ROUTES.ADMIN.PROJECTS, isProjects, 'პროექტები')}
+          {navLink(ROUTES.ADMIN.TAGS, isTags, 'თეგები')}
           {/* TODO: reactivate catalog-settings when needed */}
           {/* {navLink(ROUTES.ADMIN.CATALOG_SETTINGS, isCatalog, 'კატალოგი')} */}
           {navLink(ROUTES.ADMIN.SITE_SETTINGS, isSiteSettings, 'პარამეტრები')}
@@ -173,6 +175,7 @@ export function AdminHeader(): React.ReactElement {
             {mobileNavLink(ROUTES.ADMIN.INQUIRIES, isInquiries, 'მოთხოვნები')}
             {mobileNavLink(ROUTES.ADMIN.ARTICLES, isArticles, 'სტატიები')}
             {mobileNavLink(ROUTES.ADMIN.PROJECTS, isProjects, 'პროექტები')}
+            {mobileNavLink(ROUTES.ADMIN.TAGS, isTags, 'თეგები')}
             {mobileNavLink(ROUTES.ADMIN.SITE_SETTINGS, isSiteSettings, 'პარამეტრები')}
 
             <div className="border-t border-border/50 mt-1 pt-2 flex flex-col gap-0.5">
