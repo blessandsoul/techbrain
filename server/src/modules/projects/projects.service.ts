@@ -25,8 +25,9 @@ class ProjectsService {
     page: number = 1,
     limit: number = 10,
     type?: string,
+    tag?: string,
   ): Promise<{ items: ProjectResponse[]; totalItems: number }> {
-    return projectsRepository.findActivePaginated(page, limit, type);
+    return projectsRepository.findActivePaginated(page, limit, type, tag);
   }
 
   async getProject(id: string): Promise<ProjectResponse> {

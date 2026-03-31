@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, MapPin, SecurityCamera, Buildings, House, Storefront } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, MapPin, SecurityCamera, Buildings, House, Storefront, X } from '@phosphor-icons/react';
 import { SafeImage } from '@/components/common/SafeImage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Pagination } from '@/components/common/Pagination';
@@ -38,8 +38,9 @@ export default function ProjectsPage(): React.ReactElement {
   const { t, localized } = useLocale();
   const searchParams = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
+  const tag = searchParams.get('tag') || undefined;
 
-  const { data, isLoading } = useActiveProjects({ page, limit: 12 });
+  const { data, isLoading } = useActiveProjects({ page, limit: 12, tag });
   const projects = data?.items ?? [];
   const pagination = data?.pagination;
 
@@ -53,7 +54,23 @@ export default function ProjectsPage(): React.ReactElement {
         {t('nav.home')}
       </Link>
 
-      <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-10">{t('projects.heading')}</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-6">{t('projects.heading')}</h1>
+
+      {tag && (
+        <div className="flex items-center gap-2 mb-8">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            <span className="font-semibold">#</span>
+            {tag}
+            <Link
+              href="/projects"
+              className="ml-1 p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+              aria-label={`Remove tag filter: ${tag}`}
+            >
+              <X size={14} weight="bold" />
+            </Link>
+          </span>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -81,7 +81,7 @@ describe('Articles Service', () => {
       const response = await articlesService.getPublishedArticles(1, 10);
 
       // Assert
-      expect(articlesRepository.findPublishedPaginated).toHaveBeenCalledWith(1, 10, undefined);
+      expect(articlesRepository.findPublishedPaginated).toHaveBeenCalledWith(1, 10, undefined, undefined);
       expect(response.items[0].tags).toHaveLength(1);
       expect(response.items[0].faqs).toHaveLength(1);
       expect(response.items[0].tags[0].id).toBe('tag-1');
@@ -96,7 +96,7 @@ describe('Articles Service', () => {
       await articlesService.getPublishedArticles(1, 10, 'cameras');
 
       // Assert
-      expect(articlesRepository.findPublishedPaginated).toHaveBeenCalledWith(1, 10, 'cameras');
+      expect(articlesRepository.findPublishedPaginated).toHaveBeenCalledWith(1, 10, 'cameras', undefined);
     });
   });
 

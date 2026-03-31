@@ -67,9 +67,11 @@ class ProjectsRepository {
     page: number = 1,
     limit: number = 10,
     type?: string,
+    tag?: string,
   ): Promise<{ items: ProjectResponse[]; totalItems: number }> {
     const where: Prisma.ProjectWhereInput = { isActive: true };
     if (type) where.type = type;
+    if (tag) where.tags = { some: { tag: { slug: tag } } };
 
     const [rows, totalItems] = await Promise.all([
       prisma.project.findMany({

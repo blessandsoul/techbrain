@@ -67,9 +67,11 @@ class ArticlesRepository {
     page: number,
     limit: number,
     category?: string,
+    tag?: string,
   ): Promise<{ items: ArticleResponse[]; totalItems: number }> {
     const where: Record<string, unknown> = { isPublished: true };
     if (category) where.category = category;
+    if (tag) where.tags = { some: { tag: { slug: tag } } };
 
     const [rows, totalItems] = await Promise.all([
       prisma.article.findMany({

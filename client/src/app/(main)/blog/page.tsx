@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft } from '@phosphor-icons/react/dist/ssr';
+import { ArrowLeft, X } from '@phosphor-icons/react/dist/ssr';
 import { ArticleCard, ArticleCardSkeleton } from '@/components/common/ArticleCard';
 import { Pagination } from '@/components/common/Pagination';
 import { useArticles } from '@/features/blog/hooks/useBlog';
@@ -13,8 +13,9 @@ export default function BlogPage(): React.ReactElement {
   const { t } = useLocale();
   const searchParams = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
+  const tag = searchParams.get('tag') || undefined;
 
-  const { data, isLoading, error } = useArticles({ page, limit: 12 });
+  const { data, isLoading, error } = useArticles({ page, limit: 12, tag });
   const articles = data?.items ?? [];
   const pagination = data?.pagination;
 
@@ -28,9 +29,25 @@ export default function BlogPage(): React.ReactElement {
         {t('nav.home')}
       </Link>
 
-      <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-10">
+      <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
         {t('blog.heading')}
       </h1>
+
+      {tag && (
+        <div className="flex items-center gap-2 mb-8">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            <span className="font-semibold">#</span>
+            {tag}
+            <Link
+              href="/blog"
+              className="ml-1 p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+              aria-label={`Remove tag filter: ${tag}`}
+            >
+              <X size={14} weight="bold" />
+            </Link>
+          </span>
+        </div>
+      )}
 
       {error ? (
         <div className="text-center py-16 text-destructive">

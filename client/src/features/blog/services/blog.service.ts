@@ -24,6 +24,7 @@ class BlogService {
     };
 
     if (params?.category) query.category = params.category;
+    if (params?.tag) query.tag = params.tag;
 
     const response = await apiClient.get<PaginatedApiResponse<Article>>(
       API_ENDPOINTS.ARTICLES.LIST,

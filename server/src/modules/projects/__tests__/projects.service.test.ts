@@ -85,7 +85,7 @@ describe('Projects Service', () => {
       const result = await projectsService.getActiveProjects(1, 10);
 
       // Assert
-      expect(projectsRepository.findActivePaginated).toHaveBeenCalledWith(1, 10, undefined);
+      expect(projectsRepository.findActivePaginated).toHaveBeenCalledWith(1, 10, undefined, undefined);
       expect(result.items[0].tags).toHaveLength(1);
       expect(result.items[0].faqs).toHaveLength(1);
       expect(result.items[0].tags[0].slug).toBe('security');
@@ -100,7 +100,7 @@ describe('Projects Service', () => {
       await projectsService.getActiveProjects(1, 10, 'residential');
 
       // Assert
-      expect(projectsRepository.findActivePaginated).toHaveBeenCalledWith(1, 10, 'residential');
+      expect(projectsRepository.findActivePaginated).toHaveBeenCalledWith(1, 10, 'residential', undefined);
     });
   });
 

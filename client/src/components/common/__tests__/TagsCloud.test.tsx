@@ -19,29 +19,48 @@ describe('TagsCloud', () => {
 
   it('should render all tag names in ka locale', () => {
     render(<TagsCloud tags={mockTags} />);
-    // useLocale mock returns localized() that picks .ka
     expect(screen.getByText('კამერები')).toBeInTheDocument();
     expect(screen.getByText('უსაფრთხოება')).toBeInTheDocument();
     expect(screen.getByText('NVR')).toBeInTheDocument();
   });
 
-  it('should render tags as non-clickable badges', () => {
+  it('should render tags as clickable links', () => {
     render(<TagsCloud tags={mockTags} />);
-    const badges = screen.getAllByText(/კამერები|უსაფრთხოება|NVR/);
-    badges.forEach((badge) => {
-      // pointer-events-none class makes them non-clickable
-      expect(badge.className).toContain('pointer-events-none');
-    });
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(3);
   });
 
-  it('should render correct number of badges', () => {
+  it('should link to blog by default', () => {
     render(<TagsCloud tags={mockTags} />);
-    const badges = screen.getAllByText(/კამერები|უსაფრთხოება|NVR/);
-    expect(badges).toHaveLength(3);
+    const link = screen.getAllByRole('link')[0];
+    expect(link).toHaveAttribute('href', '/blog?tag=cameras');
+  });
+
+  it('should link to projects when context is projects', () => {
+    render(<TagsCloud tags={mockTags} context="projects" />);
+    const link = screen.getAllByRole('link')[0];
+    expect(link).toHaveAttribute('href', '/projects?tag=cameras');
+  });
+
+  it('should render correct number of tags', () => {
+    render(<TagsCloud tags={mockTags} />);
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(3);
   });
 
   it('should render single tag', () => {
     render(<TagsCloud tags={[mockTags[0]]} />);
     expect(screen.getByText('კამერები')).toBeInTheDocument();
+  });
+
+  it('should render heading with tags title', () => {
+    render(<TagsCloud tags={mockTags} />);
+    expect(screen.getByText('tags.title')).toBeInTheDocument();
+  });
+
+  it('should render # prefix on each tag', () => {
+    render(<TagsCloud tags={mockTags} />);
+    const hashSymbols = screen.getAllByText('#');
+    expect(hashSymbols).toHaveLength(3);
   });
 });

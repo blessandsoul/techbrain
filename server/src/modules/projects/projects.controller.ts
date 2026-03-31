@@ -22,8 +22,8 @@ class ProjectsController {
   // ── Public Endpoints ──────────────────────────────
 
   async getActiveProjects(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { page, limit, type } = PublicProjectsQuerySchema.parse(request.query);
-    const result = await projectsService.getActiveProjects(page, limit, type);
+    const { page, limit, type, tag } = PublicProjectsQuerySchema.parse(request.query);
+    const result = await projectsService.getActiveProjects(page, limit, type, tag);
     return reply.send(paginatedResponse(
       'Active projects retrieved successfully',
       result.items,

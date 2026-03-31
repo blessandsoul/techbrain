@@ -38,7 +38,7 @@ export default function ProjectDetailPage(): React.ReactElement {
             <ProjectBody content={project.content} />
             <ProjectFooter title={localized(project.title)} />
             <FaqAccordion faqs={project.faqs} />
-            <TagsCloud tags={project.tags} />
+            <TagsCloud tags={project.tags} context="projects" />
             <FaqJsonLd faqs={project.faqs} locale={locale} />
             <RelatedProjects currentSlug={slug} type={project.type} />
           </article>

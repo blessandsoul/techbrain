@@ -53,6 +53,7 @@ export interface ProjectFilters {
   page?: number;
   limit?: number;
   type?: string;
+  tag?: string;
 }
 
 export interface AdminProjectFilters {

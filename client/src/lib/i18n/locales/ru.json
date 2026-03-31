@@ -134,5 +134,7 @@
   "catalog.page": "Страница {page} из {totalPages}",
   "catalog.prevPage": "Предыдущая страница",
   "catalog.nextPage": "Следующая страница",
-  "catalog.inStockOnly": "Только в наличии"
+  "catalog.inStockOnly": "Только в наличии",
+
+  "tags.title": "Теги"
 }

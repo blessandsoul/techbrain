@@ -134,5 +134,7 @@
   "catalog.page": "გვერდი {page} / {totalPages}",
   "catalog.prevPage": "წინა გვერდი",
   "catalog.nextPage": "შემდეგი გვერდი",
-  "catalog.inStockOnly": "მხოლოდ მარაგში"
+  "catalog.inStockOnly": "მხოლოდ მარაგში",
+
+  "tags.title": "თეგები"
 }

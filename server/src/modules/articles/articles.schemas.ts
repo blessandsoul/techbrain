@@ -22,6 +22,7 @@ export const PublicArticlesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
   category: z.enum(['cameras', 'nvr', 'installation', 'news', 'guides']).optional(),
+  tag: z.string().max(300).optional(),
 });
 export type PublicArticlesQuery = z.infer<typeof PublicArticlesQuerySchema>;
 

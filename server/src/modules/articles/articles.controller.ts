@@ -22,8 +22,8 @@ class ArticlesController {
   // ── Public Endpoints ──────────────────────────────
 
   async getPublished(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { page, limit, category } = PublicArticlesQuerySchema.parse(request.query);
-    const result = await articlesService.getPublishedArticles(page, limit, category);
+    const { page, limit, category, tag } = PublicArticlesQuerySchema.parse(request.query);
+    const result = await articlesService.getPublishedArticles(page, limit, category, tag);
     return reply.send(paginatedResponse(
       'Published articles retrieved successfully',
       result.items,

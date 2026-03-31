@@ -134,5 +134,7 @@
   "catalog.page": "Page {page} of {totalPages}",
   "catalog.prevPage": "Previous page",
   "catalog.nextPage": "Next page",
-  "catalog.inStockOnly": "In Stock Only"
+  "catalog.inStockOnly": "In Stock Only",
+
+  "tags.title": "Tags"
 }

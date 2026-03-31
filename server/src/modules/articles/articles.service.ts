@@ -25,8 +25,9 @@ class ArticlesService {
     page: number,
     limit: number,
     category?: string,
+    tag?: string,
   ): Promise<{ items: ArticleResponse[]; totalItems: number }> {
-    return articlesRepository.findPublishedPaginated(page, limit, category);
+    return articlesRepository.findPublishedPaginated(page, limit, category, tag);
   }
 
   async getArticleBySlug(slug: string): Promise<ArticleResponse> {

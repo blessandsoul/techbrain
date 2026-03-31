@@ -22,4 +22,5 @@ export interface Article {
 
 export interface ArticleFilters {
   category?: string;
+  tag?: string;
 }

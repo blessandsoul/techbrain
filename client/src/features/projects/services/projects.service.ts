@@ -23,6 +23,7 @@ class ProjectsService {
       limit: params?.limit ?? 10,
     };
     if (params?.type) query.type = params.type;
+    if (params?.tag) query.tag = params.tag;
 
     const { data } = await apiClient.get<PaginatedApiResponse<IProject>>(
       API_ENDPOINTS.PROJECTS.ACTIVE,

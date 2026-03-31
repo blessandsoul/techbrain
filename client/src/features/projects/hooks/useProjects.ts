@@ -14,7 +14,7 @@ import type { IProject, AdminProjectFilters, ProjectFilters, CreateProjectReques
 export const projectKeys = {
   all: ['projects'] as const,
   lists: () => [...projectKeys.all, 'list'] as const,
-  active: (params?: { type?: string }) => [...projectKeys.lists(), 'active', params] as const,
+  active: (params?: { type?: string; tag?: string }) => [...projectKeys.lists(), 'active', params] as const,
   adminLists: () => [...projectKeys.all, 'admin-list'] as const,
   adminList: (filters: AdminProjectFilters) => [...projectKeys.adminLists(), filters] as const,
   details: () => [...projectKeys.all, 'detail'] as const,
