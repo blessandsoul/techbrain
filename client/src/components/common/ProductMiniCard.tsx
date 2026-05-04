@@ -24,6 +24,7 @@ interface Product {
   categories: string[];
   price: number;
   originalPrice?: number;
+  inStock?: boolean;
   images: string[];
   name: string;
   specs: ProductSpec[];
@@ -39,13 +40,13 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 
 interface ProductMiniCardProps {
   product: Product;
-  inStockLabel: string;
+  outOfStockLabel: string;
   priceOnRequestLabel: string;
   categoryLabels: Record<string, string>;
   saleColor?: 'destructive' | 'success';
 }
 
-export function ProductMiniCard({ product, inStockLabel, priceOnRequestLabel, categoryLabels, saleColor = 'destructive' }: ProductMiniCardProps): React.ReactElement {
+export function ProductMiniCard({ product, outOfStockLabel, priceOnRequestLabel, categoryLabels, saleColor = 'destructive' }: ProductMiniCardProps): React.ReactElement {
   const name = product.name;
   const hasImage = product.images.length > 0;
   const isService = product.categories.includes('services');
@@ -87,7 +88,16 @@ export function ProductMiniCard({ product, inStockLabel, priceOnRequestLabel, ca
           </div>
         )}
 
-        {/* Category badge only */}
+        {/* Out of stock badge */}
+        {product.inStock === false && (
+          <div className="absolute top-2 left-2">
+            <span className="inline-flex items-center h-6 px-1.5 rounded-md bg-destructive-deep text-[8px] font-bold uppercase tracking-[0.05em] text-white">
+              {outOfStockLabel}
+            </span>
+          </div>
+        )}
+
+        {/* Category badge */}
         <div className="absolute top-2 right-2">
           <div
             className="inline-flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-md border border-border/60 shrink-0 px-1.5 py-1.5 sm:px-2"

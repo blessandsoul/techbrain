@@ -15,6 +15,7 @@ function toMiniCardProduct(product: IProduct, localized: (field: { ka: string; r
   categories: string[];
   price: number;
   originalPrice?: number;
+  inStock: boolean;
   images: string[];
   name: string;
   specs: { key: string; value: string }[];
@@ -25,6 +26,7 @@ function toMiniCardProduct(product: IProduct, localized: (field: { ka: string; r
     categories: product.categories,
     price: product.price,
     originalPrice: product.originalPrice,
+    inStock: product.inStock,
     images: product.images.map(getProductImageUrl),
     name: localized(product.name),
     specs: product.specs.map((s) => ({
@@ -156,7 +158,7 @@ export function DiscountedProductsBlock(): React.ReactElement {
                 <div key={product.id} className="w-50 sm:w-56 shrink-0 flex">
                   <ProductMiniCard
                     product={toMiniCardProduct(product, localized)}
-                    inStockLabel={t('products.inStock')}
+                    outOfStockLabel={t('products.outOfStock')}
                     priceOnRequestLabel={t('products.priceOnRequest')}
                     categoryLabels={categoryLabels}
                     saleColor="success"

@@ -77,7 +77,7 @@ export function ProductCard({ product }: ProductCardProps): React.ReactElement {
         {/* Out of stock badge */}
         {product.inStock === false && (
           <div className="absolute top-3 right-3">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-background/90 backdrop-blur-sm border border-border/60 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="inline-flex items-center px-3 py-1.5 rounded-md bg-destructive-deep text-[10px] font-bold uppercase tracking-[0.12em] text-white">
               {t('products.outOfStock')}
             </span>
           </div>

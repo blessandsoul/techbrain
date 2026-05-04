@@ -77,12 +77,13 @@ export function useFeaturedProducts(): ReturnType<typeof useQuery<IProduct[]>> {
 
 export function useAllProducts(limit = 12): ReturnType<typeof useQuery<IProduct[]>> {
   return useQuery({
-    queryKey: [...catalogKeys.products(), 'all', limit] as const,
+    queryKey: [...catalogKeys.products(), 'all', limit, 'in-stock'] as const,
     queryFn: async () => {
       const result = await catalogService.getProducts({
         page: 1,
         limit,
         sort: 'newest',
+        inStock: true,
       });
       return result.items;
     },
@@ -91,13 +92,14 @@ export function useAllProducts(limit = 12): ReturnType<typeof useQuery<IProduct[
 
 export function useDiscountedProducts(): ReturnType<typeof useQuery<IProduct[]>> {
   return useQuery({
-    queryKey: catalogKeys.discounted(),
+    queryKey: [...catalogKeys.discounted(), 'in-stock'] as const,
     queryFn: async () => {
       const result = await catalogService.getProducts({
         hasDiscount: true,
         page: 1,
         limit: 50,
         sort: 'newest',
+        inStock: true,
       });
       return result.items;
     },

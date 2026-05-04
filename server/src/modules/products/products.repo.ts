@@ -726,19 +726,21 @@ class ProductsRepository {
 
   // ── Private Helpers ───────────────────────────────
 
-  private buildOrderBy(sort: SortOption, locale: string): Prisma.ProductOrderByWithRelationInput {
+  private buildOrderBy(sort: SortOption, locale: string): Prisma.ProductOrderByWithRelationInput[] {
+    // inStock desc keeps in-stock (true=1) before out-of-stock (false=0)
+    const stockFirst: Prisma.ProductOrderByWithRelationInput = { inStock: 'desc' };
     switch (sort) {
       case 'price-asc':
-        return { price: 'asc' };
+        return [stockFirst, { price: 'asc' }];
       case 'price-desc':
-        return { price: 'desc' };
+        return [stockFirst, { price: 'desc' }];
       case 'name-asc': {
         const field = locale === 'ru' ? 'nameRu' : locale === 'en' ? 'nameEn' : 'nameKa';
-        return { [field]: 'asc' };
+        return [stockFirst, { [field]: 'asc' }];
       }
       case 'newest':
       default:
-        return { createdAt: 'desc' };
+        return [stockFirst, { createdAt: 'desc' }];
     }
   }
 }
