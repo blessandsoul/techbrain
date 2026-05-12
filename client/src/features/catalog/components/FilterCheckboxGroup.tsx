@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { CaretDown } from '@phosphor-icons/react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useLocale } from '@/lib/i18n';
 import type { SpecValueOption } from '../types/catalog.types';
 
@@ -62,7 +63,7 @@ export function FilterCheckboxGroup({
       {/* Header */}
       <button
         onClick={() => setExpanded((prev) => !prev)}
-        className="w-full flex items-center justify-between py-1 cursor-pointer group"
+        className="w-full flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer group hover:bg-muted transition-colors"
       >
         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider group-hover:text-foreground transition-colors">
           {label}
@@ -77,47 +78,57 @@ export function FilterCheckboxGroup({
         />
       </button>
 
-      {/* Options */}
-      {expanded && (
-        <div className="space-y-1">
-          {visibleOptions.map((opt) => {
-            const isSelected = selectedValues.includes(opt.value);
-            const isDisabled = opt.count === 0 && !isSelected;
+      {/* Options — animated collapse via grid-template-rows */}
+      <div
+        className={`grid motion-safe:transition-[grid-template-rows,opacity] duration-200 ease-out ${
+          expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+        }`}
+        aria-hidden={!expanded}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-0.5">
+            {visibleOptions.map((opt) => {
+              const isSelected = selectedValues.includes(opt.value);
+              const isDisabled = opt.count === 0 && !isSelected;
 
-            return (
-              <label
-                key={opt.value}
-                className={`flex items-center gap-2.5 py-1 px-1 rounded cursor-pointer transition-colors ${
-                  isDisabled
-                    ? 'opacity-40 cursor-not-allowed'
-                    : 'hover:bg-muted/50'
-                }`}
+              const checkboxId = `filter-${paramKey}-${opt.value}`;
+              return (
+                <label
+                  key={opt.value}
+                  htmlFor={checkboxId}
+                  className={`flex items-center gap-2.5 py-2 px-3 rounded-lg transition-colors ${
+                    isDisabled
+                      ? 'opacity-40 cursor-not-allowed'
+                      : 'hover:bg-muted cursor-pointer'
+                  }`}
+                >
+                  <Checkbox
+                    id={checkboxId}
+                    checked={isSelected}
+                    disabled={isDisabled}
+                    onCheckedChange={() => toggleValue(opt.value)}
+                    tabIndex={expanded ? 0 : -1}
+                  />
+                  <span className="text-sm text-foreground flex-1 leading-tight">{opt.value}</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">{opt.count}</span>
+                </label>
+              );
+            })}
+
+            {hasMore && (
+              <button
+                onClick={() => setShowAll((prev) => !prev)}
+                tabIndex={expanded ? 0 : -1}
+                className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer mt-1 px-3 py-1"
               >
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  disabled={isDisabled}
-                  onChange={() => toggleValue(opt.value)}
-                  className="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer disabled:cursor-not-allowed"
-                />
-                <span className="text-sm text-foreground flex-1 leading-tight">{opt.value}</span>
-                <span className="text-[11px] text-muted-foreground tabular-nums">{opt.count}</span>
-              </label>
-            );
-          })}
-
-          {hasMore && (
-            <button
-              onClick={() => setShowAll((prev) => !prev)}
-              className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer mt-1 px-1"
-            >
-              {showAll
-                ? t('catalog.showLess')
-                : t('catalog.showMore', { count: options.length - INITIAL_SHOW_COUNT })}
-            </button>
-          )}
+                {showAll
+                  ? t('catalog.showLess')
+                  : t('catalog.showMore', { count: options.length - INITIAL_SHOW_COUNT })}
+              </button>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

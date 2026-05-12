@@ -16,10 +16,17 @@ interface RelatedProductsPickerProps {
 
 const categoryLabel: Record<string, string> = {
   cameras: 'CAM',
-  'nvr-kits': 'NVR',
+  'ip-cameras': 'IP',
+  'analog-cameras': 'ANL',
+  'camera-accessories': 'CAM-ACC',
+  'camera-consumables': 'CAM-CON',
+  recorders: 'REC',
+  'nvr-recorders': 'NVR',
+  'dvr-recorders': 'DVR',
+  'recorder-accessories': 'REC-ACC',
+  kits: 'KIT',
+  'video-registrators': 'VR',
   accessories: 'ACC',
-  storage: 'HDD',
-  services: 'SVC',
 };
 
 export function RelatedProductsPicker({

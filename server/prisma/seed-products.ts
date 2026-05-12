@@ -1,8 +1,12 @@
 /**
- * Seed Script — Products, Categories, Catalog Config, and Product Images
+ * Seed Script — Products and Product Images
  *
- * Reads 91 product JSON files from the reference project, creates DB records,
+ * Reads product JSON files from the reference project, creates DB records,
  * and copies product images into the structured uploads directory.
+ *
+ * Categories and catalog config are owned by `seed.ts`. This script assumes
+ * those rows already exist and looks them up by slug. Run `npm run prisma:seed`
+ * first if categories are missing.
  *
  * Usage: npx tsx prisma/seed-products.ts
  */
@@ -11,6 +15,7 @@ import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { OLD_TO_NEW_SLUG } from './category-tree.js';
 
 const prisma = new PrismaClient();
 
@@ -22,18 +27,7 @@ const __dirname = path.dirname(__filename);
 const REFERENCE_ROOT = path.resolve(__dirname, '../../reference/client');
 const PRODUCTS_JSON_DIR = path.join(REFERENCE_ROOT, 'public/data/products');
 const PRODUCTS_IMAGES_DIR = path.join(REFERENCE_ROOT, 'public/images/products');
-const CATALOG_CONFIG_PATH = path.join(REFERENCE_ROOT, 'content/catalog-config.json');
 const UPLOADS_PRODUCTS_DIR = path.resolve(__dirname, '../uploads/products');
-
-// ── Category definitions ────────────────────────────────
-
-const CATEGORIES = [
-  { slug: 'cameras', nameKa: 'კამერები', nameRu: 'Камеры', nameEn: 'Cameras', sortOrder: 1 },
-  { slug: 'nvr-kits', nameKa: 'NVR კომპლექტები', nameRu: 'Комплекты NVR', nameEn: 'NVR Kits', sortOrder: 2 },
-  { slug: 'accessories', nameKa: 'აქსესუარები', nameRu: 'Аксессуары', nameEn: 'Accessories', sortOrder: 3 },
-  { slug: 'storage', nameKa: 'შენახვა', nameRu: 'Накопители', nameEn: 'Storage', sortOrder: 4 },
-  { slug: 'services', nameKa: 'სერვისი', nameRu: 'Услуги', nameEn: 'Services', sortOrder: 5 },
-];
 
 // ── Reference product JSON shape ────────────────────────
 
@@ -91,30 +85,14 @@ function copyImageToStructuredDir(
 async function main(): Promise<void> {
   console.log('=== Seeding Products ===\n');
 
-  // 1. Create categories
-  console.log('1. Creating categories...');
-  const categoryMap = new Map<string, string>(); // slug → id
-
-  for (const cat of CATEGORIES) {
-    const row = await prisma.category.upsert({
-      where: { slug: cat.slug },
-      update: {
-        nameKa: cat.nameKa,
-        nameRu: cat.nameRu,
-        nameEn: cat.nameEn,
-        sortOrder: cat.sortOrder,
-      },
-      create: {
-        slug: cat.slug,
-        nameKa: cat.nameKa,
-        nameRu: cat.nameRu,
-        nameEn: cat.nameEn,
-        sortOrder: cat.sortOrder,
-      },
-    });
-    categoryMap.set(cat.slug, row.id);
-    console.log(`  ✓ ${cat.slug} (${row.id})`);
+  // 1. Look up existing categories (seeded by prisma/seed.ts)
+  console.log('1. Loading categories from DB...');
+  const allCats = await prisma.category.findMany({ select: { id: true, slug: true } });
+  if (allCats.length === 0) {
+    throw new Error('No categories in DB. Run `npm run prisma:seed` first to create the category tree.');
   }
+  const categoryMap = new Map(allCats.map((c) => [c.slug, c.id]));
+  console.log(`  ✓ Loaded ${allCats.length} categories`);
 
   // 2. Read all product JSON files and deduplicate slugs
   console.log('\n2. Reading product JSON files...');
@@ -162,15 +140,17 @@ async function main(): Promise<void> {
 
   for (const product of allProducts) {
     try {
-      // Resolve category ID
-      const categoryId = categoryMap.get(product.category);
-      if (!categoryId) {
+      // Reference JSON uses legacy slugs; remap them to the new tree.
+      const targetSlug =
+        OLD_TO_NEW_SLUG[product.category] ?? (categoryMap.has(product.category) ? product.category : null);
+      const categoryId = targetSlug ? categoryMap.get(targetSlug) : undefined;
+      if (!categoryId || !targetSlug) {
         console.warn(`  [WARN] Unknown category "${product.category}" for ${product.id}, skipping`);
         errors++;
         continue;
       }
 
-      // Copy images and build relative paths
+      // Copy images and build relative paths (use the legacy folder name on disk)
       const imagePaths = product.images.map((img) =>
         copyImageToStructuredDir(img, product.category, product.slug),
       );
@@ -209,7 +189,7 @@ async function main(): Promise<void> {
       });
       created++;
 
-      console.log(`  ✓ ${product.id} (${product.slug}) [${product.category}] — ${imagePaths.length} images`);
+      console.log(`  ✓ ${product.id} (${product.slug}) [${product.category} → ${targetSlug}] — ${imagePaths.length} images`);
     } catch (err) {
       console.error(`  ✗ Error seeding ${product.id}:`, err);
       errors++;
@@ -218,29 +198,7 @@ async function main(): Promise<void> {
 
   console.log(`\n  Products: ${created} created, ${errors} errors`);
 
-  // 5. Seed catalog config
-  console.log('\n4. Seeding catalog config...');
-  if (fs.existsSync(CATALOG_CONFIG_PATH)) {
-    const configRaw = fs.readFileSync(CATALOG_CONFIG_PATH, 'utf-8');
-    const config = JSON.parse(configRaw);
-
-    await prisma.catalogConfig.upsert({
-      where: { id: 'singleton' },
-      create: {
-        categories: config.categories,
-        filters: config.filters,
-      },
-      update: {
-        categories: config.categories,
-        filters: config.filters,
-      },
-    });
-    console.log('  ✓ Catalog config seeded');
-  } else {
-    console.warn('  [WARN] catalog-config.json not found at:', CATALOG_CONFIG_PATH);
-  }
-
-  // 6. Summary
+  // 5. Summary
   const totalProducts = await prisma.product.count();
   const totalSpecs = await prisma.productSpec.count();
   const totalCategories = await prisma.category.count();

@@ -43,10 +43,17 @@ export function DiscountedProductsBlock(): React.ReactElement {
 
   const categoryLabels: Record<string, string> = {
     cameras: t('category.cameras'),
-    'nvr-kits': t('category.nvr-kits'),
-    storage: t('category.storage'),
+    'ip-cameras': t('category.ip-cameras'),
+    'analog-cameras': t('category.analog-cameras'),
+    'camera-accessories': t('category.camera-accessories'),
+    'camera-consumables': t('category.camera-consumables'),
+    recorders: t('category.recorders'),
+    'nvr-recorders': t('category.nvr-recorders'),
+    'dvr-recorders': t('category.dvr-recorders'),
+    'recorder-accessories': t('category.recorder-accessories'),
+    kits: t('category.kits'),
+    'video-registrators': t('category.video-registrators'),
     accessories: t('category.accessories'),
-    services: t('category.services'),
   };
 
   const cardsRef = useRef<HTMLDivElement>(null);

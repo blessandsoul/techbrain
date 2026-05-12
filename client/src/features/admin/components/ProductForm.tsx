@@ -193,16 +193,17 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
 
   const labelClass = 'text-xs text-muted-foreground';
 
-  // Hardcoded category options (used as fallback and for display)
-  const categoryOptions = categories.length > 0
-    ? categories.map((c) => ({ value: c.slug, label: c.name.ka }))
-    : [
-        { value: 'cameras', label: 'კამერები' },
-        { value: 'nvr-kits', label: 'NVR კომპლექტები' },
-        { value: 'accessories', label: 'აქსესუარები' },
-        { value: 'storage', label: 'მეხსიერება' },
-        { value: 'services', label: 'სერვისები' },
-      ];
+  // Build hierarchical category options indented by depth.
+  function indentFor(cat: ICategory): string {
+    if (!cat.parentId) return '';
+    const parent = categories.find((p) => p.id === cat.parentId);
+    if (!parent) return '— ';
+    return parent.parentId ? '— — ' : '— ';
+  }
+  const categoryOptions = categories.map((c) => ({
+    value: c.slug,
+    label: `${indentFor(c)}${c.name.ka}`,
+  }));
 
   const saveButtonDisabled = isSubmitting || createMutation.isPending || updateMutation.isPending;
   const saveButtonLabel = isSubmitting ? 'იტვირთება...' : 'პროდუქტის შენახვა';

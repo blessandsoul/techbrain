@@ -62,16 +62,56 @@ function toProductResponse(p: ProductWithRelations): ProductResponse {
 // ── Related Categories Map ──────────────────────────────
 
 const RELATED_CATEGORIES: Record<string, string[]> = {
-  cameras: ['accessories', 'storage'],
-  'nvr-kits': ['accessories', 'storage'],
-  storage: ['accessories', 'cameras'],
-  accessories: ['cameras', 'storage'],
-  services: [],
+  cameras: ['camera-accessories', 'accessories'],
+  'ip-cameras': ['camera-accessories', 'accessories', 'recorders'],
+  'analog-cameras': ['camera-accessories', 'accessories', 'recorders'],
+  'camera-accessories': ['cameras', 'accessories'],
+  'camera-consumables': ['cameras', 'accessories'],
+  recorders: ['recorder-accessories', 'accessories'],
+  'nvr-recorders': ['recorder-accessories', 'accessories', 'cameras'],
+  'dvr-recorders': ['recorder-accessories', 'accessories', 'cameras'],
+  'recorder-accessories': ['recorders', 'accessories'],
+  kits: ['cameras', 'recorders', 'accessories'],
+  'video-registrators': ['accessories', 'cameras'],
+  accessories: ['cameras', 'recorders'],
 };
 
 // ── Repository ──────────────────────────────────────────
 
 class ProductsRepository {
+  /**
+   * Return the input slug plus every descendant slug in the category tree.
+   * Used so that filtering / counting by a parent category includes products
+   * assigned to any of its children or grandchildren.
+   */
+  private async resolveSlugWithDescendants(slug: string): Promise<string[]> {
+    const all = await prisma.category.findMany({
+      where: { isActive: true },
+      select: { slug: true, parentId: true, id: true },
+    });
+    const idBySlug = new Map(all.map((c) => [c.slug, c.id]));
+    const rootId = idBySlug.get(slug);
+    if (!rootId) return [slug];
+
+    const childrenByParent = new Map<string, typeof all>();
+    for (const c of all) {
+      if (!c.parentId) continue;
+      const arr = childrenByParent.get(c.parentId) ?? [];
+      arr.push(c);
+      childrenByParent.set(c.parentId, arr);
+    }
+
+    const result: string[] = [];
+    const visit = (id: string): void => {
+      const node = all.find((c) => c.id === id);
+      if (!node) return;
+      result.push(node.slug);
+      for (const child of childrenByParent.get(id) ?? []) visit(child.id);
+    };
+    visit(rootId);
+    return result;
+  }
+
   // ── Single Product Queries ──────────────────────────
 
   async findById(id: string): Promise<ProductResponse | null> {
@@ -127,10 +167,12 @@ class ProductsRepository {
   }): Promise<{ items: ProductResponse[]; totalItems: number; priceRange: { min: number; max: number } }> {
     const andConditions: Prisma.ProductWhereInput[] = [];
 
-    // Category filter via join table
+    // Category filter via join table — include all descendants so clicking a
+    // parent category surfaces products from its child categories too.
     if (params.categorySlug) {
+      const slugs = await this.resolveSlugWithDescendants(params.categorySlug);
       andConditions.push({
-        categories: { some: { category: { slug: params.categorySlug } } },
+        categories: { some: { category: { slug: { in: slugs } } } },
       });
     }
 
@@ -259,8 +301,9 @@ class ProductsRepository {
     // Build base where to get matching product IDs
     const andConditions: Prisma.ProductWhereInput[] = [];
     if (categorySlug) {
+      const slugs = await this.resolveSlugWithDescendants(categorySlug);
       andConditions.push({
-        categories: { some: { category: { slug: categorySlug } } },
+        categories: { some: { category: { slug: { in: slugs } } } },
       });
     }
     if (subcategorySpecFilter) {
@@ -311,8 +354,9 @@ class ProductsRepository {
   ): Promise<{ min: number; max: number }> {
     const andConditions: Prisma.ProductWhereInput[] = [];
     if (categorySlug) {
+      const slugs = await this.resolveSlugWithDescendants(categorySlug);
       andConditions.push({
-        categories: { some: { category: { slug: categorySlug } } },
+        categories: { some: { category: { slug: { in: slugs } } } },
       });
     }
     if (subcategorySpecFilter) {
@@ -337,65 +381,53 @@ class ProductsRepository {
   // ── Category Counts ───────────────────────────────
 
   async getCategoryCounts(
-    catalogConfig: CatalogConfigResponse,
+    _catalogConfig: CatalogConfigResponse,
   ): Promise<Record<string, number>> {
-    // Total active products
     const totalCount = await prisma.product.count({ where: { isActive: true } });
     const counts: Record<string, number> = { all: totalCount };
 
-    // Count per top-level category via join table
+    // Load the whole tree once
     const allCategories = await prisma.category.findMany({
       where: { isActive: true },
-      select: { slug: true, id: true },
+      select: { id: true, slug: true, parentId: true },
     });
 
-    const categoryCounts = await Promise.all(
+    const childrenByParent = new Map<string, typeof allCategories>();
+    for (const c of allCategories) {
+      if (!c.parentId) continue;
+      const arr = childrenByParent.get(c.parentId) ?? [];
+      arr.push(c);
+      childrenByParent.set(c.parentId, arr);
+    }
+
+    // For each category, collect itself + every descendant id
+    function descendantIds(rootId: string): string[] {
+      const out: string[] = [];
+      const visit = (id: string): void => {
+        out.push(id);
+        for (const child of childrenByParent.get(id) ?? []) visit(child.id);
+      };
+      visit(rootId);
+      return out;
+    }
+
+    // Count distinct products in each category's subtree (parallel)
+    const results = await Promise.all(
       allCategories.map(async (cat) => {
+        const ids = descendantIds(cat.id);
         const count = await prisma.product.count({
           where: {
             isActive: true,
-            categories: { some: { categoryId: cat.id } },
+            categories: { some: { categoryId: { in: ids } } },
           },
         });
         return { slug: cat.slug, count };
       }),
     );
 
-    for (const { slug, count } of categoryCounts) {
+    for (const { slug, count } of results) {
       counts[slug] = count;
     }
-
-    // Count subcategories (virtual, spec-filter based)
-    const subcategoryQueries: Array<{ id: string; promise: Promise<number> }> = [];
-    for (const cat of catalogConfig.categories) {
-      if (cat.children) {
-        for (const child of cat.children) {
-          if (child.specFilter && cat.parentCategory) {
-            const parentCat = allCategories.find((c) => c.slug === cat.parentCategory);
-            if (parentCat) {
-              subcategoryQueries.push({
-                id: child.id,
-                promise: prisma.product.count({
-                  where: {
-                    isActive: true,
-                    categories: { some: { categoryId: parentCat.id } },
-                    specs: { some: { keyKa: child.specFilter.kaKey, value: child.specFilter.value } },
-                  },
-                }),
-              });
-            }
-          }
-        }
-      }
-    }
-
-    if (subcategoryQueries.length > 0) {
-      const results = await Promise.all(subcategoryQueries.map((q) => q.promise));
-      subcategoryQueries.forEach((q, i) => {
-        counts[q.id] = results[i];
-      });
-    }
-
     return counts;
   }
 
@@ -640,14 +672,16 @@ class ProductsRepository {
 
   // ── Categories ───────────────────────────────────
 
-  async findAllCategories(): Promise<Array<{ id: string; slug: string; name: { ka: string; ru: string; en: string } }>> {
+  async findAllCategories(): Promise<Array<{ id: string; slug: string; parentId: string | null; sortOrder: number; name: { ka: string; ru: string; en: string } }>> {
     const rows = await prisma.category.findMany({
       where: { isActive: true },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: [{ sortOrder: 'asc' }],
     });
     return rows.map((c) => ({
       id: c.id,
       slug: c.slug,
+      parentId: c.parentId,
+      sortOrder: c.sortOrder,
       name: { ka: c.nameKa, ru: c.nameRu, en: c.nameEn },
     }));
   }

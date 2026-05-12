@@ -8,8 +8,8 @@ import {
   ArrowRight,
   Camera,
   HardDrive,
-  Wrench,
-  Cpu,
+  Toolbox,
+  VideoCamera,
 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 
@@ -31,11 +31,18 @@ interface Product {
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  cameras:     <Camera    size={11} weight="duotone" aria-hidden="true" />,
-  'nvr-kits':  <Cpu       size={11} weight="duotone" aria-hidden="true" />,
-  storage:     <HardDrive size={11} weight="duotone" aria-hidden="true" />,
-  accessories: <Package   size={11} weight="duotone" aria-hidden="true" />,
-  services:    <Wrench    size={11} weight="duotone" aria-hidden="true" />,
+  cameras:               <Camera      size={11} weight="duotone" aria-hidden="true" />,
+  'ip-cameras':          <Camera      size={11} weight="duotone" aria-hidden="true" />,
+  'analog-cameras':      <Camera      size={11} weight="duotone" aria-hidden="true" />,
+  'camera-accessories':  <Toolbox     size={11} weight="duotone" aria-hidden="true" />,
+  'camera-consumables':  <Toolbox     size={11} weight="duotone" aria-hidden="true" />,
+  recorders:             <HardDrive   size={11} weight="duotone" aria-hidden="true" />,
+  'nvr-recorders':       <HardDrive   size={11} weight="duotone" aria-hidden="true" />,
+  'dvr-recorders':       <HardDrive   size={11} weight="duotone" aria-hidden="true" />,
+  'recorder-accessories':<Toolbox     size={11} weight="duotone" aria-hidden="true" />,
+  kits:                  <Package     size={11} weight="duotone" aria-hidden="true" />,
+  'video-registrators':  <VideoCamera size={11} weight="duotone" aria-hidden="true" />,
+  accessories:           <Toolbox     size={11} weight="duotone" aria-hidden="true" />,
 };
 
 interface ProductMiniCardProps {
@@ -49,7 +56,7 @@ interface ProductMiniCardProps {
 export function ProductMiniCard({ product, outOfStockLabel, priceOnRequestLabel, categoryLabels, saleColor = 'destructive' }: ProductMiniCardProps): React.ReactElement {
   const name = product.name;
   const hasImage = product.images.length > 0;
-  const isService = product.categories.includes('services');
+  const isService = product.price === 0;
   const imageSrc = hasImage
     ? product.images[0].startsWith('http')
       ? product.images[0]

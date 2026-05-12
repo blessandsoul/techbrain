@@ -359,10 +359,10 @@ export function HeroSection(): React.ReactElement {
           subtitle={t('hero.subtitle')}
           categoryLabels={{
             cameras: t('category.cameras'),
-            'nvr-kits': t('category.nvr-kits'),
+            recorders: t('category.recorders'),
+            kits: t('category.kits'),
+            'video-registrators': t('category.video-registrators'),
             accessories: t('category.accessories'),
-            storage: t('category.storage'),
-            services: t('category.services'),
           }}
         />
       </div>

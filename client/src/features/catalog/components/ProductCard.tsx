@@ -29,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps): React.ReactElement {
   const { t, localized } = useLocale();
   const name = typeof product.name === 'string' ? product.name : localized(product.name);
   const hasImage = product.images.length > 0;
-  const isService = product.categories.includes('services');
+  const isService = product.price === 0;
   const categoryLabel = t(`category.${product.categories[0]}` as keyof typeof import('@/lib/i18n/locales/ka.json')) ?? product.categories[0];
   const imgSrc = hasImage ? getProductImageUrl(product.images[0]) : '';
 

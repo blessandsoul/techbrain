@@ -2,8 +2,6 @@
  * Products Module — Types
  */
 
-export type ProductCategorySlug = 'cameras' | 'nvr-kits' | 'storage' | 'services' | 'accessories';
-
 export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc';
 
 export interface LocalizedString {

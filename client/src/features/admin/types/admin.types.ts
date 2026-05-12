@@ -25,6 +25,8 @@ export interface AdminProductsResponse {
 export interface ICategory {
   id: string;
   slug: string;
+  parentId: string | null;
+  sortOrder: number;
   name: LocalizedString;
 }
 

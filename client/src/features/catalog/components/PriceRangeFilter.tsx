@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useLocale } from '@/lib/i18n';
@@ -24,8 +24,16 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
   const [localMin, setLocalMin] = useState<string>(currentMin ?? '');
   const [localMax, setLocalMax] = useState<string>(currentMax ?? '');
 
-  const debouncedMin = useDebounce(localMin, 500);
-  const debouncedMax = useDebounce(localMax, 500);
+  // Snappier: filter 300ms after the user stops typing.
+  const debouncedMin = useDebounce(localMin, 300);
+  const debouncedMax = useDebounce(localMax, 300);
+
+  // Remember what we last pushed so the URL→local sync effect doesn't fight
+  // active typing when our own push round-trips back through the router.
+  const lastPushedRef = useRef<{ min: string; max: string }>({
+    min: currentMin ?? '',
+    max: currentMax ?? '',
+  });
 
   const updateUrl = useCallback(
     (minVal: string, maxVal: string) => {
@@ -50,6 +58,10 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
       const target = `${pathname}?${params.toString()}`;
       const current = `${pathname}?${searchParams.toString()}`;
       if (target !== current) {
+        lastPushedRef.current = {
+          min: params.get('minPrice') ?? '',
+          max: params.get('maxPrice') ?? '',
+        };
         router.push(target);
       }
     },
@@ -62,9 +74,19 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
     }
   }, [debouncedMin, debouncedMax, updateUrl, isInvalid]);
 
+  // Only sync local state from the URL when the URL changed *externally*
+  // (e.g. "Clear filters" button). Skip echoes of our own push.
   useEffect(() => {
-    setLocalMin(currentMin ?? '');
-    setLocalMax(currentMax ?? '');
+    const urlMin = currentMin ?? '';
+    const urlMax = currentMax ?? '';
+    if (urlMin !== lastPushedRef.current.min) {
+      setLocalMin(urlMin);
+      lastPushedRef.current.min = urlMin;
+    }
+    if (urlMax !== lastPushedRef.current.max) {
+      setLocalMax(urlMax);
+      lastPushedRef.current.max = urlMax;
+    }
   }, [currentMin, currentMax]);
 
   if (isInvalid) return null;
@@ -84,7 +106,7 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
             value={localMin}
             onChange={(e) => setLocalMin(e.target.value)}
             placeholder={String(min)}
-            className="w-full px-2.5 py-1.5 rounded-lg bg-muted border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors tabular-nums"
+            className="no-spinner w-full px-2.5 py-1.5 rounded-lg bg-muted border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors tabular-nums"
             aria-label={t('catalog.priceMin')}
           />
         </div>
@@ -97,7 +119,7 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
             value={localMax}
             onChange={(e) => setLocalMax(e.target.value)}
             placeholder={String(max)}
-            className="w-full px-2.5 py-1.5 rounded-lg bg-muted border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors tabular-nums"
+            className="no-spinner w-full px-2.5 py-1.5 rounded-lg bg-muted border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors tabular-nums"
             aria-label={t('catalog.priceMax')}
           />
         </div>

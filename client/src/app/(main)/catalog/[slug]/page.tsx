@@ -145,7 +145,7 @@ function ProductDetailContent(): React.ReactElement {
   if (isLoading) return <ProductDetailSkeleton />;
   if (isError || !product) return notFound();
 
-  const isService = product.categories.includes('services');
+  const isService = product.price === 0;
   const popularProducts = (featuredProducts ?? []).filter((p: IProduct) => p.id !== product.id);
   const categoryLabel = t(`category.${product.categories[0]}` as keyof typeof import('@/lib/i18n/locales/ka.json')) ?? product.categories[0];
 

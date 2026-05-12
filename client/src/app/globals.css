@@ -158,30 +158,111 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    scrollbar-width: thin;
-    scrollbar-color: oklch(from var(--foreground) l c h / 0.15) transparent;
-  }
-  *:hover {
-    scrollbar-color: oklch(from var(--foreground) l c h / 0.25) transparent;
-  }
-  *::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  *::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  *::-webkit-scrollbar-thumb {
-    background: oklch(from var(--foreground) l c h / 0.15);
-    border-radius: 9999px;
-  }
-  *::-webkit-scrollbar-thumb:hover {
-    background: oklch(from var(--foreground) l c h / 0.25);
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* ── Slim global scrollbar ─────────────────────────────────
+ * Kept OUTSIDE @layer so Tailwind utility-layer rules can't override it.
+ * Do NOT set `scrollbar-width` on Chromium — it disables ::-webkit-scrollbar
+ * rules and forces the ~10px built-in thin scrollbar.
+ */
+html {
+  scrollbar-color: oklch(from var(--foreground) l c h / 0.2) transparent;
+}
+@supports (-moz-appearance: none) {
+  html {
+    scrollbar-width: thin;
+  }
+}
+*::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track-piece,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: oklch(from var(--foreground) l c h / 0.25);
+  border-radius: 9999px;
+  border: none;
+  transition: background-color 150ms ease;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: oklch(from var(--foreground) l c h / 0.4);
+}
+*::-webkit-scrollbar-thumb:active {
+  background-color: oklch(from var(--foreground) l c h / 0.55);
+}
+/* Kill the up/down arrow buttons on every variant */
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-button:start:decrement,
+*::-webkit-scrollbar-button:end:increment,
+*::-webkit-scrollbar-button:vertical:start:increment,
+*::-webkit-scrollbar-button:vertical:end:decrement,
+*::-webkit-scrollbar-button:horizontal:start:increment,
+*::-webkit-scrollbar-button:horizontal:end:decrement {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ── Catalog sidebar — 1px scrollbar via scroll-driven animation ──
+ *
+ * Modern Chromium's overlay scrollbars on Windows ignore `::-webkit-scrollbar`
+ * width entirely, so to get a true 1px scrollbar we:
+ *   1. Hide the native scrollbar via `scrollbar-width: none`.
+ *   2. Render our own 1px thumb as a ::after on the parent wrapper,
+ *      animated by CSS scroll-timeline to track scroll position.
+ *
+ * Browser support: Chromium 115+, Firefox 137+. Safari falls back to no thumb
+ * (scrolling still works; no visual indicator).
+ */
+.sidebar-scroll-wrapper {
+  position: relative;
+  /* Lift the named timeline up so this element's ::after can reference it. */
+  timeline-scope: --sidebar-scroll;
+}
+.sidebar-scroll-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 15%;
+  background-color: oklch(from var(--foreground) l c h / 0.3);
+  border-radius: 9999px;
+  pointer-events: none;
+  animation-name: sidebar-thumb-move;
+  animation-duration: auto;
+  animation-timing-function: linear;
+  animation-timeline: --sidebar-scroll;
+}
+@keyframes sidebar-thumb-move {
+  /* thumb height is 15% of wrapper, so it can travel the remaining 85% */
+  from { top: 0%; }
+  to { top: 85%; }
+}
+.sidebar-scroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-timeline-name: --sidebar-scroll;
+  scroll-timeline-axis: y;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* ── Mobile filter drawer slide-in ── */
@@ -481,4 +562,15 @@
   float: left;
   margin-right: 0.25rem;
   margin-top: -0.25rem;
+}
+
+/* ── Hide native number input spinner arrows ── */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }

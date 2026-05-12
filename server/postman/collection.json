@@ -420,7 +420,7 @@
                     { "key": "hasDiscount", "value": "true", "disabled": true }
                   ]
                 },
-                "description": "Get filtered product listing with pagination. All query params are optional.\n\n- category: filter by category slug (cameras, nvr-kits, accessories, storage, services)\n- search: full-text search across product names and slugs\n- sort: newest | price-asc | price-desc | name-asc\n- minPrice / maxPrice: price range filter\n- specs: JSON string of spec filters, e.g. {\"brand\":[\"Tiandy\",\"Dahua\"]}\n- subcategorySpecFilter: JSON string for virtual subcategory, e.g. {\"kaKey\":\"...\",\"value\":\"...\"}\n- locale: ka | ru | en (for name-based sorting)\n- hasDiscount: true to return only discounted products (originalPrice > price)"
+                "description": "Get filtered product listing with pagination. All query params are optional.\n\n- category: filter by category slug (video-surveillance, cameras, ip-cameras, analog-cameras, camera-accessories, camera-consumables, recorders, nvr-recorders, dvr-recorders, recorder-accessories, kits, video-registrators, accessories)\n- search: full-text search across product names and slugs\n- sort: newest | price-asc | price-desc | name-asc\n- minPrice / maxPrice: price range filter\n- specs: JSON string of spec filters, e.g. {\"brand\":[\"Tiandy\",\"Dahua\"]}\n- subcategorySpecFilter: JSON string for virtual subcategory, e.g. {\"kaKey\":\"...\",\"value\":\"...\"}\n- locale: ka | ru | en (for name-based sorting)\n- hasDiscount: true to return only discounted products (originalPrice > price)"
               },
               "response": []
             },

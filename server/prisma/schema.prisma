@@ -98,6 +98,7 @@ model BlockedIp {
 model Category {
   id        String   @id @default(uuid())
   slug      String   @unique @db.VarChar(100)
+  parentId  String?
   nameKa    String   @db.VarChar(200)
   nameRu    String   @default("") @db.VarChar(200)
   nameEn    String   @default("") @db.VarChar(200)
@@ -106,10 +107,13 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryHierarchy")
   products ProductCategory[]
 
   @@index([isActive])
   @@index([sortOrder])
+  @@index([parentId])
   @@map("categories")
 }
 

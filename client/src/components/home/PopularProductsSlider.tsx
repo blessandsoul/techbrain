@@ -40,9 +40,16 @@ export function PopularProductsSlider(): ReactElement | null {
 
   const categoryLabels: Record<string, string> = {
     cameras: t('category.cameras'),
-    'nvr-kits': t('category.nvr-kits'),
-    storage: t('category.storage'),
-    services: t('category.services'),
+    'ip-cameras': t('category.ip-cameras'),
+    'analog-cameras': t('category.analog-cameras'),
+    'camera-accessories': t('category.camera-accessories'),
+    'camera-consumables': t('category.camera-consumables'),
+    recorders: t('category.recorders'),
+    'nvr-recorders': t('category.nvr-recorders'),
+    'dvr-recorders': t('category.dvr-recorders'),
+    'recorder-accessories': t('category.recorder-accessories'),
+    kits: t('category.kits'),
+    'video-registrators': t('category.video-registrators'),
     accessories: t('category.accessories'),
   };
 
@@ -119,7 +126,7 @@ export function PopularProductsSlider(): ReactElement | null {
 function ProductCard({ product, categoryLabels, byOrderLabel, learnMoreLabel, outOfStockLabel }: { product: FlatProduct; categoryLabels: Record<string, string>; byOrderLabel: string; learnMoreLabel: string; outOfStockLabel: string }): ReactElement {
   const name = product.name;
   const hasImage = product.images.length > 0;
-  const isService = product.categories.includes('services');
+  const isService = product.price === 0;
   const categoryLabel = categoryLabels[product.categories[0]] ?? product.categories[0];
   const imgSrc = hasImage
     ? (product.images[0].startsWith('http') ? product.images[0] : `/images/products/${product.images[0]}`)

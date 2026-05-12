@@ -2,7 +2,6 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { CategoryTree } from './CategoryTree';
 import { DynamicFilterSection } from './DynamicFilterSection';
 import { PriceRangeFilter } from './PriceRangeFilter';
@@ -55,7 +54,7 @@ export function CatalogSidebar({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Category tree */}
       <CategoryTree categoryTree={categoryTree} categoryCounts={categoryCounts} />
 
@@ -80,12 +79,10 @@ export function CatalogSidebar({
       )}
 
       {/* Dynamic spec filters */}
-      <div className="px-3">
-        <DynamicFilterSection
-          filterConfigs={filterConfigs}
-          availableValues={availableValues}
-        />
-      </div>
+      <DynamicFilterSection
+        filterConfigs={filterConfigs}
+        availableValues={availableValues}
+      />
 
       {/* Price range */}
       {filterConfigs.length > 0 && (
@@ -99,18 +96,17 @@ export function CatalogSidebar({
 
       {/* In stock filter */}
       <div className="border-t border-border" />
-      <div className="px-3">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="inStock-filter"
-            checked={hasInStockFilter}
-            onCheckedChange={(checked) => toggleInStock(checked === true)}
-          />
-          <Label htmlFor="inStock-filter" className="text-sm text-foreground cursor-pointer">
-            {t('catalog.inStockOnly')}
-          </Label>
-        </div>
-      </div>
+      <label
+        htmlFor="inStock-filter"
+        className="flex items-center gap-2.5 py-2 px-3 rounded-lg hover:bg-muted cursor-pointer transition-colors text-sm text-foreground"
+      >
+        <Checkbox
+          id="inStock-filter"
+          checked={hasInStockFilter}
+          onCheckedChange={(checked) => toggleInStock(checked === true)}
+        />
+        <span className="flex-1">{t('catalog.inStockOnly')}</span>
+      </label>
     </div>
   );
 }

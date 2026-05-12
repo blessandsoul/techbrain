@@ -1,5 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import argon2 from 'argon2';
+import {
+  CATEGORY_TREE,
+  CATALOG_CATEGORIES_TREE,
+  CATALOG_FILTERS,
+} from './category-tree.js';
 
 const prisma = new PrismaClient();
 
@@ -34,26 +39,51 @@ async function main(): Promise<void> {
   // eslint-disable-next-line no-console
   console.log('Seeded users:', { admin: admin.email, user: user.email });
 
-  // ── Seed Categories ────────────────────────────────
+  // ── Seed Categories (hierarchical) ─────────────────
 
-  const categoriesData = [
-    { slug: 'cameras', nameKa: 'კამერები', nameRu: 'Камеры', nameEn: 'Cameras', sortOrder: 0 },
-    { slug: 'nvr-kits', nameKa: 'NVR კომპლექტები', nameRu: 'NVR комплекты', nameEn: 'NVR Kits', sortOrder: 1 },
-    { slug: 'accessories', nameKa: 'აქსესუარები', nameRu: 'Аксессуары', nameEn: 'Accessories', sortOrder: 2 },
-    { slug: 'storage', nameKa: 'მეხსიერება', nameRu: 'Память', nameEn: 'Storage', sortOrder: 3 },
-    { slug: 'services', nameKa: 'სერვისები', nameRu: 'Услуги', nameEn: 'Services', sortOrder: 4 },
-  ];
-
-  for (const cat of categoriesData) {
-    await prisma.category.upsert({
+  // Insert in tree order — parents before children — so the parentId lookup succeeds.
+  const slugToId = new Map<string, string>();
+  for (const cat of CATEGORY_TREE) {
+    const parentId = cat.parentSlug ? slugToId.get(cat.parentSlug) ?? null : null;
+    const row = await prisma.category.upsert({
       where: { slug: cat.slug },
-      update: { nameKa: cat.nameKa, nameRu: cat.nameRu, nameEn: cat.nameEn, sortOrder: cat.sortOrder },
-      create: cat,
+      update: {
+        parentId,
+        nameKa: cat.nameKa,
+        nameRu: cat.nameRu,
+        nameEn: cat.nameEn,
+        sortOrder: cat.sortOrder,
+      },
+      create: {
+        slug: cat.slug,
+        parentId,
+        nameKa: cat.nameKa,
+        nameRu: cat.nameRu,
+        nameEn: cat.nameEn,
+        sortOrder: cat.sortOrder,
+      },
     });
+    slugToId.set(cat.slug, row.id);
   }
-
   // eslint-disable-next-line no-console
-  console.log('Seeded categories:', categoriesData.length);
+  console.log('Seeded categories:', CATEGORY_TREE.length);
+
+  // ── Seed Catalog Config (tree + filters) ───────────
+
+  await prisma.catalogConfig.upsert({
+    where: { id: 'singleton' },
+    update: {
+      categories: CATALOG_CATEGORIES_TREE as unknown as object,
+      filters: CATALOG_FILTERS as unknown as object,
+    },
+    create: {
+      id: 'singleton',
+      categories: CATALOG_CATEGORIES_TREE as unknown as object,
+      filters: CATALOG_FILTERS as unknown as object,
+    },
+  });
+  // eslint-disable-next-line no-console
+  console.log('Seeded catalog config');
 
   // ── Seed Projects ──────────────────────────────────
 

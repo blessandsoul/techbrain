@@ -55,8 +55,10 @@ function CatalogContent(): React.ReactElement {
       <div className="flex gap-8">
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-72 shrink-0">
-          <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto space-y-6 pb-8">
-            {sidebarContent}
+          <div className="sidebar-scroll-wrapper sticky top-20 max-h-[calc(100dvh-6rem)]">
+            <div className="sidebar-scroll max-h-[calc(100dvh-6rem)] space-y-6 pb-8 pr-2">
+              {sidebarContent}
+            </div>
           </div>
         </aside>
 

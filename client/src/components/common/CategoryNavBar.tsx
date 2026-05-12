@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import {
   SecurityCamera,
-  MonitorPlay,
-  Toolbox,
+  VideoCamera,
+  Package,
   HardDrives,
-  Wrench,
+  Toolbox,
 } from '@phosphor-icons/react';
 
 interface CategoryItem {
@@ -22,28 +22,28 @@ const CATEGORIES: CategoryItem[] = [
     icon: <SecurityCamera size={26} weight="duotone" aria-hidden="true" />,
   },
   {
-    value: 'nvr-kits',
-    href: '/catalog?category=nvr-kits',
-    label: 'NVR კომპლექტები',
-    icon: <MonitorPlay size={26} weight="duotone" aria-hidden="true" />,
+    value: 'recorders',
+    href: '/catalog?category=recorders',
+    label: 'ჩამწერები',
+    icon: <HardDrives size={26} weight="duotone" aria-hidden="true" />,
+  },
+  {
+    value: 'kits',
+    href: '/catalog?category=kits',
+    label: 'კომპლექტები',
+    icon: <Package size={26} weight="duotone" aria-hidden="true" />,
+  },
+  {
+    value: 'video-registrators',
+    href: '/catalog?category=video-registrators',
+    label: 'ვიდეო-რეგისტრატორები',
+    icon: <VideoCamera size={26} weight="duotone" aria-hidden="true" />,
   },
   {
     value: 'accessories',
     href: '/catalog?category=accessories',
     label: 'აქსესუარები',
     icon: <Toolbox size={26} weight="duotone" aria-hidden="true" />,
-  },
-  {
-    value: 'storage',
-    href: '/catalog?category=storage',
-    label: 'შენახვა',
-    icon: <HardDrives size={26} weight="duotone" aria-hidden="true" />,
-  },
-  {
-    value: 'services',
-    href: '/catalog?category=services',
-    label: 'სერვისი',
-    icon: <Wrench size={26} weight="duotone" aria-hidden="true" />,
   },
 ];
 

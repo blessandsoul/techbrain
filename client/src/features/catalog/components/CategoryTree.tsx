@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { CaretRight } from '@phosphor-icons/react';
 import { useLocale } from '@/lib/i18n';
@@ -16,54 +16,40 @@ export function CategoryTree({ categoryTree, categoryCounts }: CategoryTreeProps
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
   const activeCategory = searchParams.get('category') ?? undefined;
-  const activeSubcategory = searchParams.get('subcategory') ?? undefined;
 
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
-    const initial = new Set<string>();
-    if (activeCategory) initial.add(activeCategory);
-    return initial;
-  });
+  // Root nodes are always expanded by default; also expand any ancestor of the active category.
+  // The tree arrives asynchronously, so we re-seed expansion once when it becomes available.
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const seededRef = useRef(false);
+
+  useEffect(() => {
+    if (seededRef.current || categoryTree.length === 0) return;
+    seededRef.current = true;
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      for (const root of categoryTree) next.add(root.id);
+      if (activeCategory) {
+        const path = findPath(categoryTree, activeCategory);
+        for (const id of path) next.add(id);
+      }
+      return next;
+    });
+  }, [categoryTree, activeCategory]);
 
   function toggleExpand(id: string): void {
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
 
   function selectCategory(node: CategoryNode): void {
     const params = new URLSearchParams();
-
-    if (node.id === 'all') {
-      router.push(pathname);
-      return;
-    }
-
-    const isChild = categoryTree.some((parent) => parent.children?.some((c) => c.id === node.id));
-    if (isChild && node.parentCategory) {
-      params.set('category', node.parentCategory);
-      params.set('subcategory', node.id);
-    } else if (node.parentCategory) {
-      params.set('category', node.parentCategory);
-    }
-
+    params.set('category', node.id);
     router.push(`${pathname}?${params.toString()}`);
-  }
-
-  function isActive(node: CategoryNode): boolean {
-    if (node.id === 'all' && !activeCategory) return true;
-    if (activeSubcategory) return node.id === activeSubcategory;
-    if (!activeSubcategory && node.parentCategory) {
-      return node.id === activeCategory && !node.specFilter;
-    }
-    return false;
   }
 
   return (
@@ -71,72 +57,110 @@ export function CategoryTree({ categoryTree, categoryCounts }: CategoryTreeProps
       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-3">
         {t('catalog.categories')}
       </p>
-      {categoryTree.map((node) => {
-        const hasChildren = node.children && node.children.length > 0;
-        const isExpanded = expandedIds.has(node.id);
-        const count = categoryCounts[node.id] ?? 0;
-        const active = isActive(node);
-
-        return (
-          <div key={node.id}>
-            <button
-              onClick={() => {
-                if (hasChildren) {
-                  toggleExpand(node.id);
-                  selectCategory(node);
-                } else {
-                  selectCategory(node);
-                }
-              }}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-150 cursor-pointer ${
-                active
-                  ? 'bg-primary/10 text-primary font-medium'
-                  : 'text-foreground hover:bg-muted'
-              }`}
-            >
-              {hasChildren && (
-                <CaretRight
-                  size={14}
-                  weight="bold"
-                  className={`shrink-0 text-muted-foreground transition-transform duration-200 ${
-                    isExpanded ? 'rotate-90' : ''
-                  }`}
-                  aria-hidden="true"
-                />
-              )}
-              {!hasChildren && <span className="w-3.5 shrink-0" />}
-              <span className="flex-1 text-left">{localized(node.label)}</span>
-              <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
-            </button>
-
-            {/* Children */}
-            {hasChildren && isExpanded && (
-              <div className="ml-5 mt-0.5 space-y-0.5">
-                {node.children!.map((child) => {
-                  const childCount = categoryCounts[child.id] ?? 0;
-                  if (childCount === 0) return null;
-                  const childActive = isActive(child);
-
-                  return (
-                    <button
-                      key={child.id}
-                      onClick={() => selectCategory(child)}
-                      className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all duration-150 cursor-pointer ${
-                        childActive
-                          ? 'bg-primary/10 text-primary font-medium'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                      }`}
-                    >
-                      <span className="flex-1 text-left">{localized(child.label)}</span>
-                      <span className="text-xs tabular-nums">{childCount}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
+      {categoryTree.map((node) => (
+        <CategoryItem
+          key={node.id}
+          node={node}
+          depth={0}
+          counts={categoryCounts}
+          expanded={expandedIds}
+          active={activeCategory}
+          onToggle={toggleExpand}
+          onSelect={selectCategory}
+          localize={(label) => localized(label)}
+        />
+      ))}
     </nav>
   );
+}
+
+// ── Recursive item ────────────────────────────────────
+
+interface CategoryItemProps {
+  node: CategoryNode;
+  depth: number;
+  counts: Record<string, number>;
+  expanded: Set<string>;
+  active: string | undefined;
+  onToggle: (id: string) => void;
+  onSelect: (node: CategoryNode) => void;
+  localize: (label: CategoryNode['label']) => string;
+}
+
+function CategoryItem({ node, depth, counts, expanded, active, onToggle, onSelect, localize }: CategoryItemProps): React.ReactElement {
+  const hasChildren = !!node.children && node.children.length > 0;
+  const isExpanded = expanded.has(node.id);
+  const isActive = active === node.id;
+  const count = counts[node.id] ?? 0;
+
+  function handleRowClick(): void {
+    onSelect(node);
+    if (hasChildren) onToggle(node.id);
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={handleRowClick}
+        aria-expanded={hasChildren ? isExpanded : undefined}
+        className={`w-full flex items-center gap-2 pr-3 py-2 rounded-lg text-sm text-left transition-colors duration-150 cursor-pointer ${
+          isActive ? 'bg-primary/10 text-primary font-medium' : 'text-foreground hover:bg-muted'
+        }`}
+        style={{ paddingLeft: `${depth * 12}px` }}
+      >
+        {hasChildren ? (
+          <CaretRight
+            size={14}
+            weight="bold"
+            className={`shrink-0 mx-2 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+            aria-hidden="true"
+          />
+        ) : (
+          <span className="w-7 shrink-0" />
+        )}
+        <span className="flex-1">{localize(node.label)}</span>
+        <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
+      </button>
+
+      {hasChildren && (
+        <div
+          className={`grid motion-safe:transition-[grid-template-rows,opacity] duration-200 ease-out ${
+            isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="space-y-0.5 mt-0.5">
+              {node.children!.map((child) => (
+                <CategoryItem
+                  key={child.id}
+                  node={child}
+                  depth={depth + 1}
+                  counts={counts}
+                  expanded={expanded}
+                  active={active}
+                  onToggle={onToggle}
+                  onSelect={onSelect}
+                  localize={localize}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Helper: find the path of IDs from root → target ───
+
+function findPath(tree: CategoryNode[], targetId: string): string[] {
+  for (const node of tree) {
+    if (node.id === targetId) return [node.id];
+    if (node.children) {
+      const childPath = findPath(node.children, targetId);
+      if (childPath.length > 0) return [node.id, ...childPath];
+    }
+  }
+  return [];
 }

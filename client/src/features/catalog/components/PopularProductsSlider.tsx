@@ -142,7 +142,7 @@ function SliderCard({ product }: { product: IProduct }): React.ReactElement {
   const name = localized(product.name);
   const hasImage = product.images.length > 0;
   const imgSrc = hasImage ? getProductImageUrl(product.images[0]) : '';
-  const isService = product.categories.includes('services');
+  const isService = product.price === 0;
   const hasDiscount = product.originalPrice !== undefined && product.originalPrice > product.price;
 
   return (

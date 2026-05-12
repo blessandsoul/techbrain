@@ -98,7 +98,7 @@ class ProductsService {
 
   // ── Admin Categories ────────────────────────────
 
-  async getCategories(): Promise<Array<{ id: string; slug: string; name: { ka: string; ru: string; en: string } }>> {
+  async getCategories(): Promise<Array<{ id: string; slug: string; parentId: string | null; sortOrder: number; name: { ka: string; ru: string; en: string } }>> {
     return productsRepository.findAllCategories();
   }
 

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table';
 
 import { InfoTooltip } from './InfoTooltip';
+import { useAdminCategories } from '../hooks/useAdminProducts';
 import { DeleteProductButton } from './DeleteProductButton';
 import {
   useAdminProducts,
@@ -73,6 +74,7 @@ function useUrlFilters() {
 
 export function ProductTable(): React.ReactElement {
   const { search, category, status, page, setParam } = useUrlFilters();
+  const { data: allCategories = [] } = useAdminCategories();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [searchInput, setSearchInput] = useState(search);
   const debouncedSearch = useDebounce(searchInput, 400);
@@ -194,11 +196,14 @@ export function ProductTable(): React.ReactElement {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">ყველა კატეგორია</SelectItem>
-            <SelectItem value="cameras">კამერები</SelectItem>
-            <SelectItem value="nvr-kits">NVR კომპლექტები</SelectItem>
-            <SelectItem value="accessories">აქსესუარები</SelectItem>
-            <SelectItem value="storage">მეხსიერება</SelectItem>
-            <SelectItem value="services">სერვისები</SelectItem>
+            {allCategories.map((cat) => {
+              const indent = cat.parentId ? (allCategories.find((p) => p.id === cat.parentId)?.parentId ? '— — ' : '— ') : '';
+              return (
+                <SelectItem key={cat.id} value={cat.slug}>
+                  {indent}{cat.name.ka}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         <Select value={status} onValueChange={(v) => setParam('status', v)}>
