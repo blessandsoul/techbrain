@@ -6,7 +6,33 @@ import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/utils/error';
 import { adminProductService } from '../services/admin-product.service';
 
-import type { AdminProductFilters, CreateProductInput, UpdateProductInput } from '../types/admin.types';
+import type { AdminProductFilters, CreateProductInput, UpdateProductInput, ICategory } from '../types/admin.types';
+
+/**
+ * Reorder a flat category list so children render directly under their parent.
+ * The API returns categories sorted only by sortOrder, which jumbles parents
+ * and children when multiple categories share the same sortOrder.
+ */
+function sortCategoriesAsTree(cats: ICategory[]): ICategory[] {
+  const byParent = new Map<string | null, ICategory[]>();
+  for (const c of cats) {
+    const arr = byParent.get(c.parentId) ?? [];
+    arr.push(c);
+    byParent.set(c.parentId, arr);
+  }
+  for (const arr of byParent.values()) {
+    arr.sort((a, b) => a.sortOrder - b.sortOrder);
+  }
+  const out: ICategory[] = [];
+  const visit = (parentId: string | null): void => {
+    for (const cat of byParent.get(parentId) ?? []) {
+      out.push(cat);
+      visit(cat.id);
+    }
+  };
+  visit(null);
+  return out;
+}
 
 // ── Query Key Factory ────────────────────────────────
 
@@ -31,7 +57,7 @@ export function useAdminProducts(filters: AdminProductFilters) {
 export function useAdminCategories() {
   return useQuery({
     queryKey: adminProductKeys.categories(),
-    queryFn: () => adminProductService.getCategories(),
+    queryFn: async () => sortCategoriesAsTree(await adminProductService.getCategories()),
     staleTime: 10 * 60 * 1000, // 10 min — categories rarely change
   });
 }
