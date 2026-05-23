@@ -327,10 +327,9 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
             under the categories since it depends on the selected category. */}
         <div className="p-4">
           <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-3">
-            ტექნიკური მახასიათებლები <InfoTooltip text="ფილტრები არჩეული კატეგორიის მიხედვით — აირჩიეთ მნიშვნელობები. ბრენდი/ლინზის ზომა ხელითაც შეგიძლიათ დაამატოთ" />
+            ტექნიკური მახასიათებლები <InfoTooltip text="აირჩიეთ მნიშვნელობები პროდუქტისთვის. ბრენდი/ლინზის ზომა ხელითაც შეგიძლიათ დაამატოთ" />
           </span>
           <CategorySpecPicker
-            selectedCategorySlugs={selectedCategorySlugs}
             filters={filtersByCategory}
             values={suggestedSpecs}
             onChange={handleSuggestedChange}

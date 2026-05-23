@@ -10,14 +10,12 @@ import type { FilterFieldConfig } from '@/features/catalog/types/catalog.types';
 const NON_SPEC_KEYS = new Set(['ფასი', 'მარაგი']);
 
 interface CategorySpecPickerProps {
-  selectedCategorySlugs: string[];
   filters: Record<string, FilterFieldConfig[]>;
   values: Record<string, string[]>;
   onChange: (values: Record<string, string[]>) => void;
 }
 
 export function CategorySpecPicker({
-  selectedCategorySlugs,
   filters,
   values,
   onChange,
@@ -31,13 +29,13 @@ export function CategorySpecPicker({
     return map;
   }, [suggestions]);
 
-  // Applicable filters = union across selected categories, deduped by specKaKey,
-  // excluding price/stock. Preserves first-seen order (priority within category).
+  // Show ALL spec filters across every category (deduped by specKaKey),
+  // excluding price/stock — always visible regardless of category selection.
   const applicableFilters = useMemo(() => {
     const seen = new Set<string>();
     const out: FilterFieldConfig[] = [];
-    for (const slug of selectedCategorySlugs) {
-      for (const f of filters[slug] ?? []) {
+    for (const list of Object.values(filters)) {
+      for (const f of list) {
         if (NON_SPEC_KEYS.has(f.specKaKey)) continue;
         if (seen.has(f.specKaKey)) continue;
         seen.add(f.specKaKey);
@@ -45,7 +43,7 @@ export function CategorySpecPicker({
       }
     }
     return out;
-  }, [selectedCategorySlugs, filters]);
+  }, [filters]);
 
   const toggleValue = useCallback(
     (keyKa: string, value: string): void => {
@@ -59,21 +57,10 @@ export function CategorySpecPicker({
     [values, onChange],
   );
 
-  if (selectedCategorySlugs.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed border-border bg-muted/30 px-4 py-6 text-center">
-        <p className="text-sm font-medium text-foreground">ჯერ აირჩიეთ კატეგორია</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          ფილტრები არჩეული კატეგორიის მიხედვით გამოჩნდება ამ ადგილას.
-        </p>
-      </div>
-    );
-  }
-
   if (applicableFilters.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border bg-muted/30 px-4 py-5 text-center">
-        <p className="text-xs text-muted-foreground">ამ კატეგორიას ფილტრები არ აქვს.</p>
+        <p className="text-xs text-muted-foreground">ფილტრები იტვირთება...</p>
       </div>
     );
   }
