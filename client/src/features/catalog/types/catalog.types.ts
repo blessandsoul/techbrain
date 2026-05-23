@@ -21,6 +21,8 @@ export interface FilterFieldConfig {
   label: CatalogLabel;
   priority: number;
   defaultExpanded?: boolean;
+  options?: string[];
+  allowCustom?: boolean;
 }
 
 export interface SpecValueOption {

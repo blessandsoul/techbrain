@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { ImageManager } from './ImageManager';
 import { RelatedProductsPicker } from './RelatedProductsPicker';
-import { SpecSuggestionsSection } from './SpecSuggestionsSection';
+import { CategorySpecPicker } from './CategorySpecPicker';
 import { InfoTooltip } from './InfoTooltip';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from './RichTextEditor';
 import { ROUTES } from '@/lib/constants/routes';
-import { useAdminCategories, useCreateProduct, useUpdateProduct, useSpecSuggestions } from '../hooks/useAdminProducts';
-import type { IProduct } from '@/features/catalog/types/catalog.types';
+import { useAdminCategories, useCreateProduct, useUpdateProduct } from '../hooks/useAdminProducts';
+import { useAdminCatalogConfig } from '../hooks/useCatalogConfig';
+import type { IProduct, FilterFieldConfig } from '@/features/catalog/types/catalog.types';
 import type { ICategory, CreateProductInput, UpdateProductInput } from '../types/admin.types';
 
 interface ProductFormProps {
@@ -46,7 +47,22 @@ function mapCategorySlugToId(slug: string, categories: ICategory[]): string | nu
 export function ProductForm({ product }: ProductFormProps): React.ReactElement {
   const router = useRouter();
   const { data: categories = [], isLoading: categoriesLoading } = useAdminCategories();
-  const { data: specSuggestions = [] } = useSpecSuggestions();
+  const { data: catalogConfig } = useAdminCatalogConfig();
+  const filtersByCategory = catalogConfig?.filters ?? {};
+
+  // Flat map: spec key (ka) → its filter config, across all categories.
+  // Excludes price/stock which aren't picked as product specs.
+  const filterBySpecKey = useMemo(() => {
+    const map = new Map<string, FilterFieldConfig>();
+    for (const list of Object.values(filtersByCategory)) {
+      for (const f of list) {
+        if (f.specKaKey === 'ფასი' || f.specKaKey === 'მარაგი') continue;
+        if (!map.has(f.specKaKey)) map.set(f.specKaKey, f);
+      }
+    }
+    return map;
+  }, [filtersByCategory]);
+
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const isEditMode = !!product;
@@ -80,18 +96,18 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
   // Custom specs: for adding entirely new spec keys not in suggestions
   const [customSpecs, setCustomSpecs] = useState<SpecRow[]>([]);
 
-  // Once specSuggestions load, split existing product specs into suggested vs custom
+  // Once the catalog config loads, split existing product specs into
+  // controlled (matches a known filter spec key) vs free-form custom.
   const specsSplitDone = useRef(false);
   useEffect(() => {
-    if (specsSplitDone.current || !product?.specs?.length || specSuggestions.length === 0) return;
+    if (specsSplitDone.current || !product?.specs?.length || filterBySpecKey.size === 0) return;
     specsSplitDone.current = true;
 
-    const suggestionKeys = new Set(specSuggestions.map((s) => s.key.ka));
     const suggested: Record<string, string[]> = {};
     const custom: SpecRow[] = [];
 
     for (const s of product.specs) {
-      if (suggestionKeys.has(s.key.ka)) {
+      if (filterBySpecKey.has(s.key.ka)) {
         suggested[s.key.ka] = [...(suggested[s.key.ka] ?? []), s.value];
       } else {
         custom.push({ key_ka: s.key.ka, key_ru: s.key.ru, key_en: s.key.en, value: s.value });
@@ -100,7 +116,7 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
 
     setSuggestedSpecs(suggested);
     if (custom.length > 0) setCustomSpecs(custom);
-  }, [product?.specs, specSuggestions]);
+  }, [product?.specs, filterBySpecKey]);
 
   const handleSuggestedChange = useCallback((values: Record<string, string[]>): void => {
     setSuggestedSpecs(values);
@@ -145,11 +161,12 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
       }
       setPriceError(null);
 
-      // Build specs array from suggested specs + custom specs
-      const suggestionMap = new Map(specSuggestions.map((s) => [s.key.ka, s.key]));
+      // Build specs array from controlled-vocabulary specs + custom specs.
+      // The localized spec key comes from the matching filter's label.
       const specs = [
         ...Object.entries(suggestedSpecs).flatMap(([keyKa, values]) => {
-          const key = suggestionMap.get(keyKa) ?? { ka: keyKa, ru: '', en: '' };
+          const filter = filterBySpecKey.get(keyKa);
+          const key = filter ? filter.label : { ka: keyKa, ru: '', en: '' };
           return values
             .filter((v) => v.trim())
             .map((value) => ({ key, value: value.trim() }));
@@ -339,12 +356,17 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
           />
         </div>
 
-        {/* Spec Suggestions from existing products */}
+        {/* Category-driven technical specs (controlled vocabulary) */}
         <div className="p-4">
           <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-2">
-            ტექნიკური მახასიათებლები <InfoTooltip text="არსებული პროდუქტებიდან აგრეგირებული სპეციფიკაციები — აირჩიეთ შესაბამისი მნიშვნელობები" />
+            ტექნიკური მახასიათებლები <InfoTooltip text="ფილტრები არჩეული კატეგორიის მიხედვით — აირჩიეთ მნიშვნელობები. ბრენდი/ლინზის ზომა ხელითაც შეგიძლიათ დაამატოთ" />
           </span>
-          <SpecSuggestionsSection values={suggestedSpecs} onChange={handleSuggestedChange} />
+          <CategorySpecPicker
+            selectedCategorySlugs={selectedCategorySlugs}
+            filters={filtersByCategory}
+            values={suggestedSpecs}
+            onChange={handleSuggestedChange}
+          />
         </div>
 
         {/* Custom Specs */}

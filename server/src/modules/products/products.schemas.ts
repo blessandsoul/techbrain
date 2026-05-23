@@ -138,6 +138,8 @@ const CatalogFilterSchema = z.object({
   }),
   priority: z.number().int().min(1),
   defaultExpanded: z.boolean().optional(),
+  options: z.array(z.string()).optional(),
+  allowCustom: z.boolean().optional(),
 });
 
 export const CatalogConfigSchema = z.object({

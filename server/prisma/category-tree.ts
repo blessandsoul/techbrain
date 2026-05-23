@@ -70,6 +70,8 @@ export interface CatalogFilterConfig {
   label: CatalogLabel;
   priority: number;
   defaultExpanded?: boolean;
+  options?: string[];      // controlled-vocabulary option values (from the spec doc)
+  allowCustom?: boolean;   // admin may type a value not in the predefined list (brand, lens)
 }
 
 function buildCatalogTree(): CatalogCategoryNode[] {
@@ -106,24 +108,40 @@ function buildCatalogTree(): CatalogCategoryNode[] {
 
 export const CATALOG_CATEGORIES_TREE: CatalogCategoryNode[] = buildCatalogTree();
 
-// Filter primitives — defined once and reused across categories
+// ── Controlled-vocabulary option lists (from the client spec doc) ──
+const BRANDS = ['Hikvision', 'Hiwatch', 'CPPLUS', 'RUICHI', 'Camel', 'OEM', 'OOSSXX', 'OHWOAI'];
+const RESOLUTIONS = ['1MP', '1.3MP', '2MP', '3MP', '4MP', '5MP', '6MP', '8MP', '12MP', '16MP'];
+const CONNECTION_TYPES = ['4G', 'WIFI', 'WIFI + ლან კაბელით (12V)', 'ლან კაბელით (PoE)', 'ანალოგური'];
+const YES_NO = ['კი', 'არა'];
+const IP_RATINGS = ['IP20', 'IP40', 'IP65', 'IP66', 'IP67', 'IK10'];
+const INDOOR_OUTDOOR = ['გარე', 'შიდა'];
+const BODY_TYPES = ['Bullet', 'Dome', 'Turret', 'PTZ'];
+const LENS_SIZES = ['2.8mm', '3.6mm', '4mm', '6mm', '8mm', '12mm', '2.8-12MM'];
+const AUDIO_OPTIONS = ['ჩაშენებული მიკროფონით', 'ომრხრივი აუდიო კავშირი', 'მიკროფონის ინტერფეისი'];
+const HDD_COUNTS = ['1', '2', '4', '8'];
+const POE_OPTIONS = ['Non-PoE', 'PoE'];
+const CHANNEL_COUNTS = ['4 არხიანი', '8 არხიანი', '10 არხიანი', '12 არხიანი', '16 არხიანი', '24 არხიანი', '32 არხიანი', '64 არხიანი', '128 არხიანი'];
+const CAPACITIES = ['64GB', '128GB', '256GB', '512GB'];
+
+// Filter primitives — defined once and reused across categories.
+// `price` and `stock` carry no options (rendered as a range filter / in-stock toggle).
 const F = {
-  brand: { id: 'brand', specKaKey: 'ბრენდი', label: { ka: 'ბრენდი', ru: 'Бренд', en: 'Brand' }, priority: 10, defaultExpanded: true },
+  brand: { id: 'brand', specKaKey: 'ბრენდი', label: { ka: 'ბრენდი', ru: 'Бренд', en: 'Brand' }, priority: 10, defaultExpanded: true, options: BRANDS, allowCustom: true },
   stock: { id: 'stock', specKaKey: 'მარაგი', label: { ka: 'მარაგი', ru: 'Наличие', en: 'Stock' }, priority: 20, defaultExpanded: true },
   price: { id: 'price', specKaKey: 'ფასი', label: { ka: 'ფასი', ru: 'Цена', en: 'Price' }, priority: 30, defaultExpanded: true },
-  resolution: { id: 'resolution', specKaKey: 'რეზოლუცია', label: { ka: 'რეზოლუცია', ru: 'Разрешение', en: 'Resolution' }, priority: 40 },
-  connectionType: { id: 'connection-type', specKaKey: 'კავშირის ტიპი', label: { ka: 'კავშირის ტიპი', ru: 'Тип подключения', en: 'Connection Type' }, priority: 50 },
-  microSD: { id: 'micro-sd', specKaKey: 'MicroSD', label: { ka: 'MicroSD', ru: 'MicroSD', en: 'MicroSD' }, priority: 60 },
-  ipProtection: { id: 'ip-protection', specKaKey: 'დაცვის პროტოკოლი', label: { ka: 'დაცვის პროტოკოლი', ru: 'Защита', en: 'IP Rating' }, priority: 70 },
-  indoorOutdoor: { id: 'indoor-outdoor', specKaKey: 'შიდა გამოყენება / გარე გამოყენება', label: { ka: 'შიდა/გარე', ru: 'Внутр./Внешн.', en: 'Indoor/Outdoor' }, priority: 80 },
-  solarPanel: { id: 'solar-panel', specKaKey: 'მზის პანელით', label: { ka: 'მზის პანელით', ru: 'Солнечная панель', en: 'Solar Panel' }, priority: 90 },
-  bodyType: { id: 'body-type', specKaKey: 'კამერის კორპუსის ტიპი', label: { ka: 'კორპუსის ტიპი', ru: 'Тип корпуса', en: 'Body Type' }, priority: 100 },
-  lensSize: { id: 'lens-size', specKaKey: 'ლინზის ზომა', label: { ka: 'ლინზის ზომა', ru: 'Размер линзы', en: 'Lens Size' }, priority: 110 },
-  audio: { id: 'audio', specKaKey: 'აუდიო', label: { ka: 'აუდიო', ru: 'Аудио', en: 'Audio' }, priority: 120 },
-  hddCount: { id: 'hdd-count', specKaKey: 'HDD რაოდენობა', label: { ka: 'HDD რაოდენობა', ru: 'Кол-во HDD', en: 'HDD Count' }, priority: 50 },
-  poeInterface: { id: 'poe-interface', specKaKey: 'PoE ინტერფეისი', label: { ka: 'PoE ინტერფეისი', ru: 'PoE', en: 'PoE Interface' }, priority: 60 },
-  channelCount: { id: 'channel-count', specKaKey: 'არხების რაოდენობა', label: { ka: 'არხების რაოდენობა', ru: 'Кол-во каналов', en: 'Channel Count' }, priority: 70 },
-  capacity: { id: 'capacity', specKaKey: 'მოცულობა', label: { ka: 'მოცულობა', ru: 'Объём', en: 'Capacity' }, priority: 50 },
+  resolution: { id: 'resolution', specKaKey: 'რეზოლუცია', label: { ka: 'რეზოლუცია', ru: 'Разрешение', en: 'Resolution' }, priority: 40, options: RESOLUTIONS },
+  connectionType: { id: 'connection-type', specKaKey: 'კავშირის ტიპი', label: { ka: 'კავშირის ტიპი', ru: 'Тип подключения', en: 'Connection Type' }, priority: 50, options: CONNECTION_TYPES },
+  microSD: { id: 'micro-sd', specKaKey: 'MicroSD', label: { ka: 'MicroSD', ru: 'MicroSD', en: 'MicroSD' }, priority: 60, options: YES_NO },
+  ipProtection: { id: 'ip-protection', specKaKey: 'დაცვის პროტოკოლი', label: { ka: 'დაცვის პროტოკოლი', ru: 'Защита', en: 'IP Rating' }, priority: 70, options: IP_RATINGS },
+  indoorOutdoor: { id: 'indoor-outdoor', specKaKey: 'შიდა გამოყენება / გარე გამოყენება', label: { ka: 'შიდა/გარე', ru: 'Внутр./Внешн.', en: 'Indoor/Outdoor' }, priority: 80, options: INDOOR_OUTDOOR },
+  solarPanel: { id: 'solar-panel', specKaKey: 'მზის პანელით', label: { ka: 'მზის პანელით', ru: 'Солнечная панель', en: 'Solar Panel' }, priority: 90, options: YES_NO },
+  bodyType: { id: 'body-type', specKaKey: 'კამერის კორპუსის ტიპი', label: { ka: 'კორპუსის ტიპი', ru: 'Тип корпуса', en: 'Body Type' }, priority: 100, options: BODY_TYPES },
+  lensSize: { id: 'lens-size', specKaKey: 'ლინზის ზომა', label: { ka: 'ლინზის ზომა', ru: 'Размер линзы', en: 'Lens Size' }, priority: 110, options: LENS_SIZES, allowCustom: true },
+  audio: { id: 'audio', specKaKey: 'აუდიო', label: { ka: 'აუდიო', ru: 'Аудио', en: 'Audio' }, priority: 120, options: AUDIO_OPTIONS },
+  hddCount: { id: 'hdd-count', specKaKey: 'HDD რაოდენობა', label: { ka: 'HDD რაოდენობა', ru: 'Кол-во HDD', en: 'HDD Count' }, priority: 50, options: HDD_COUNTS },
+  poeInterface: { id: 'poe-interface', specKaKey: 'PoE ინტერფეისი', label: { ka: 'PoE ინტერფეისი', ru: 'PoE', en: 'PoE Interface' }, priority: 60, options: POE_OPTIONS },
+  channelCount: { id: 'channel-count', specKaKey: 'არხების რაოდენობა', label: { ka: 'არხების რაოდენობა', ru: 'Кол-во каналов', en: 'Channel Count' }, priority: 70, options: CHANNEL_COUNTS },
+  capacity: { id: 'capacity', specKaKey: 'მოცულობა', label: { ka: 'მოცულობა', ru: 'Объём', en: 'Capacity' }, priority: 50, options: CAPACITIES },
 } satisfies Record<string, CatalogFilterConfig>;
 
 export const CATALOG_FILTERS: Record<string, CatalogFilterConfig[]> = {

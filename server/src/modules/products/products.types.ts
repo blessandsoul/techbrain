@@ -75,6 +75,8 @@ export interface CatalogFilterConfig {
   label: LocalizedString;
   priority: number;
   defaultExpanded?: boolean;
+  options?: string[];
+  allowCustom?: boolean;
 }
 
 export interface CatalogConfigResponse {

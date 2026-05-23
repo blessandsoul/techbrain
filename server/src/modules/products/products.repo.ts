@@ -323,8 +323,15 @@ class ProductsRepository {
     });
     const productIds = matchingProducts.map((p) => p.id);
 
+    // No products: still surface the predefined option lists (count 0) so the
+    // catalog sidebar always shows the full controlled vocabulary.
     if (productIds.length === 0) {
-      return Object.fromEntries(filterConfigs.map((c) => [c.id, []]));
+      return Object.fromEntries(
+        filterConfigs.map((c) => [
+          c.id,
+          (c.options ?? []).map((value) => ({ value, count: 0 })),
+        ]),
+      );
     }
 
     const entries = await Promise.all(
@@ -339,7 +346,22 @@ class ProductsRepository {
           _count: { _all: true },
           orderBy: { value: 'asc' },
         });
-        return [config.id, groups.map((g) => ({ value: g.value, count: g._count._all }))];
+        const countByValue = new Map(groups.map((g) => [g.value, g._count._all]));
+
+        // Predefined options first (in doc order, count 0 if none), then any
+        // product values not in the predefined list (e.g. admin-added customs).
+        const predefined = config.options ?? [];
+        const result: SpecValueOption[] = predefined.map((value) => ({
+          value,
+          count: countByValue.get(value) ?? 0,
+        }));
+        const predefinedSet = new Set(predefined);
+        for (const g of groups) {
+          if (!predefinedSet.has(g.value)) {
+            result.push({ value: g.value, count: g._count._all });
+          }
+        }
+        return [config.id, result];
       }),
     );
 
