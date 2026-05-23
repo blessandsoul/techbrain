@@ -323,6 +323,20 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
           </div>
         </div>
 
+        {/* Category-driven technical specs (controlled vocabulary) — sits right
+            under the categories since it depends on the selected category. */}
+        <div className="p-4">
+          <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-3">
+            ტექნიკური მახასიათებლები <InfoTooltip text="ფილტრები არჩეული კატეგორიის მიხედვით — აირჩიეთ მნიშვნელობები. ბრენდი/ლინზის ზომა ხელითაც შეგიძლიათ დაამატოთ" />
+          </span>
+          <CategorySpecPicker
+            selectedCategorySlugs={selectedCategorySlugs}
+            filters={filtersByCategory}
+            values={suggestedSpecs}
+            onChange={handleSuggestedChange}
+          />
+        </div>
+
         {/* Name */}
         <div className="p-4">
           <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-2">სახელი <InfoTooltip text="პროდუქტის სახელი" /></span>
@@ -353,19 +367,6 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
             selectedIds={relatedIds}
             currentProductId={product?.id}
             onChange={setRelatedIds}
-          />
-        </div>
-
-        {/* Category-driven technical specs (controlled vocabulary) */}
-        <div className="p-4">
-          <span className="block text-xs font-medium text-foreground uppercase tracking-wider mb-2">
-            ტექნიკური მახასიათებლები <InfoTooltip text="ფილტრები არჩეული კატეგორიის მიხედვით — აირჩიეთ მნიშვნელობები. ბრენდი/ლინზის ზომა ხელითაც შეგიძლიათ დაამატოთ" />
-          </span>
-          <CategorySpecPicker
-            selectedCategorySlugs={selectedCategorySlugs}
-            filters={filtersByCategory}
-            values={suggestedSpecs}
-            onChange={handleSuggestedChange}
           />
         </div>
 

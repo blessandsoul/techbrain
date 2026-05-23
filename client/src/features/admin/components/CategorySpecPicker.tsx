@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { useSpecSuggestions } from '../hooks/useAdminProducts';
 import type { FilterFieldConfig } from '@/features/catalog/types/catalog.types';
 
@@ -62,26 +61,28 @@ export function CategorySpecPicker({
 
   if (selectedCategorySlugs.length === 0) {
     return (
-      <p className="text-xs text-muted-foreground py-2">
-        ჯერ აირჩიეთ კატეგორია — ფილტრები კატეგორიის მიხედვით გამოჩნდება.
-      </p>
+      <div className="rounded-xl border border-dashed border-border bg-muted/30 px-4 py-6 text-center">
+        <p className="text-sm font-medium text-foreground">ჯერ აირჩიეთ კატეგორია</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          ფილტრები არჩეული კატეგორიის მიხედვით გამოჩნდება ამ ადგილას.
+        </p>
+      </div>
     );
   }
 
   if (applicableFilters.length === 0) {
     return (
-      <p className="text-xs text-muted-foreground py-2">
-        ამ კატეგორიას ფილტრები არ აქვს.
-      </p>
+      <div className="rounded-xl border border-dashed border-border bg-muted/30 px-4 py-5 text-center">
+        <p className="text-xs text-muted-foreground">ამ კატეგორიას ფილტრები არ აქვს.</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="overflow-hidden rounded-xl border border-border divide-y divide-border">
       {applicableFilters.map((filter) => {
         const selected = values[filter.specKaKey] ?? [];
         const predefined = filter.options ?? [];
-        // Show predefined ∪ existing product values ∪ any currently-selected custom values.
         const extra = filter.allowCustom ? suggestionsByKey.get(filter.specKaKey) ?? [] : [];
         const optionList = Array.from(new Set([...predefined, ...extra, ...selected]));
 
@@ -121,9 +122,19 @@ function SpecFilterRow({ label, options, selected, allowCustom, onToggle }: Spec
   }
 
   return (
-    <div className="flex items-start gap-3 py-1">
-      <span className="text-xs text-muted-foreground w-36 shrink-0 pt-1.5">{label}</span>
-      <div className="flex flex-wrap items-center gap-1.5 flex-1">
+    <div className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-start sm:gap-4 hover:bg-muted/30 transition-colors">
+      {/* Label + selected count */}
+      <div className="flex shrink-0 items-center gap-1.5 sm:w-40 sm:pt-1">
+        <span className="text-xs font-semibold text-foreground">{label}</span>
+        {selected.length > 0 && (
+          <span className="rounded-full bg-primary/10 px-1.5 text-[10px] font-bold leading-4 text-primary tabular-nums">
+            {selected.length}
+          </span>
+        )}
+      </div>
+
+      {/* Pills + custom add */}
+      <div className="flex flex-1 flex-wrap items-center gap-1.5">
         {options.map((val) => {
           const isSelected = selected.includes(val);
           return (
@@ -132,10 +143,10 @@ function SpecFilterRow({ label, options, selected, allowCustom, onToggle }: Spec
               type="button"
               onClick={() => onToggle(val)}
               className={cn(
-                'px-2.5 py-1 rounded-lg text-xs font-medium border transition-all duration-200 cursor-pointer',
+                'rounded-lg border px-2.5 py-1 text-xs font-medium transition-all duration-150 cursor-pointer active:scale-[0.97]',
                 isSelected
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-muted/50 text-muted-foreground border-border hover:border-primary/40',
+                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                  : 'border-border bg-muted/40 text-muted-foreground hover:border-primary/40 hover:text-foreground',
               )}
             >
               {val}
@@ -155,11 +166,16 @@ function SpecFilterRow({ label, options, selected, allowCustom, onToggle }: Spec
                 }
               }}
               placeholder="დამატება..."
-              className="h-7 w-32 text-xs"
+              className="h-7 w-28 text-xs"
             />
-            <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={addCustom}>
+            <button
+              type="button"
+              onClick={addCustom}
+              disabled={!custom.trim()}
+              className="rounded-lg border border-dashed border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
               + დამატება
-            </Button>
+            </button>
           </div>
         )}
       </div>
