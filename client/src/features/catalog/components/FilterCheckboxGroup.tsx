@@ -4,10 +4,7 @@ import { useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { CaretDown } from '@phosphor-icons/react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useLocale } from '@/lib/i18n';
 import type { SpecValueOption } from '../types/catalog.types';
-
-const INITIAL_SHOW_COUNT = 5;
 
 interface FilterCheckboxGroupProps {
   label: string;
@@ -22,12 +19,10 @@ export function FilterCheckboxGroup({
   options,
   defaultExpanded = false,
 }: FilterCheckboxGroupProps): React.ReactElement | null {
-  const { t } = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [showAll, setShowAll] = useState(false);
 
   if (options.length === 0) return null;
 
@@ -54,9 +49,6 @@ export function FilterCheckboxGroup({
 
     router.push(`${pathname}?${params.toString()}`);
   }
-
-  const visibleOptions = showAll ? options : options.slice(0, INITIAL_SHOW_COUNT);
-  const hasMore = options.length > INITIAL_SHOW_COUNT;
 
   return (
     <div className="space-y-2">
@@ -87,7 +79,7 @@ export function FilterCheckboxGroup({
       >
         <div className="overflow-hidden">
           <div className="space-y-0.5">
-            {visibleOptions.map((opt) => {
+            {options.map((opt) => {
               const isSelected = selectedValues.includes(opt.value);
               const isDisabled = opt.count === 0 && !isSelected;
 
@@ -114,18 +106,6 @@ export function FilterCheckboxGroup({
                 </label>
               );
             })}
-
-            {hasMore && (
-              <button
-                onClick={() => setShowAll((prev) => !prev)}
-                tabIndex={expanded ? 0 : -1}
-                className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer mt-1 px-3 py-1"
-              >
-                {showAll
-                  ? t('catalog.showLess')
-                  : t('catalog.showMore', { count: options.length - INITIAL_SHOW_COUNT })}
-              </button>
-            )}
           </div>
         </div>
       </div>

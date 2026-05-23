@@ -150,15 +150,17 @@ export const CATALOG_FILTERS: Record<string, CatalogFilterConfig[]> = {
   cameras: [F.brand, F.stock, F.connectionType, F.microSD, F.ipProtection, F.indoorOutdoor, F.resolution, F.solarPanel, F.bodyType, F.lensSize, F.audio],
   'ip-cameras': [F.brand, F.stock, F.microSD, F.ipProtection, F.indoorOutdoor, F.resolution, F.solarPanel, F.bodyType, F.lensSize, F.audio],
   'analog-cameras': [F.brand, F.stock, F.microSD, F.ipProtection, F.indoorOutdoor, F.resolution, F.solarPanel, F.bodyType, F.lensSize, F.audio],
-  'camera-accessories': [F.stock],
-  'camera-consumables': [F.stock],
+  // Accessories / consumables: doc says use only the in-stock filter, which is
+  // always rendered separately — so the filter list is empty (no price, no specs).
+  'camera-accessories': [],
+  'camera-consumables': [],
 
   recorders: [F.brand, F.hddCount, F.stock, F.poeInterface, F.channelCount],
   'nvr-recorders': [F.brand, F.hddCount, F.stock, F.poeInterface, F.channelCount],
   'dvr-recorders': [F.brand, F.hddCount, F.stock, F.channelCount],
-  'recorder-accessories': [F.stock],
+  'recorder-accessories': [],
 
   kits: [F.brand, F.stock],
   'video-registrators': [F.stock, F.brand, F.capacity],
-  accessories: [F.brand, F.stock],
+  accessories: [],
 };

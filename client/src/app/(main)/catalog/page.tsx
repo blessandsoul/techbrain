@@ -7,6 +7,7 @@ import { MobileFilterDrawer } from '@/features/catalog/components/MobileFilterDr
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { Pagination } from '@/components/common/Pagination';
 import { useCatalogPageData } from '@/features/catalog/hooks/useCatalog';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useLocale } from '@/lib/i18n';
 
 function ProductGridSkeleton(): React.ReactElement {
@@ -40,6 +41,11 @@ function CatalogContent(): React.ReactElement {
     isProductsLoading,
   } = useCatalogPageData();
 
+  // Mount the sidebar in exactly ONE place at a time. Rendering it in both the
+  // desktop aside and the mobile drawer mounts duplicate stateful filters
+  // (e.g. two PriceRangeFilters) that fight over the shared URL state.
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+
   const sidebarContent = (
     <CatalogSidebar
       categoryTree={categoryTree}
@@ -53,13 +59,15 @@ function CatalogContent(): React.ReactElement {
   return (
     <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl py-12">
       <div className="flex gap-8">
-        {/* Desktop sidebar */}
+        {/* Desktop sidebar — only mounted on desktop (see isDesktop note above) */}
         <aside className="hidden lg:block w-72 shrink-0">
-          <div className="sidebar-scroll-wrapper sticky top-20 max-h-[calc(100dvh-6rem)]">
-            <div className="sidebar-scroll max-h-[calc(100dvh-6rem)] space-y-6 pb-8 pr-2">
-              {sidebarContent}
+          {isDesktop && (
+            <div className="sidebar-scroll-wrapper sticky top-20 max-h-[calc(100dvh-5rem)]">
+              <div className="sidebar-scroll max-h-[calc(100dvh-5rem)] space-y-6 pb-10 pr-3">
+                {sidebarContent}
+              </div>
             </div>
-          </div>
+          )}
         </aside>
 
         {/* Main content */}
@@ -71,7 +79,7 @@ function CatalogContent(): React.ReactElement {
               filterConfigs={filterConfigs}
               filterSlot={
                 <MobileFilterDrawer filterConfigs={filterConfigs}>
-                  {sidebarContent}
+                  {!isDesktop ? sidebarContent : null}
                 </MobileFilterDrawer>
               }
             />

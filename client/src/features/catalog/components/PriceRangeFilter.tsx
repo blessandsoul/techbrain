@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useDebounce } from '@/hooks/useDebounce';
 import { useLocale } from '@/lib/i18n';
 
 interface PriceRangeFilterProps {
@@ -18,78 +17,72 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
 
   const isInvalid = min >= max || max === 0;
 
-  const currentMin = searchParams.get('minPrice');
-  const currentMax = searchParams.get('maxPrice');
+  const currentMin = searchParams.get('minPrice') ?? '';
+  const currentMax = searchParams.get('maxPrice') ?? '';
 
-  const [localMin, setLocalMin] = useState<string>(currentMin ?? '');
-  const [localMax, setLocalMax] = useState<string>(currentMax ?? '');
+  const [localMin, setLocalMin] = useState<string>(currentMin);
+  const [localMax, setLocalMax] = useState<string>(currentMax);
 
-  // Snappier: filter 300ms after the user stops typing.
-  const debouncedMin = useDebounce(localMin, 300);
-  const debouncedMax = useDebounce(localMax, 300);
+  // Latest router context for the debounced writer — kept in a ref so the
+  // pending timer always reads fresh values without restarting on each render.
+  const latest = useRef({ searchParams, pathname });
+  latest.current = { searchParams, pathname };
 
-  // Remember what we last pushed so the URL→local sync effect doesn't fight
-  // active typing when our own push round-trips back through the router.
-  const lastPushedRef = useRef<{ min: string; max: string }>({
-    min: currentMin ?? '',
-    max: currentMax ?? '',
-  });
+  // Holds the pending debounce timer. While it's non-null the user is actively
+  // editing, so we ignore URL changes (they're just the async echo of our own
+  // push). Set back to null the moment the timer fires.
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const updateUrl = useCallback(
-    (minVal: string, maxVal: string) => {
-      const params = new URLSearchParams(searchParams.toString());
+  // Write the price params to the URL, 300ms after the user stops typing.
+  // Whatever number is entered is applied as-is — no "must be inside the range"
+  // guard, which previously dropped values at/below the floor (the placeholder).
+  function schedulePush(minVal: string, maxVal: string): void {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      const { searchParams: sp, pathname: pn } = latest.current;
+      const params = new URLSearchParams(sp.toString());
 
       const parsedMin = parseFloat(minVal);
       const parsedMax = parseFloat(maxVal);
 
-      if (minVal && Number.isFinite(parsedMin) && parsedMin > min) {
-        params.set('minPrice', String(parsedMin));
-      } else {
-        params.delete('minPrice');
-      }
-
-      if (maxVal && Number.isFinite(parsedMax) && parsedMax < max) {
-        params.set('maxPrice', String(parsedMax));
-      } else {
-        params.delete('maxPrice');
-      }
+      if (minVal !== '' && Number.isFinite(parsedMin)) params.set('minPrice', String(parsedMin));
+      else params.delete('minPrice');
+      if (maxVal !== '' && Number.isFinite(parsedMax)) params.set('maxPrice', String(parsedMax));
+      else params.delete('maxPrice');
 
       params.delete('page');
-      const target = `${pathname}?${params.toString()}`;
-      const current = `${pathname}?${searchParams.toString()}`;
-      if (target !== current) {
-        lastPushedRef.current = {
-          min: params.get('minPrice') ?? '',
-          max: params.get('maxPrice') ?? '',
-        };
-        router.push(target);
-      }
-    },
-    [searchParams, pathname, router, min, max],
-  );
+      const target = `${pn}?${params.toString()}`;
+      const current = `${pn}?${sp.toString()}`;
+      if (target !== current) router.push(target);
+    }, 300);
+  }
 
+  // Sync the inputs from the URL only when idle (no pending edit). This handles
+  // external changes (category switch, "clear filters", browser back) while
+  // ignoring the async echo of our own push mid-typing.
   useEffect(() => {
-    if (!isInvalid) {
-      updateUrl(debouncedMin, debouncedMax);
-    }
-  }, [debouncedMin, debouncedMax, updateUrl, isInvalid]);
-
-  // Only sync local state from the URL when the URL changed *externally*
-  // (e.g. "Clear filters" button). Skip echoes of our own push.
-  useEffect(() => {
-    const urlMin = currentMin ?? '';
-    const urlMax = currentMax ?? '';
-    if (urlMin !== lastPushedRef.current.min) {
-      setLocalMin(urlMin);
-      lastPushedRef.current.min = urlMin;
-    }
-    if (urlMax !== lastPushedRef.current.max) {
-      setLocalMax(urlMax);
-      lastPushedRef.current.max = urlMax;
-    }
+    if (timerRef.current) return;
+    setLocalMin(currentMin);
+    setLocalMax(currentMax);
   }, [currentMin, currentMax]);
 
+  // Clean up the debounce timer on unmount.
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
+
   if (isInvalid) return null;
+
+  function handleMinChange(value: string): void {
+    setLocalMin(value);
+    schedulePush(value, localMax);
+  }
+
+  function handleMaxChange(value: string): void {
+    setLocalMax(value);
+    schedulePush(localMin, value);
+  }
 
   return (
     <div className="space-y-3">
@@ -104,7 +97,7 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
             min={min}
             max={max}
             value={localMin}
-            onChange={(e) => setLocalMin(e.target.value)}
+            onChange={(e) => handleMinChange(e.target.value)}
             placeholder={String(min)}
             className="no-spinner w-full px-2.5 py-1.5 rounded-lg bg-muted border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors tabular-nums"
             aria-label={t('catalog.priceMin')}
@@ -117,7 +110,7 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
             min={min}
             max={max}
             value={localMax}
-            onChange={(e) => setLocalMax(e.target.value)}
+            onChange={(e) => handleMaxChange(e.target.value)}
             placeholder={String(max)}
             className="no-spinner w-full px-2.5 py-1.5 rounded-lg bg-muted border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors tabular-nums"
             aria-label={t('catalog.priceMax')}

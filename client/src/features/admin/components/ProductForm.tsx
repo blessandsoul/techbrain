@@ -13,8 +13,8 @@ import { Label } from '@/components/ui/label';
 import { RichTextEditor } from './RichTextEditor';
 import { ROUTES } from '@/lib/constants/routes';
 import { useAdminCategories, useCreateProduct, useUpdateProduct } from '../hooks/useAdminProducts';
-import { useAdminCatalogConfig } from '../hooks/useCatalogConfig';
-import type { IProduct, FilterFieldConfig } from '@/features/catalog/types/catalog.types';
+import { useAdminCatalogConfig, useUpdateCatalogConfig } from '../hooks/useCatalogConfig';
+import type { IProduct, FilterFieldConfig, CatalogConfigResponse } from '@/features/catalog/types/catalog.types';
 import type { ICategory, CreateProductInput, UpdateProductInput } from '../types/admin.types';
 
 interface ProductFormProps {
@@ -121,6 +121,50 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
   const handleSuggestedChange = useCallback((values: Record<string, string[]>): void => {
     setSuggestedSpecs(values);
   }, []);
+
+  // Add/remove an option value in the shared catalog config for a given spec.
+  // The value lives on every category that uses that spec, so the admin form
+  // and the catalog filters stay in sync.
+  const updateConfig = useUpdateCatalogConfig();
+
+  const mutateOption = useCallback(
+    (specKaKey: string, mutate: (options: string[]) => string[]): void => {
+      if (!catalogConfig) return;
+      const next: CatalogConfigResponse = {
+        categories: catalogConfig.categories,
+        filters: Object.fromEntries(
+          Object.entries(catalogConfig.filters).map(([slug, list]) => [
+            slug,
+            list.map((f) =>
+              f.specKaKey === specKaKey ? { ...f, options: mutate(f.options ?? []) } : f,
+            ),
+          ]),
+        ),
+      };
+      updateConfig.mutate(next);
+    },
+    [catalogConfig, updateConfig],
+  );
+
+  const handleAddOption = useCallback(
+    (specKaKey: string, value: string): void => {
+      mutateOption(specKaKey, (opts) => (opts.includes(value) ? opts : [...opts, value]));
+    },
+    [mutateOption],
+  );
+
+  const handleDeleteOption = useCallback(
+    (specKaKey: string, value: string): void => {
+      // Drop it from the current product selection too, if picked.
+      setSuggestedSpecs((prev) => {
+        const cur = prev[specKaKey];
+        if (!cur?.includes(value)) return prev;
+        return { ...prev, [specKaKey]: cur.filter((v) => v !== value) };
+      });
+      mutateOption(specKaKey, (opts) => opts.filter((o) => o !== value));
+    },
+    [mutateOption],
+  );
 
   function addCustomSpec(): void {
     setCustomSpecs((s) => [...s, { key_ka: '', key_ru: '', key_en: '', value: '' }]);
@@ -333,6 +377,8 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
             filters={filtersByCategory}
             values={suggestedSpecs}
             onChange={handleSuggestedChange}
+            onAddOption={handleAddOption}
+            onDeleteOption={handleDeleteOption}
           />
         </div>
 

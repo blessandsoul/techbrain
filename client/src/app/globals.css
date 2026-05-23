@@ -217,52 +217,40 @@ html {
   height: 0;
 }
 
-/* ── Catalog sidebar — 1px scrollbar via scroll-driven animation ──
+/* ── Catalog sidebar scroll ──
  *
- * Modern Chromium's overlay scrollbars on Windows ignore `::-webkit-scrollbar`
- * width entirely, so to get a true 1px scrollbar we:
- *   1. Hide the native scrollbar via `scrollbar-width: none`.
- *   2. Render our own 1px thumb as a ::after on the parent wrapper,
- *      animated by CSS scroll-timeline to track scroll position.
- *
- * Browser support: Chromium 115+, Firefox 137+. Safari falls back to no thumb
- * (scrolling still works; no visual indicator).
+ * Visible thin scrollbar so users can clearly tell the filter panel scrolls.
+ * `scrollbar-color` forces Chromium off its invisible overlay scrollbar onto a
+ * classic, always-visible one; `::-webkit-scrollbar` is the Safari/legacy path.
+ * A soft fade at the bottom hints there's more below the fold.
  */
 .sidebar-scroll-wrapper {
   position: relative;
-  /* Lift the named timeline up so this element's ::after can reference it. */
-  timeline-scope: --sidebar-scroll;
 }
 .sidebar-scroll-wrapper::after {
   content: '';
   position: absolute;
-  top: 0;
+  left: 0;
   right: 0;
-  width: 2px;
-  height: 15%;
-  background-color: oklch(from var(--foreground) l c h / 0.3);
-  border-radius: 9999px;
+  bottom: 0;
+  height: 2.5rem;
+  background: linear-gradient(to top, var(--background), transparent);
   pointer-events: none;
-  animation-name: sidebar-thumb-move;
-  animation-duration: auto;
-  animation-timing-function: linear;
-  animation-timeline: --sidebar-scroll;
-}
-@keyframes sidebar-thumb-move {
-  /* thumb height is 15% of wrapper, so it can travel the remaining 85% */
-  from { top: 0%; }
-  to { top: 85%; }
 }
 .sidebar-scroll {
   overflow-y: auto;
-  scrollbar-width: none;
-  scroll-timeline-name: --sidebar-scroll;
-  scroll-timeline-axis: y;
+  scrollbar-width: thin;
+  scrollbar-color: oklch(from var(--foreground) l c h / 0.35) transparent;
 }
 .sidebar-scroll::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+  width: 8px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: oklch(from var(--foreground) l c h / 0.35);
+  border-radius: 9999px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* ── Mobile filter drawer slide-in ── */
