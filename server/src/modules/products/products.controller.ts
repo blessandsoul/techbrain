@@ -126,8 +126,8 @@ class ProductsController {
   // ── Admin Endpoints ───────────────────────────────
 
   async getAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { page, limit, isActive, inStock, category, search } = AdminProductsQuerySchema.parse(request.query);
-    const result = await productsService.getAllProducts(page, limit, { isActive, inStock, category, search });
+    const { page, limit, isActive, inStock, category, search, ids } = AdminProductsQuerySchema.parse(request.query);
+    const result = await productsService.getAllProducts(page, limit, { isActive, inStock, category, search, ids });
     return reply.send(paginatedResponse(
       'Products retrieved successfully',
       result.items,

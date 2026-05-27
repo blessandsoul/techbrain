@@ -161,6 +161,9 @@ export const AdminProductsQuerySchema = z.object({
   ),
   category: z.string().optional(),
   search: z.string().max(200).optional(),
+  ids: z.string().optional().transform((v) =>
+    v ? v.split(',').map((s) => s.trim()).filter(Boolean) : undefined,
+  ),
 });
 export type AdminProductsQuery = z.infer<typeof AdminProductsQuerySchema>;
 

@@ -492,9 +492,13 @@ class ProductsRepository {
   async findAllPaginated(
     page: number,
     limit: number,
-    filters?: { isActive?: boolean; inStock?: boolean; category?: string; search?: string },
+    filters?: { isActive?: boolean; inStock?: boolean; category?: string; search?: string; ids?: string[] },
   ): Promise<{ items: ProductResponse[]; totalItems: number }> {
     const where: Prisma.ProductWhereInput = {};
+
+    if (filters?.ids && filters.ids.length > 0) {
+      where.id = { in: filters.ids };
+    }
 
     if (filters?.isActive !== undefined) {
       where.isActive = filters.isActive;

@@ -744,10 +744,11 @@
                     { "key": "limit", "value": "50" },
                     { "key": "search", "value": "", "disabled": true },
                     { "key": "category", "value": "", "disabled": true },
-                    { "key": "isActive", "value": "true", "disabled": true }
+                    { "key": "isActive", "value": "true", "disabled": true },
+                    { "key": "ids", "value": "{{productId}}", "disabled": true, "description": "Comma-separated product IDs. When set, returns only those products (used by admin Related Products picker to hydrate saved selections regardless of category/pagination)." }
                   ]
                 },
-                "description": "Get paginated list of all products (active and inactive) with optional filters. Requires ADMIN role."
+                "description": "Get paginated list of all products (active and inactive) with optional filters. Pass `ids=id1,id2` to fetch a specific set of products by ID (bypasses pagination order). Requires ADMIN role."
               },
               "response": []
             },

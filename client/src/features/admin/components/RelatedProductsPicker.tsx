@@ -64,18 +64,40 @@ export function RelatedProductsPicker({
     return Array.from(map.values());
   }, [data1, data2, data3]);
 
-  // Fetch selected products separately so they resolve even if from a different category
-  const { data: allData } = useAdminProducts(
-    selectedIds.length > 0 ? { limit: 100 } : { limit: 0 },
+  // Fetch selected products by id so they resolve regardless of category/pagination.
+  const { data: selectedData, isLoading: selectedLoading } = useAdminProducts(
+    selectedIds.length > 0
+      ? { ids: selectedIds, limit: selectedIds.length }
+      : { limit: 0 },
   );
-  const allProducts = allData?.items ?? [];
+  const selectedFromServer = selectedData?.items ?? [];
 
+  // Preserve admin-picked order; fall back to in-session category fetch for items
+  // just added before the by-id query refetches.
   const selectedProducts = useMemo(
     () =>
       selectedIds
-        .map((id) => allProducts.find((p) => p.id === id) ?? categoryProducts.find((p) => p.id === id))
-        .filter(Boolean) as IProduct[],
-    [selectedIds, allProducts, categoryProducts],
+        .map(
+          (id): IProduct | undefined =>
+            selectedFromServer.find((p) => p.id === id) ??
+            categoryProducts.find((p) => p.id === id),
+        )
+        .filter((p): p is IProduct => Boolean(p)),
+    [selectedIds, selectedFromServer, categoryProducts],
+  );
+
+  // IDs saved on the product but no longer resolvable (deleted product, etc.).
+  // Show them as unavailable rows so the admin can still clean them up.
+  const orphanIds = useMemo(
+    () =>
+      selectedLoading
+        ? []
+        : selectedIds.filter(
+            (id) =>
+              !selectedFromServer.some((p) => p.id === id) &&
+              !categoryProducts.some((p) => p.id === id),
+          ),
+    [selectedIds, selectedFromServer, categoryProducts, selectedLoading],
   );
 
   const availableProducts = useMemo(
@@ -111,8 +133,59 @@ export function RelatedProductsPicker({
     [selectedIds, onChange],
   );
 
+  const showSkeleton = selectedLoading && selectedProducts.length === 0 && selectedIds.length > 0;
+
   return (
     <div>
+      {showSkeleton && (
+        <div className="space-y-1.5 mb-3">
+          {selectedIds.map((id) => (
+            <div
+              key={id}
+              className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-1.5 animate-pulse"
+            >
+              <div className="w-7 h-7 rounded bg-muted shrink-0" />
+              <div className="h-4 flex-1 rounded bg-muted" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {orphanIds.length > 0 && (
+        <div className="space-y-1.5 mb-3">
+          {orphanIds.map((id) => (
+            <div
+              key={id}
+              className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-1.5"
+            >
+              <span className="text-[10px] font-medium uppercase tracking-wider text-destructive bg-destructive/10 px-1.5 py-0.5 rounded shrink-0">
+                მიუწვდომელი
+              </span>
+              <span className="text-sm text-muted-foreground truncate flex-1 font-mono">{id}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => handleRemove(id)}
+                className="text-muted-foreground hover:text-destructive shrink-0 w-6 h-6"
+                aria-label={`წაშლა: ${id}`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-3.5 h-3.5"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {selectedProducts.length > 0 && (
         <div className="space-y-1.5 mb-3">
           {selectedProducts.map((p) => (
@@ -215,7 +288,7 @@ export function RelatedProductsPicker({
         )}
       </div>
 
-      {selectedProducts.length === 0 && (
+      {selectedIds.length === 0 && (
         <p className="text-xs text-muted-foreground mt-1.5">
           ცარიელის შემთხვევაში ავტომატურად შეირჩევა მსგავსი კატეგორიიდან.
         </p>

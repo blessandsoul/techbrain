@@ -77,6 +77,7 @@ class AdminProductService {
     if (params?.isActive) query.isActive = params.isActive;
     if (params?.page) query.page = String(params.page);
     if (params?.limit) query.limit = String(params.limit);
+    if (params?.ids && params.ids.length > 0) query.ids = params.ids.join(',');
 
     const response = await apiClient.get<PaginatedApiResponse<IProduct>>(
       API_ENDPOINTS.PRODUCTS.ADMIN_LIST,

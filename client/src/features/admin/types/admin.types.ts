@@ -8,6 +8,7 @@ export interface AdminProductFilters {
   isActive?: string; // 'true' | 'false' | undefined (all)
   page?: number;
   limit?: number;
+  ids?: string[];
 }
 
 export interface AdminProductsResponse {

@@ -113,7 +113,7 @@ class ProductsService {
   async getAllProducts(
     page: number,
     limit: number,
-    filters?: { isActive?: boolean; inStock?: boolean; category?: string; search?: string },
+    filters?: { isActive?: boolean; inStock?: boolean; category?: string; search?: string; ids?: string[] },
   ): Promise<{ items: ProductResponse[]; totalItems: number }> {
     return productsRepository.findAllPaginated(page, limit, filters);
   }
