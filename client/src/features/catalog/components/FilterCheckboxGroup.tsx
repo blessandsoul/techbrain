@@ -22,12 +22,12 @@ export function FilterCheckboxGroup({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [expanded, setExpanded] = useState(defaultExpanded);
-
-  if (options.length === 0) return null;
 
   const currentRaw = searchParams.get(paramKey) ?? '';
   const selectedValues = currentRaw ? currentRaw.split(',').filter(Boolean) : [];
+  const [expanded, setExpanded] = useState(defaultExpanded || selectedValues.length > 0);
+
+  if (options.length === 0) return null;
 
   function toggleValue(value: string): void {
     const params = new URLSearchParams(searchParams.toString());

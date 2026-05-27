@@ -28,7 +28,6 @@ export function DynamicFilterSection({
           label={localized(config.label)}
           paramKey={config.id}
           options={availableValues[config.id] ?? []}
-          defaultExpanded
         />
       ))}
     </div>

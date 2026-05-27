@@ -37,6 +37,16 @@ export function CategoryTree({ categoryTree, categoryCounts }: CategoryTreeProps
     });
   }, [categoryTree, activeCategory]);
 
+  // Default-select the first root category if none is active, so filters for that
+  // category load immediately on a fresh visit to /catalog.
+  useEffect(() => {
+    if (activeCategory || categoryTree.length === 0) return;
+    const firstRoot = categoryTree[0];
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('category', firstRoot.id);
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [activeCategory, categoryTree, pathname, router, searchParams]);
+
   function toggleExpand(id: string): void {
     setExpandedIds((prev) => {
       const next = new Set(prev);

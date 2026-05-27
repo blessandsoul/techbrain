@@ -59,43 +59,22 @@ export function CatalogSidebar({
       <CategoryTree categoryTree={categoryTree} categoryCounts={categoryCounts} />
 
       {/* Divider */}
-      {filterConfigs.length > 0 && (
-        <div className="border-t border-border" />
-      )}
+      <div className="border-t border-border" />
 
       {/* Filters header + clear */}
-      {filterConfigs.length > 0 && (
-        <div className="flex items-center justify-between px-3">
-          <p className="text-sm font-semibold text-foreground">{t('catalog.filters')}</p>
-          {hasFilters && (
-            <button
-              onClick={clearAllFilters}
-              className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer"
-            >
-              {t('catalog.clearFilters')}
-            </button>
-          )}
-        </div>
-      )}
+      <div className="flex items-center justify-between px-3">
+        <p className="text-sm font-semibold text-foreground">{t('catalog.filters')}</p>
+        {hasFilters && (
+          <button
+            onClick={clearAllFilters}
+            className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer"
+          >
+            {t('catalog.clearFilters')}
+          </button>
+        )}
+      </div>
 
-      {/* Dynamic spec filters */}
-      <DynamicFilterSection
-        filterConfigs={filterConfigs}
-        availableValues={availableValues}
-      />
-
-      {/* Price range */}
-      {filterConfigs.length > 0 && (
-        <>
-          <div className="border-t border-border" />
-          <div className="px-3">
-            <PriceRangeFilter min={priceRange.min} max={priceRange.max} />
-          </div>
-        </>
-      )}
-
-      {/* In stock filter */}
-      <div className="border-t border-border" />
+      {/* In stock filter — always at top of filters */}
       <label
         htmlFor="inStock-filter"
         className="flex items-center gap-2.5 py-2 px-3 rounded-lg hover:bg-muted cursor-pointer transition-colors text-sm text-foreground"
@@ -107,6 +86,17 @@ export function CatalogSidebar({
         />
         <span className="flex-1">{t('catalog.inStockOnly')}</span>
       </label>
+
+      {/* Price range — always shown below in-stock */}
+      <div className="px-3">
+        <PriceRangeFilter min={priceRange.min} max={priceRange.max} />
+      </div>
+
+      {/* Dynamic spec filters */}
+      <DynamicFilterSection
+        filterConfigs={filterConfigs}
+        availableValues={availableValues}
+      />
     </div>
   );
 }
