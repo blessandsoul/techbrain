@@ -43,7 +43,6 @@ export interface DashboardStats {
 }
 
 export interface CreateProductInput {
-  slug: string;
   categoryIds: string[];
   price: number;
   originalPrice?: number;
@@ -60,7 +59,6 @@ export interface CreateProductInput {
 }
 
 export interface UpdateProductInput {
-  slug?: string;
   categoryIds?: string[];
   price?: number;
   originalPrice?: number | null;

@@ -28,17 +28,6 @@ interface SpecRow {
   value: string;
 }
 
-function generateSlug(name: string): string {
-  const slug = name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 200);
-  return slug || `product-${Date.now()}`;
-}
-
 function mapCategorySlugToId(slug: string, categories: ICategory[]): string | null {
   const cat = categories.find((c) => c.slug === slug);
   return cat?.id ?? null;
@@ -223,10 +212,7 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
           })),
       ];
 
-      const slug = generateSlug(nameKa) || `product-${Date.now()}`;
-
       const input: CreateProductInput = {
-        slug,
         categoryIds,
         price: parsedPrice,
         originalPrice: parsedOrig > 0 ? parsedOrig : undefined,
