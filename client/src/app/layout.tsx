@@ -26,6 +26,11 @@ const notoSansGeorgian = Noto_Sans_Georgian({
 export const metadata: Metadata = {
   title: APP_NAME,
   description: 'A full-stack application built with Next.js and Fastify',
+  verification: {
+    other: {
+      'facebook-domain-verification': 'z0xn3n7huef7tey9gh2q2s9ke7fvaa',
+    },
+  },
 };
 
 export default function RootLayout({
