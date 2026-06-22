@@ -27,6 +27,12 @@ const envSchema = z.object({
   RATE_LIMIT_AUTH_LOGIN_MAX: z.coerce.number().int().min(1).optional(),
   RATE_LIMIT_AUTH_REGISTER_MAX: z.coerce.number().int().min(1).optional(),
 
+  // --- Proxy / Client IP ---
+  // Trust CF-Connecting-IP / X-Forwarded-For to derive the real client IP for
+  // rate-limit & IP-block keys. Safe ONLY when the origin is locked to the
+  // Cloudflare/Traefik proxy (these headers are client-spoofable otherwise).
+  TRUST_CLOUDFLARE: z.coerce.boolean().default(false),
+
   // --- File Upload ---
   MAX_FILE_SIZE_MB: z.coerce.number().min(1).max(100).default(10),
   MAX_VIDEO_FILE_SIZE_MB: z.coerce.number().min(1).max(500).default(50),

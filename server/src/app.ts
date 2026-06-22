@@ -29,6 +29,7 @@ import { fileStorageService } from '@libs/storage/file-storage.service.js';
 import { registerJobs } from '@jobs/index.js';
 import { RATE_LIMIT_ENABLED, getRateLimitRedisStore } from '@config/rate-limit.config.js';
 import { isIpBlocked, recordRateLimitViolation, syncBlockedIpsToRedis } from '@libs/ip-block.js';
+import { getClientIp } from '@libs/client-ip.js';
 import { ForbiddenError } from '@shared/errors/errors.js';
 import {
   serializerCompiler,
@@ -94,8 +95,10 @@ export async function buildApp() {
       redis: redisStore,
       nameSpace: 'rl:',
       skipOnError: true, // Gracefully degrade if Redis fails mid-request
-      onExceeded: (request: { ip: string }) => {
-        recordRateLimitViolation(request.ip);
+      // Key on the real client IP (not the shared proxy/edge IP) so limits are per-visitor
+      keyGenerator: (request: FastifyRequest) => getClientIp(request),
+      onExceeded: (request: FastifyRequest) => {
+        recordRateLimitViolation(getClientIp(request));
       },
     });
   } else {
@@ -154,26 +157,30 @@ export async function buildApp() {
   // --- Sync permanent IP blocks from DB to Redis ---
   await syncBlockedIpsToRedis();
 
+  // Monitoring/health-probe paths: skipped by both the IP-block hook (so a
+  // blocked or shared-edge IP can't take down load-balancer health checks) and
+  // request logging (to keep probe noise out of the logs).
+  const monitoringPaths = new Set(['/api/v1/health', '/api/v1/ready', '/api/v1/live']);
+
   // --- IP Block Check (runs before everything else) ---
   app.addHook('onRequest', async (request: FastifyRequest) => {
-    if (await isIpBlocked(request.ip)) {
+    if (monitoringPaths.has(request.url.split('?')[0])) return;
+    if (await isIpBlocked(getClientIp(request))) {
       throw new ForbiddenError('Access denied', 'IP_BLOCKED');
     }
   });
 
   // --- Request/Response Logging ---
-  const skipLogPaths = new Set(['/api/v1/health', '/api/v1/ready', '/api/v1/live']);
-
   app.addHook('preHandler', async (request) => {
     const pathname = request.url.split('?')[0];
-    if (!skipLogPaths.has(pathname)) {
+    if (!monitoringPaths.has(pathname)) {
       markRequestStart(request);
     }
   });
 
   app.addHook('onResponse', async (request, reply) => {
     const pathname = request.url.split('?')[0];
-    if (!skipLogPaths.has(pathname)) {
+    if (!monitoringPaths.has(pathname)) {
       logRequestLine(request, reply);
     }
   });
