@@ -30,6 +30,7 @@ import { registerJobs } from '@jobs/index.js';
 import { RATE_LIMIT_ENABLED, getRateLimitRedisStore } from '@config/rate-limit.config.js';
 import { isIpBlocked, recordRateLimitViolation, syncBlockedIpsToRedis } from '@libs/ip-block.js';
 import { getClientIp } from '@libs/client-ip.js';
+import { isAuthPath } from '@libs/auth-path.js';
 import { ForbiddenError } from '@shared/errors/errors.js';
 import {
   serializerCompiler,
@@ -98,6 +99,9 @@ export async function buildApp() {
       // Key on the real client IP (not the shared proxy/edge IP) so limits are per-visitor
       keyGenerator: (request: FastifyRequest) => getClientIp(request),
       onExceeded: (request: FastifyRequest) => {
+        // Auth routes keep their own per-route limit + account lockout; don't let
+        // a mistyped password arm the IP-wide auto-ban.
+        if (isAuthPath(request)) return;
         recordRateLimitViolation(getClientIp(request));
       },
     });
