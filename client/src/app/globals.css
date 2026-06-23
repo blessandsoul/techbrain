@@ -397,8 +397,8 @@ html {
   height: auto;
 }
 
-/* Center plain prose images that have no explicit alignment */
-.prose p > img:not([data-align]) {
+/* Center in-body content images (any nesting) that have no explicit alignment */
+.prose img:not([data-align]) {
   display: block;
   max-width: 100%;
   height: auto;
