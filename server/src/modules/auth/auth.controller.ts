@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { successResponse } from '@shared/responses/successResponse.js';
 import { UnauthorizedError } from '@shared/errors/errors.js';
 import { setAuthCookies, clearAuthCookies } from '@libs/cookies.js';
+import { getClientIp } from '@libs/client-ip.js';
 import type {
   RegisterInput,
   LoginInput,
@@ -13,7 +14,7 @@ export async function register(
   reply: FastifyReply,
 ): Promise<void> {
   const deviceInfo = request.headers['user-agent'];
-  const ipAddress = request.ip;
+  const ipAddress = getClientIp(request);
 
   const result = await authService.register(request.body, deviceInfo, ipAddress);
 
@@ -26,7 +27,7 @@ export async function login(
   reply: FastifyReply,
 ): Promise<void> {
   const deviceInfo = request.headers['user-agent'];
-  const ipAddress = request.ip;
+  const ipAddress = getClientIp(request);
 
   const result = await authService.login(request.body, deviceInfo, ipAddress);
 
