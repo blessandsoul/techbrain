@@ -383,13 +383,27 @@ html {
 
 /* ── Rich text editor — image resize handle ── */
 .prose .resizable-img {
-  display: inline-block;
+  display: block;            /* was inline-block — lets margin auto center it */
   position: relative;
+  width: fit-content;        /* shrink to the (resized) image width */
+  max-width: 100%;           /* never overflow the text column */
+  margin-left: auto;
+  margin-right: auto;        /* center the block */
 }
 
 .prose .resizable-img img {
   display: block;
   max-width: 100%;
+  height: auto;
+}
+
+/* Center plain prose images that have no explicit alignment */
+.prose p > img:not([data-align]) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ── Rich text editor — image grid ── */
