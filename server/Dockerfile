@@ -52,8 +52,11 @@ RUN npx tsc prisma/seed.ts --outDir dist/seed --esModuleInterop --module NodeNex
 # ===================================================================
 FROM node:20-alpine AS production
 
-# dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# dumb-init for proper signal handling. ImageMagick provides a CPU-portable
+# production image backend for hosts that cannot load Sharp's x64-v2/WASM builds.
+RUN apk add --no-cache dumb-init imagemagick imagemagick-webp
+
+ENV IMAGE_PROCESSOR=imagemagick
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \

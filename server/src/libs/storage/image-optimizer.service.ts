@@ -1,10 +1,10 @@
 /**
  * Image Optimization Service
  *
- * Handles image processing, optimization, and validation using Sharp.
+ * Handles image processing, optimization, and validation using the configured backend.
  */
 
-import sharp from 'sharp';
+import { imageProcessor as sharp } from './image-processor.js';
 import { FILE_UPLOAD_CONSTANTS } from './file-validator.js';
 import { ValidationError, InternalError } from '@shared/errors/errors.js';
 import { logger } from '@libs/logger.js';
