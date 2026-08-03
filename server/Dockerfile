@@ -80,27 +80,11 @@ COPY --from=builder --chown=nodejs:nodejs /app/uploads ./uploads.default
 # Create uploads directory (writable by app for file uploads)
 RUN mkdir -p uploads && chown nodejs:nodejs uploads
 
-# Entrypoint script: seed volume from backup on first run, then start app
-COPY <<'EOF' /app/entrypoint.sh
-#!/bin/sh
-set -e
-
-# Use a marker file to track if initial seeding has been done
-if [ -d /app/uploads.default ] && [ ! -f /app/uploads/.seeded ]; then
-  echo "First run — copying default uploads into volume..."
-  cp -rn /app/uploads.default/* /app/uploads/ 2>/dev/null || true
-  touch /app/uploads/.seeded
-  echo "Done."
-fi
-
-# Apply pending database migrations
-echo "Running Prisma migrations..."
-npx prisma migrate deploy
-echo "Migrations applied."
-
-exec node dist/server.js
-EOF
-RUN chmod +x /app/entrypoint.sh
+# Entrypoint script: seed volume from backup, apply migrations, then start app.
+# Normalize defensively because a CRLF shebang makes Linux report the script as
+# missing even though the file exists.
+COPY --chown=nodejs:nodejs entrypoint.sh /app/entrypoint.sh
+RUN sed -i 's/\r$//' /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 # Switch to non-root user
 USER nodejs
