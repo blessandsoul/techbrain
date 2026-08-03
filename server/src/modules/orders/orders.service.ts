@@ -43,6 +43,7 @@ class OrdersService {
     const order = await ordersRepository.create({
       customerName: input.customerName,
       customerPhone: input.customerPhone,
+      customerAddress: input.customerAddress,
       locale: input.locale,
       total,
       items: input.items,

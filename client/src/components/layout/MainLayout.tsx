@@ -11,7 +11,7 @@ interface MainLayoutProps {
 
 export const MainLayout = ({ children }: MainLayoutProps): React.ReactElement => {
   return (
-    <div className="flex min-h-dvh flex-col pt-17">
+    <div className="flex min-h-dvh flex-col pt-17 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <AnnouncementBanner />
       <Header />
       <main className="flex flex-1 flex-col">{children}</main>

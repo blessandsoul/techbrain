@@ -18,7 +18,7 @@ interface BoughtTogetherProps {
 }
 
 export function BoughtTogether({ mainProduct, relatedProducts }: BoughtTogetherProps): React.ReactElement | null {
-  const { t, localized } = useLocale();
+  const { t } = useLocale();
   const addItem = useCartStore((s) => s.addItem);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     () => new Set(relatedProducts.map((p) => p.id))
@@ -73,7 +73,7 @@ export function BoughtTogether({ mainProduct, relatedProducts }: BoughtTogetherP
   return (
     <div className="rounded-xl border border-border bg-card">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+      <div className="flex items-center justify-between border-b border-border px-3 py-3 sm:px-5 sm:py-4">
         <div className="flex items-center gap-2">
           <h2 className="text-sm font-semibold text-foreground">
             {t('catalog.boughtTogether')}
@@ -102,18 +102,18 @@ export function BoughtTogether({ mainProduct, relatedProducts }: BoughtTogetherP
       ))}
 
       {/* Footer: total + buy all */}
-      <div className="flex items-center justify-between gap-4 px-5 py-4 border-t border-border bg-muted/30">
-        <div className="flex flex-col gap-0.5">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2 border-t border-border bg-muted/30 px-3 py-3 sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4">
+        <div className="flex min-w-0 flex-col gap-0.5">
           <span className="text-[11px] text-muted-foreground">
             {t('catalog.total', { count: allProducts.length })}
           </span>
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             {hasSavings && (
-              <span className="text-sm text-muted-foreground/60 line-through tabular-nums">
+              <span className="whitespace-nowrap text-xs text-muted-foreground/60 line-through tabular-nums sm:text-sm">
                 {totalOriginalPrice.toLocaleString()} ₾
               </span>
             )}
-            <span className="text-xl font-bold text-foreground tabular-nums">
+            <span className="whitespace-nowrap text-lg font-bold leading-none text-foreground tabular-nums sm:text-xl">
               {totalPrice.toLocaleString()} ₾
             </span>
           </div>
@@ -123,7 +123,7 @@ export function BoughtTogether({ mainProduct, relatedProducts }: BoughtTogetherP
           onClick={handleBuyAll}
           disabled={added}
           className={cn(
-            'flex items-center justify-center gap-2 h-10 px-6 rounded-xl text-sm font-medium',
+            'flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-medium sm:h-10 sm:gap-2 sm:px-6 sm:text-sm',
             'transition-all duration-200 cursor-pointer',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
             'active:scale-[0.98]',
@@ -139,10 +139,10 @@ export function BoughtTogether({ mainProduct, relatedProducts }: BoughtTogetherP
             </svg>
           ) : (
             <>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} className="hidden shrink-0 min-[360px]:block" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
               </svg>
-              <span>{t('catalog.buyAll')}</span>
+              <span className="whitespace-nowrap">{t('catalog.buyAll')}</span>
             </>
           )}
         </button>
@@ -170,7 +170,7 @@ function BoughtTogetherItem({ product, isMain, isSelected, onToggle }: BoughtTog
   return (
     <div
       className={cn(
-        'flex items-center gap-3 px-5 py-3 border-b border-border/50 last:border-b-0',
+        'flex items-center gap-2 border-b border-border/50 px-3 py-3 last:border-b-0 sm:gap-3 sm:px-5',
         'transition-opacity duration-200',
         !isSelected && !isMain && 'opacity-40'
       )}
@@ -204,7 +204,7 @@ function BoughtTogetherItem({ product, isMain, isSelected, onToggle }: BoughtTog
       )}
 
       {/* Thumbnail */}
-      <div className="relative w-12 h-12 rounded-lg bg-muted overflow-hidden shrink-0">
+      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-12 sm:w-12">
         {imageSrc ? (
           <SafeImage
             src={imageSrc}
@@ -229,14 +229,14 @@ function BoughtTogetherItem({ product, isMain, isSelected, onToggle }: BoughtTog
       </div>
 
       {/* Price */}
-      <div className="flex flex-col items-end gap-0.5 shrink-0">
+      <div className="flex shrink-0 flex-col items-end gap-0.5">
         {hasDiscount && (
-          <span className="text-xs text-destructive/60 line-through tabular-nums">
+          <span className="whitespace-nowrap text-[11px] text-destructive/60 line-through tabular-nums sm:text-xs">
             {product.originalPrice!.toLocaleString()} ₾
           </span>
         )}
         <span className={cn(
-          'text-sm font-bold tabular-nums',
+          'whitespace-nowrap text-xs font-bold tabular-nums sm:text-sm',
           hasDiscount ? 'text-destructive' : 'text-foreground'
         )}>
           {product.price.toLocaleString()} ₾
@@ -247,7 +247,7 @@ function BoughtTogetherItem({ product, isMain, isSelected, onToggle }: BoughtTog
       {!isMain && (
         <Link
           href={`/catalog/${product.slug}`}
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors duration-150 shrink-0"
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-primary/5 hover:text-primary sm:h-7 sm:w-7"
           aria-label={name}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">

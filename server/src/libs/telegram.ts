@@ -91,6 +91,7 @@ export function formatOrderMessage(order: OrderResponse): string {
     '',
     `👤 Name: ${escapeHtml(order.customerName)}`,
     `📞 Phone: ${escapeHtml(order.customerPhone)}`,
+    `📍 Address: ${escapeHtml(order.customerAddress)}`,
     `🌐 Language: ${order.locale}`,
     '',
     '📦 Order items:',

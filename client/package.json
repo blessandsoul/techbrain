@@ -26,13 +26,13 @@
     "@tiptap/pm": "^3.20.1",
     "@tiptap/react": "^3.20.1",
     "@tiptap/starter-kit": "^3.20.1",
-    "axios": "^1.13.5",
+    "axios": "^1.19.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.1",
-    "isomorphic-dompurify": "^3.1.0",
+    "isomorphic-dompurify": "^3.19.0",
     "lucide-react": "^0.563.0",
-    "next": "16.1.6",
+    "next": "16.2.12",
     "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
@@ -50,7 +50,9 @@
     "zustand": "^5.0.11"
   },
   "overrides": {
-    "minimatch": ">=10.2.1"
+    "minimatch": ">=10.2.1",
+    "postcss": "8.5.25",
+    "sharp": "0.35.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -65,7 +67,7 @@
     "@vitest/coverage-v8": "^4.1.2",
     "@vitest/ui": "^4.1.2",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "16.2.12",
     "jsdom": "^29.0.1",
     "shadcn": "^3.8.4",
     "tailwindcss": "^4",

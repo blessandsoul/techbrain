@@ -146,11 +146,11 @@ export async function buildApp() {
   await app.register(fastifyStatic, {
     root: path.join(__dirname, '..', 'uploads'),
     prefix: '/uploads/',
-    setHeaders(res, filePath) {
+    setHeaders(reply, filePath) {
       // Ensure proper caching and Range support for video files
       if (/\.(mp4|webm|mov|avi|mkv)$/i.test(filePath)) {
-        res.setHeader('Accept-Ranges', 'bytes');
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        reply.header('Accept-Ranges', 'bytes');
+        reply.header('Cache-Control', 'public, max-age=31536000, immutable');
       }
     },
   });

@@ -14,12 +14,13 @@ import { getErrorMessage } from '@/lib/utils/error';
 interface OrderForm {
   name: string;
   phone: string;
+  address: string;
 }
 
 export default function CartPage(): React.ReactElement {
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice } = useCartStore();
   const createOrder = useCreateOrder();
-  const [form, setForm] = useState<OrderForm>({ name: '', phone: '' });
+  const [form, setForm] = useState<OrderForm>({ name: '', phone: '', address: '' });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
@@ -30,8 +31,9 @@ export default function CartPage(): React.ReactElement {
 
     try {
       await createOrder.mutateAsync({
-        customerName: form.name,
+        customerName: form.name.trim().replace(/\s+/g, ' '),
         customerPhone: form.phone,
+        customerAddress: form.address.trim(),
         locale: 'ka',
         items: items.map((i) => ({
           productId: i.product.id,
@@ -185,36 +187,43 @@ export default function CartPage(): React.ReactElement {
 
             <div>
               <label htmlFor="order-name" className="block text-sm text-muted-foreground mb-1.5">
-                სახელი
+                სახელი და გვარი
               </label>
               <input
                 id="order-name"
+                name="name"
                 type="text"
+                autoComplete="name"
                 required
-                minLength={2}
-                maxLength={20}
+                minLength={3}
+                maxLength={100}
+                pattern=".*\S+\s+\S+.*"
+                title="მიუთითეთ სახელი და გვარი"
                 value={form.name}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/[^a-zA-Z\u10A0-\u10FF\u0400-\u04FF\s]/g, '');
+                  const value = e.target.value.replace(/[^\p{L}\s'-]/gu, '');
                   setForm((f) => ({ ...f, name: value }));
                 }}
-                placeholder="თქვენი სახელი"
+                placeholder="თქვენი სახელი და გვარი"
                 className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
               />
             </div>
 
             <div>
               <label htmlFor="order-phone" className="block text-sm text-muted-foreground mb-1.5">
-                ტელეფონი
+                მობილურის ნომერი
               </label>
               <input
                 id="order-phone"
+                name="phone"
                 type="tel"
                 inputMode="numeric"
-                pattern="[0-9]*"
+                autoComplete="tel"
+                pattern="5[0-9]{8}"
                 required
-                minLength={1}
-                maxLength={30}
+                minLength={9}
+                maxLength={9}
+                title="მიუთითეთ 9-ნიშნა მობილურის ნომერი, რომელიც იწყება 5-ით"
                 value={form.phone}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, '');
@@ -222,6 +231,25 @@ export default function CartPage(): React.ReactElement {
                 }}
                 placeholder="5XX XXX XXX"
                 className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="order-address" className="block text-sm text-muted-foreground mb-1.5">
+                მისამართი
+              </label>
+              <textarea
+                id="order-address"
+                name="address"
+                autoComplete="street-address"
+                required
+                minLength={5}
+                maxLength={300}
+                rows={3}
+                value={form.address}
+                onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+                placeholder="მიუთითეთ მიწოდების მისამართი"
+                className="w-full resize-y px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
               />
             </div>
 

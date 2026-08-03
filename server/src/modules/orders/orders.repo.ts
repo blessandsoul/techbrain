@@ -39,6 +39,7 @@ function toOrderResponse(row: OrderWithItems): OrderResponse {
     id: row.id,
     customerName: row.customerName,
     customerPhone: row.customerPhone,
+    customerAddress: row.customerAddress,
     locale: row.locale,
     total: row.total,
     status: row.status,
@@ -78,6 +79,7 @@ class OrdersRepository {
       where.OR = [
         { customerName: { contains: filters.search } },
         { customerPhone: { contains: filters.search } },
+        { customerAddress: { contains: filters.search } },
         { items: { some: { productName: { contains: filters.search } } } },
       ];
     }
@@ -110,6 +112,7 @@ class OrdersRepository {
   async create(data: {
     customerName: string;
     customerPhone: string;
+    customerAddress: string;
     locale: string;
     total: number;
     items: Array<{
@@ -125,6 +128,7 @@ class OrdersRepository {
       data: {
         customerName: data.customerName,
         customerPhone: data.customerPhone,
+        customerAddress: data.customerAddress,
         locale: data.locale,
         total: data.total,
         items: {

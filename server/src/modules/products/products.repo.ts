@@ -651,8 +651,8 @@ class ProductsRepository {
         });
       }
 
-      // Build update data (exclude categoryIds and specs)
-      const { categoryIds: _c, specs: _s, ...updateFields } = data;
+      // Copy only scalar fields below; categoryIds and specs were handled above.
+      const updateFields = data;
       const updateData: Record<string, unknown> = {};
       if (updateFields.slug !== undefined) updateData.slug = updateFields.slug;
       if (updateFields.price !== undefined) updateData.price = updateFields.price;

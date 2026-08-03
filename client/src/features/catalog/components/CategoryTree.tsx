@@ -26,6 +26,8 @@ export function CategoryTree({ categoryTree, categoryCounts }: CategoryTreeProps
   useEffect(() => {
     if (seededRef.current || categoryTree.length === 0) return;
     seededRef.current = true;
+    // The asynchronous tree seeds the user's subsequently editable expansion state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExpandedIds((prev) => {
       const next = new Set(prev);
       for (const root of categoryTree) next.add(root.id);

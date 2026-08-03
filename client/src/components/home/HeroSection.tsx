@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Phone, SecurityCamera, CaretLeft, CaretRight, Wrench, ShieldCheck, Truck } from '@phosphor-icons/react';
@@ -78,40 +78,16 @@ function ProductSpecTagsD({ product, specKeyLocalized }: { product: IProduct; sp
 function DotIndicators({ count, current, onDotClick }: { count: number; current: number; onDotClick: (i: number) => void }) {
   if (count <= 1) return null;
 
-  const totalDots = 9;
-  const prevRef = useRef(current);
-  const windowStartRef = useRef(((current - 4) % count + count) % count);
-  const activePosRef = useRef(4);
-
-  if (prevRef.current !== current) {
-    const prev = prevRef.current;
-    prevRef.current = current;
-
-    const fwd = ((current - prev) % count + count) % count;
-    const bwd = ((prev - current) % count + count) % count;
-
-    if (fwd <= bwd) {
-      activePosRef.current += fwd;
-    } else {
-      activePosRef.current -= bwd;
-    }
-
-    if (activePosRef.current > 6) {
-      const shift = activePosRef.current - 5;
-      windowStartRef.current = (windowStartRef.current + shift) % count;
-      activePosRef.current = 5;
-    } else if (activePosRef.current < 2) {
-      const shift = 3 - activePosRef.current;
-      windowStartRef.current = ((windowStartRef.current - shift) % count + count) % count;
-      activePosRef.current = 3;
-    }
-  }
+  const totalDots = Math.min(9, count);
+  const maxStart = Math.max(0, count - totalDots);
+  const windowStart = Math.min(Math.max(0, current - Math.floor(totalDots / 2)), maxStart);
+  const activePosition = current - windowStart;
 
   return (
     <div className="flex items-center justify-center gap-1.5">
       {Array.from({ length: totalDots }).map((_, i) => {
-        const actualIndex = (windowStartRef.current + i) % count;
-        const isActive = i === activePosRef.current;
+        const actualIndex = windowStart + i;
+        const isActive = i === activePosition;
         const isEdge = i === 0 || i === totalDots - 1;
 
         let className: string;

@@ -15,11 +15,6 @@ export function MobileMenu({ links, phone }: MobileMenuProps): React.ReactElemen
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Close menu on route change
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
   // Prevent body scroll when menu is open
   useEffect(() => {
     if (open) {
@@ -82,6 +77,7 @@ export function MobileMenu({ links, phone }: MobileMenuProps): React.ReactElemen
                   <Link
                     key={link.href}
                     href={link.href}
+                    onClick={() => setOpen(false)}
                     className={`px-4 py-3 text-base rounded-lg transition-colors ${
                       isActive
                         ? 'text-foreground font-medium bg-accent'

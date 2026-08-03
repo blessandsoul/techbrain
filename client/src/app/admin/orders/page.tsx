@@ -94,6 +94,8 @@ export default function AdminOrdersPage(): React.ReactElement {
   // Sync URL search back to input when navigating
   useEffect(() => {
     if (!isUserTyping.current) {
+      // URL navigation is an external source for this controlled input.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearchInput(search);
     }
   }, [search]);

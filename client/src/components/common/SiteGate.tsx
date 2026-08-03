@@ -23,7 +23,7 @@ import type { ILoginRequest } from '@/features/auth/types/auth.types';
 export function SiteGate({ children }: { children: React.ReactNode }): React.ReactElement {
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-  const [isChecking, setIsChecking] = useState(true);
+  const [isChecking, setIsChecking] = useState(() => !isAuthenticated);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,10 +31,7 @@ export function SiteGate({ children }: { children: React.ReactNode }): React.Rea
 
   // On mount, try to rehydrate auth from existing cookies
   useEffect(() => {
-    if (isAuthenticated) {
-      setIsChecking(false);
-      return;
-    }
+    if (isAuthenticated) return;
 
     authService
       .getMe()

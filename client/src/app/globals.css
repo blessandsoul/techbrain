@@ -224,6 +224,17 @@ html {
  * classic, always-visible one; `::-webkit-scrollbar` is the Safari/legacy path.
  * A soft fade at the bottom hints there's more below the fold.
  */
+/* Hide the native track without disabling scrolling or touch swiping. */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 .sidebar-scroll-wrapper {
   position: relative;
 }

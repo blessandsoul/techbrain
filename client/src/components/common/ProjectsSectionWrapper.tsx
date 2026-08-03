@@ -1,6 +1,7 @@
 'use client';
 
 import { useActiveProjects } from '@/features/projects/hooks/useProjects';
+import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
 import { ProjectsSection } from './ProjectsSection';
 import { useLocale } from '@/lib/i18n';
 
@@ -20,7 +21,8 @@ interface ProjectForSection {
 
 export function ProjectsSectionWrapper(): React.ReactElement {
   const { data } = useActiveProjects({ limit: 4 });
-  const { localized } = useLocale();
+  const { stats } = usePublicSiteSettings();
+  const { localized, t } = useLocale();
 
   const mapped = data?.items?.slice(0, 4).map((p: IProject): ProjectForSection => ({
     id: p.id,
@@ -33,15 +35,6 @@ export function ProjectsSectionWrapper(): React.ReactElement {
     year: p.year,
     updatedAt: p.updatedAt,
   })) ?? [];
-
-  // TODO: Wire stats to real site settings API
-  const stats = {
-    camerasInstalled: '500+',
-    projectsCompleted: '120+',
-    yearsExperience: '5+',
-  };
-
-  const { t } = useLocale();
 
   const labels = {
     badge: t('projects.badge'),

@@ -14,8 +14,9 @@ WORKDIR /app
 
 COPY package.json package-lock.json* ./
 
-# Install production dependencies + prisma CLI (needed for migrations)
-RUN npm ci --omit=dev && npm i prisma
+# Install the exact production dependency tree from the lockfile. Prisma is a
+# runtime dependency because the entrypoint applies migrations before startup.
+RUN npm ci --omit=dev
 
 # ===================================================================
 # Stage 2: Build (compile TypeScript)

@@ -83,6 +83,8 @@ export function ProductTable(): React.ReactElement {
   // Sync searchInput when URL changes (e.g. back/forward navigation)
   useEffect(() => {
     if (!isUserTyping.current) {
+      // URL navigation is an external source for this controlled input.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearchInput(search);
     }
   }, [search]);

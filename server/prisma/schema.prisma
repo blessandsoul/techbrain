@@ -246,6 +246,7 @@ model Order {
   id            String      @id @default(uuid())
   customerName  String      @db.VarChar(100)
   customerPhone String      @db.VarChar(30)
+  customerAddress String      @default("") @db.VarChar(300)
   locale        String      @default("ka") @db.VarChar(5)
   total         Float       @default(0)
   status        OrderStatus @default(NEW)

@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom/vitest';
+import { createElement } from 'react';
 import { vi } from 'vitest';
+
+import type { ReactNode } from 'react';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -16,10 +19,8 @@ vi.mock('next/navigation', () => ({
 
 // Mock next/link
 vi.mock('next/link', () => ({
-  default: ({ children, href, ...props }: { children: React.ReactNode; href: string; [key: string]: unknown }) => {
-    const React = require('react');
-    return React.createElement('a', { href, ...props }, children);
-  },
+  default: ({ children, href, ...props }: { children: ReactNode; href: string; [key: string]: unknown }) =>
+    createElement('a', { href, ...props }, children),
 }));
 
 // Mock sonner

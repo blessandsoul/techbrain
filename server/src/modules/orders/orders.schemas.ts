@@ -35,8 +35,18 @@ const OrderItemSchema = z.object({
 });
 
 export const CreateOrderSchema = z.object({
-  customerName: z.string().min(2).max(100),
-  customerPhone: z.string().min(1).max(30),
+  customerName: z.string()
+    .trim()
+    .min(3)
+    .max(100)
+    .regex(
+      /^\p{L}[\p{L}'-]*(?:\s+\p{L}[\p{L}'-]*)+$/u,
+      'Name and surname are required',
+    ),
+  customerPhone: z.string()
+    .trim()
+    .regex(/^5\d{8}$/, 'A valid 9-digit Georgian mobile number is required'),
+  customerAddress: z.string().trim().min(5).max(300),
   locale: z.enum(['ka', 'ru', 'en']).default('ka'),
   items: z.array(OrderItemSchema).min(1),
   total: z.number().min(0).max(10000000).optional(),

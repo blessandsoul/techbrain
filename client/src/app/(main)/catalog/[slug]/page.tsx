@@ -96,11 +96,14 @@ function ExpandableDescription({ html }: { html: string }): React.ReactElement {
   const { t } = useLocale();
   const [expanded, setExpanded] = useState(false);
   const [needsTruncation, setNeedsTruncation] = useState(false);
+  const [contentHeight, setContentHeight] = useState(DESCRIPTION_COLLAPSED_HEIGHT);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (contentRef.current) {
-      setNeedsTruncation(contentRef.current.scrollHeight > DESCRIPTION_COLLAPSED_HEIGHT);
+      const measuredHeight = contentRef.current.scrollHeight;
+      setContentHeight(measuredHeight);
+      setNeedsTruncation(measuredHeight > DESCRIPTION_COLLAPSED_HEIGHT);
     }
   }, [html]);
 
@@ -114,7 +117,7 @@ function ExpandableDescription({ html }: { html: string }): React.ReactElement {
       <div
         ref={contentRef}
         className="prose prose-sm max-w-none text-muted-foreground leading-relaxed prose-headings:text-foreground prose-a:text-primary prose-a:underline overflow-hidden transition-[max-height] duration-300 ease-out"
-        style={{ maxHeight: expanded || !needsTruncation ? contentRef.current?.scrollHeight ?? 'none' : DESCRIPTION_COLLAPSED_HEIGHT }}
+        style={{ maxHeight: expanded || !needsTruncation ? contentHeight : DESCRIPTION_COLLAPSED_HEIGHT }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
       {needsTruncation && !expanded && (
@@ -205,22 +208,22 @@ function ProductDetailContent(): React.ReactElement {
           )}
 
           {/* Price + CTA */}
-          <div className="flex flex-col gap-4 p-6 rounded-xl bg-muted border border-border">
+          <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted p-4 sm:gap-4 sm:p-6">
             {isService ? (
               <span className="text-muted-foreground">{t('catalog.priceNegotiable')}</span>
             ) : (
               <>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {product.originalPrice && product.discount != null && product.discount > 0 ? (
                     <>
-                      <span className="text-lg text-destructive/60 line-through tabular-nums">{product.originalPrice} ₾</span>
-                      <span className="text-3xl font-bold text-success tabular-nums">{product.price} ₾</span>
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-success text-white text-sm font-bold tabular-nums">
+                      <span className="text-base text-destructive/60 line-through tabular-nums sm:text-lg">{product.originalPrice} ₾</span>
+                      <span className="text-2xl font-bold text-success tabular-nums sm:text-3xl">{product.price} ₾</span>
+                      <span className="inline-flex items-center rounded-lg bg-success px-2 py-0.5 text-xs font-bold text-white tabular-nums sm:px-2.5 sm:py-1 sm:text-sm">
                         -{product.discount}%
                       </span>
                     </>
                   ) : (
-                    <span className="text-3xl font-bold text-foreground tabular-nums">{product.price} ₾</span>
+                    <span className="text-2xl font-bold text-foreground tabular-nums sm:text-3xl">{product.price} ₾</span>
                   )}
                 </div>
                 <ProductCTA product={product} />

@@ -26,7 +26,10 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
   // Latest router context for the debounced writer — kept in a ref so the
   // pending timer always reads fresh values without restarting on each render.
   const latest = useRef({ searchParams, pathname });
-  latest.current = { searchParams, pathname };
+
+  useEffect(() => {
+    latest.current = { searchParams, pathname };
+  }, [searchParams, pathname]);
 
   // Holds the pending debounce timer. While it's non-null the user is actively
   // editing, so we ignore URL changes (they're just the async echo of our own
@@ -63,6 +66,8 @@ export function PriceRangeFilter({ min, max }: PriceRangeFilterProps): React.Rea
   // ignoring the async echo of our own push mid-typing.
   useEffect(() => {
     if (timerRef.current) return;
+    // Browser navigation and clear-filter actions are external sources for these inputs.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalMin(currentMin);
     setLocalMax(currentMax);
   }, [currentMin, currentMax]);

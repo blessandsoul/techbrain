@@ -25,6 +25,7 @@ export interface OrderResponse {
   id: string;
   customerName: string;
   customerPhone: string;
+  customerAddress: string;
   locale: string;
   total: number;
   status: string;

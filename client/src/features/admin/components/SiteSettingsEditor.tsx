@@ -22,6 +22,8 @@ export function SiteSettingsEditor(): React.ReactElement {
 
   useEffect(() => {
     if (serverSettings) {
+      // The query result initializes and refreshes this editable form draft.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSettings(serverSettings);
     }
   }, [serverSettings]);

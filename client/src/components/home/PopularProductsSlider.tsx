@@ -110,10 +110,22 @@ export function PopularProductsSlider(): ReactElement | null {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} categoryLabels={categoryLabels} byOrderLabel={t('products.byOrder')} learnMoreLabel={t('products.learnMore')} outOfStockLabel={t('products.outOfStock')} />
           ))}
+        </div>
+
+        <div className="mt-8 flex justify-center md:hidden">
+          <Link
+            href="/catalog"
+            className="flex items-center gap-2 rounded-xl border border-primary/30 px-6 py-3 text-sm font-semibold text-primary transition-colors duration-150 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          >
+            {t('products.viewProducts')}
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+            </svg>
+          </Link>
         </div>
 
       </div>
@@ -134,7 +146,7 @@ function ProductCard({ product, categoryLabels, byOrderLabel, learnMoreLabel, ou
   const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
   return (
-    <article className="group relative flex flex-col rounded-xl border border-border/50 bg-card overflow-hidden transition-all duration-300 hover:border-border/80 hover:-translate-y-0.5">
+    <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-border/50 bg-card transition-all duration-300 hover:border-border/80 hover:-translate-y-0.5">
 
       {/* Image */}
       <Link
@@ -191,22 +203,22 @@ function ProductCard({ product, categoryLabels, byOrderLabel, learnMoreLabel, ou
       </Link>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-5 gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-4 p-5">
 
-        <Link href={`/catalog/${product.slug}`} className="focus-visible:outline-none">
+        <Link href={`/catalog/${product.slug}`} className="min-w-0 focus-visible:outline-none">
           <h3 className="font-semibold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-200 text-base">
             {name}
           </h3>
         </Link>
 
         {/* Price + CTA */}
-        <div className="mt-auto flex items-center justify-between gap-3">
+        <div className="mt-auto flex flex-col items-stretch gap-3 lg:flex-row lg:items-center lg:justify-between">
           {isService ? (
-            <span className="text-base text-muted-foreground italic">
+            <span className="min-w-0 text-base italic text-muted-foreground">
               {byOrderLabel}
             </span>
           ) : (
-            <div className="flex flex-col leading-none">
+            <div className="flex min-w-0 flex-col leading-none">
               {hasDiscount ? (
                 <>
                   <span className="text-sm text-destructive/60 line-through tabular-nums mb-0.5">
@@ -226,7 +238,7 @@ function ProductCard({ product, categoryLabels, byOrderLabel, learnMoreLabel, ou
 
           <Link
             href={`/catalog/${product.slug}`}
-            className="flex items-center justify-center gap-2 h-11 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm whitespace-nowrap transition-all duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold whitespace-nowrap text-primary-foreground transition-all duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 lg:w-auto"
           >
             {learnMoreLabel}
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">

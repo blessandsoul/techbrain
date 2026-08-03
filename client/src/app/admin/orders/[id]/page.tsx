@@ -147,7 +147,7 @@ export default function OrderDetailPage(): React.ReactElement {
           <h2 className="text-sm font-medium text-muted-foreground mb-3">მომხმარებელი <InfoTooltip text="შეკვეთის გამფორმებლის საკონტაქტო ინფორმაცია" /></h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">სახელი <InfoTooltip text="მომხმარებლის სახელი" /></p>
+              <p className="text-xs text-muted-foreground mb-1">სახელი და გვარი <InfoTooltip text="მომხმარებლის სახელი და გვარი" /></p>
               <p className="text-sm font-medium text-foreground">{order.customerName}</p>
             </div>
             <div>
@@ -164,6 +164,10 @@ export default function OrderDetailPage(): React.ReactElement {
             <div>
               <p className="text-xs text-muted-foreground mb-1">ენა <InfoTooltip text="ენა რომელზეც მომხმარებელმა გააფორმა შეკვეთა" /></p>
               <p className="text-sm font-medium text-foreground">{localeLabels[order.locale] || order.locale}</p>
+            </div>
+            <div className="sm:col-span-3">
+              <p className="text-xs text-muted-foreground mb-1">მისამართი <InfoTooltip text="მიწოდების მისამართი" /></p>
+              <p className="text-sm font-medium text-foreground whitespace-pre-wrap">{order.customerAddress}</p>
             </div>
           </div>
         </div>

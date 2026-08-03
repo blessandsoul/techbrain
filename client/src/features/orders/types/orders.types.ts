@@ -19,6 +19,7 @@ export interface IOrder {
   id: string;
   customerName: string;
   customerPhone: string;
+  customerAddress: string;
   locale: string;
   total: number;
   status: OrderStatus;
@@ -38,6 +39,7 @@ export interface OrderFilters {
 export interface CreateOrderRequest {
   customerName: string;
   customerPhone: string;
+  customerAddress: string;
   locale: string;
   items: Array<{ productId: string; productName: string; productImage?: string; productSlug?: string; quantity: number; unitPrice: number }>;
   total: number;

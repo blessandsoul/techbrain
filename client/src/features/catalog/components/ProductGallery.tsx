@@ -133,7 +133,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
       {/* Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90"
           onClick={() => setLightbox(false)}
           role="dialog"
           aria-modal="true"
@@ -143,7 +143,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
           <button
             type="button"
             onClick={() => setLightbox(false)}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer z-10"
+            className="absolute right-4 top-[calc(1rem+env(safe-area-inset-top))] z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/70 text-white shadow-xl backdrop-blur-sm transition-colors hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 cursor-pointer"
             aria-label="Close"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -152,7 +152,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
           </button>
 
           {/* Image */}
-          <div className="relative w-full h-full max-w-5xl max-h-[90dvh] mx-4" onClick={(e) => e.stopPropagation()}>
+          <div className="relative mx-auto h-full max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-5xl sm:w-[calc(100%-3rem)]" onClick={(e) => e.stopPropagation()}>
             <SafeImage
               src={imgSrc}
               alt={productName}
@@ -167,7 +167,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); prev(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+                className="absolute left-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white shadow-xl backdrop-blur-sm transition-colors hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:left-5 cursor-pointer"
                 aria-label="Previous image"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -177,7 +177,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); next(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/70 text-white shadow-xl backdrop-blur-sm transition-colors hover:bg-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:right-5 cursor-pointer"
                 aria-label="Next image"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -189,7 +189,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
 
           {/* Counter */}
           {hasMultiple && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm font-medium tabular-nums">
+            <div className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/30 bg-black/70 px-3 py-1.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm tabular-nums">
               {selected + 1} / {images.length}
             </div>
           )}
