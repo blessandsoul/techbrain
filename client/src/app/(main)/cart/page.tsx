@@ -1,80 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-
+import { Clock, Phone } from '@phosphor-icons/react';
 import Link from 'next/link';
 
 import { SafeImage } from '@/components/common/SafeImage';
 import { useCartStore } from '@/features/cart/store/cartStore';
 import { getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
-import { useCreateOrder } from '@/features/orders/hooks/useOrders';
 import { ROUTES } from '@/lib/constants/routes';
-import { getErrorMessage } from '@/lib/utils/error';
-
-interface OrderForm {
-  name: string;
-  phone: string;
-  address: string;
-}
 
 export default function CartPage(): React.ReactElement {
-  const { items, removeItem, updateQuantity, clearCart, getTotalPrice } = useCartStore();
-  const createOrder = useCreateOrder();
-  const [form, setForm] = useState<OrderForm>({ name: '', phone: '', address: '' });
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
-
-  async function handleSubmit(e: React.FormEvent): Promise<void> {
-    e.preventDefault();
-    if (items.length === 0) return;
-    setError('');
-
-    try {
-      await createOrder.mutateAsync({
-        customerName: form.name.trim().replace(/\s+/g, ' '),
-        customerPhone: form.phone,
-        customerAddress: form.address.trim(),
-        locale: 'ka',
-        items: items.map((i) => ({
-          productId: i.product.id,
-          productName: i.product.name.ka,
-          productImage: i.product.images[0] || undefined,
-          productSlug: i.product.slug,
-          quantity: i.quantity,
-          unitPrice: i.product.price,
-        })),
-        total: getTotalPrice(),
-      });
-      setSuccess(true);
-      clearCart();
-    } catch (err) {
-      setError(getErrorMessage(err));
-    }
-  }
-
-  if (success) {
-    return (
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl py-24 text-center">
-        <div className="max-w-md mx-auto p-8 rounded-2xl bg-card border border-border">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-primary">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-foreground mb-4">შეკვეთა მიღებულია!</h2>
-          <p className="text-muted-foreground mb-6">მალე დაგიკავშირდებით</p>
-          <div className="mt-8">
-            <Link
-              href={ROUTES.CATALOG}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              კატალოგში დაბრუნება
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
 
   if (items.length === 0) {
     return (
@@ -181,89 +116,88 @@ export default function CartPage(): React.ReactElement {
             </div>
           </div>
 
-          {/* Order form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-6 rounded-xl bg-card border border-border">
-            <h2 className="font-semibold text-foreground">შეკვეთის გაფორმება</h2>
-
-            <div>
-              <label htmlFor="order-name" className="block text-sm text-muted-foreground mb-1.5">
-                სახელი და გვარი
-              </label>
-              <input
-                id="order-name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                required
-                minLength={3}
-                maxLength={100}
-                pattern=".*\S+\s+\S+.*"
-                title="მიუთითეთ სახელი და გვარი"
-                value={form.name}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^\p{L}\s'-]/gu, '');
-                  setForm((f) => ({ ...f, name: value }));
-                }}
-                placeholder="თქვენი სახელი და გვარი"
-                className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-              />
+          {/* Keep the checkout fields visible so the paused online-ordering state is unmistakable. */}
+          <form className="flex flex-col gap-5 p-6 rounded-xl bg-card border border-border">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                <Clock size={20} weight="duotone" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="font-semibold text-foreground">შეკვეთის გაფორმება</h2>
+                <p id="ordering-paused-message" className="mt-1 text-sm font-medium text-muted-foreground">
+                  დროებით შეჩერებულია
+                </p>
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="order-phone" className="block text-sm text-muted-foreground mb-1.5">
-                მობილურის ნომერი
-              </label>
-              <input
-                id="order-phone"
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                pattern="5[0-9]{8}"
-                required
-                minLength={9}
-                maxLength={9}
-                title="მიუთითეთ 9-ნიშნა მობილურის ნომერი, რომელიც იწყება 5-ით"
-                value={form.phone}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '');
-                  setForm((f) => ({ ...f, phone: value }));
-                }}
-                placeholder="5XX XXX XXX"
-                className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="order-address" className="block text-sm text-muted-foreground mb-1.5">
-                მისამართი
-              </label>
-              <textarea
-                id="order-address"
-                name="address"
-                autoComplete="street-address"
-                required
-                minLength={5}
-                maxLength={300}
-                rows={3}
-                value={form.address}
-                onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
-                placeholder="მიუთითეთ მიწოდების მისამართი"
-                className="w-full resize-y px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-              />
-            </div>
-
-            {error && (
-              <p className="text-destructive text-sm" role="alert">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={createOrder.isPending}
-              className="w-full py-3 bg-primary hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] text-primary-foreground font-semibold rounded-xl transition-all duration-200 cursor-pointer"
+            <fieldset
+              disabled
+              aria-describedby="ordering-paused-message"
+              className="flex min-w-0 flex-col gap-4"
             >
-              {createOrder.isPending ? 'იგზავნება...' : 'შეკვეთა'}
-            </button>
+              <div>
+                <label htmlFor="order-name" className="mb-1.5 block text-sm text-muted-foreground/70">
+                  სახელი და გვარი
+                </label>
+                <input
+                  id="order-name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="თქვენი სახელი და გვარი"
+                  className="w-full cursor-not-allowed rounded-lg border border-border/60 bg-muted/70 px-4 py-2.5 text-muted-foreground/60 placeholder:text-muted-foreground/45"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="order-phone" className="mb-1.5 block text-sm text-muted-foreground/70">
+                  მობილურის ნომერი
+                </label>
+                <input
+                  id="order-phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  placeholder="5XX XXX XXX"
+                  className="w-full cursor-not-allowed rounded-lg border border-border/60 bg-muted/70 px-4 py-2.5 text-muted-foreground/60 placeholder:text-muted-foreground/45"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="order-address" className="mb-1.5 block text-sm text-muted-foreground/70">
+                  მისამართი
+                </label>
+                <textarea
+                  id="order-address"
+                  name="address"
+                  autoComplete="street-address"
+                  rows={3}
+                  placeholder="მიუთითეთ მიწოდების მისამართი"
+                  className="w-full cursor-not-allowed resize-none rounded-lg border border-border/60 bg-muted/70 px-4 py-2.5 text-muted-foreground/60 placeholder:text-muted-foreground/45"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled
+                className="w-full cursor-not-allowed rounded-xl bg-muted py-3 font-semibold text-muted-foreground/60"
+              >
+                შეკვეთა
+              </button>
+            </fieldset>
+
+            <div className="border-t border-border pt-5">
+              <p className="text-sm text-muted-foreground">შესაკვეთად დაგვირეკეთ</p>
+              <a
+                href="tel:+995597470518"
+                aria-label="დარეკეთ ნომერზე 597 47 05 18"
+                className="mt-2 inline-flex items-center gap-2 text-xl font-bold tabular-nums text-primary transition-colors hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card active:scale-[0.98]"
+              >
+                <Phone size={22} weight="fill" aria-hidden="true" />
+                <span>597 47 05 18</span>
+              </a>
+            </div>
           </form>
         </div>
       </div>
