@@ -130,6 +130,18 @@ export default function CartPage(): React.ReactElement {
               </div>
             </div>
 
+            <div className="rounded-lg border border-primary/15 bg-primary/5 p-4">
+              <p className="text-sm text-muted-foreground">შესაკვეთად დაგვირეკეთ</p>
+              <a
+                href="tel:+995597470518"
+                aria-label="დარეკეთ ნომერზე 597 47 05 18"
+                className="mt-2 inline-flex items-center gap-2 text-xl font-bold tabular-nums text-primary transition-colors hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card active:scale-[0.98]"
+              >
+                <Phone size={22} weight="fill" aria-hidden="true" />
+                <span>597 47 05 18</span>
+              </a>
+            </div>
+
             <fieldset
               disabled
               aria-describedby="ordering-paused-message"
@@ -186,18 +198,6 @@ export default function CartPage(): React.ReactElement {
                 შეკვეთა
               </button>
             </fieldset>
-
-            <div className="border-t border-border pt-5">
-              <p className="text-sm text-muted-foreground">შესაკვეთად დაგვირეკეთ</p>
-              <a
-                href="tel:+995597470518"
-                aria-label="დარეკეთ ნომერზე 597 47 05 18"
-                className="mt-2 inline-flex items-center gap-2 text-xl font-bold tabular-nums text-primary transition-colors hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card active:scale-[0.98]"
-              >
-                <Phone size={22} weight="fill" aria-hidden="true" />
-                <span>597 47 05 18</span>
-              </a>
-            </div>
           </form>
         </div>
       </div>

@@ -38,7 +38,8 @@ describe('CartPage paused ordering state', () => {
     render(<CartPage />);
 
     expect(screen.getByText('დროებით შეჩერებულია')).toBeVisible();
-    expect(screen.getByLabelText('სახელი და გვარი')).toBeDisabled();
+    const nameInput = screen.getByLabelText('სახელი და გვარი');
+    expect(nameInput).toBeDisabled();
     expect(screen.getByLabelText('მობილურის ნომერი')).toBeDisabled();
     expect(screen.getByLabelText('მისამართი')).toBeDisabled();
     expect(screen.getByRole('button', { name: 'შეკვეთა' })).toBeDisabled();
@@ -46,5 +47,8 @@ describe('CartPage paused ordering state', () => {
     const callLink = screen.getByRole('link', { name: 'დარეკეთ ნომერზე 597 47 05 18' });
     expect(callLink).toHaveAttribute('href', 'tel:+995597470518');
     expect(callLink).toHaveTextContent('597 47 05 18');
+    expect(
+      callLink.compareDocumentPosition(nameInput) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });
