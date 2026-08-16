@@ -5,7 +5,6 @@
  */
 
 import { NotFoundError, BadRequestError } from '@shared/errors/errors.js';
-import { sendTelegramMessage, formatOrderMessage } from '@libs/telegram.js';
 import { ordersRepository } from './orders.repo.js';
 import type { OrderStatus } from '@prisma/client';
 import type { OrderResponse, OrderFilters } from './orders.types.js';
@@ -48,9 +47,6 @@ class OrdersService {
       total,
       items: input.items,
     });
-
-    // Fire-and-forget Telegram notification — never blocks the response
-    void sendTelegramMessage(formatOrderMessage(order));
 
     return order;
   }
