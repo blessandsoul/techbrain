@@ -54,7 +54,8 @@ FROM node:20-alpine AS production
 
 # dumb-init for proper signal handling. ImageMagick provides a CPU-portable
 # production image backend for hosts that cannot load Sharp's x64-v2/WASM builds.
-RUN apk add --no-cache dumb-init imagemagick imagemagick-webp
+# Alpine splits JPEG decoding and WebP encoding into separate modules.
+RUN apk add --no-cache dumb-init imagemagick imagemagick-jpeg imagemagick-webp
 
 ENV IMAGE_PROCESSOR=imagemagick
 
