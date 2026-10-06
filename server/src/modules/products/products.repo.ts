@@ -26,6 +26,9 @@ const productInclude = {
 
 type ProductWithRelations = Prisma.ProductGetPayload<{ include: typeof productInclude }>;
 
+/** Products that have a real price. Price 0 is the "price on request" marker (the client shows it as such). */
+const PRICED_ONLY = { price: { gt: 0 } } satisfies Prisma.ProductWhereInput;
+
 // ── DB → Response Mapper ────────────────────────────────
 
 function toProductResponse(p: ProductWithRelations): ProductResponse {
@@ -222,9 +225,10 @@ class ProductsRepository {
       ...(andConditions.length > 0 ? { AND: andConditions } : {}),
     };
 
-    // Get price range BEFORE applying price filter
+    // Get price range BEFORE applying price filter. Price 0 means "price on request" (not a real price), so it
+    // must not drag the filter's lower bound down to 0.
     const priceAgg = await prisma.product.aggregate({
-      where: baseWhere,
+      where: { AND: [baseWhere, PRICED_ONLY] },
       _min: { price: true },
       _max: { price: true },
     });
@@ -274,19 +278,65 @@ class ProductsRepository {
     const page = Math.min(params.page, totalPages);
     const offset = (page - 1) * params.limit;
 
-    const rows = await prisma.product.findMany({
-      where,
-      include: productInclude,
-      orderBy: this.buildOrderBy(params.sort, params.locale),
-      skip: offset,
-      take: params.limit,
-    });
+    const rows = params.sort === 'price-asc'
+      ? await this.findPricedBeforeOnRequest(where, offset, params.limit)
+      : await prisma.product.findMany({
+          where,
+          include: productInclude,
+          orderBy: this.buildOrderBy(params.sort, params.locale),
+          skip: offset,
+          take: params.limit,
+        });
 
     return {
       items: rows.map(toProductResponse),
       totalItems,
       priceRange,
     };
+  }
+
+  /**
+   * One page of the "cheapest first" list with price-on-request products (price 0) at the END.
+   *
+   * Sorting by `price asc` alone puts the 0-priced products first, so a visitor looking for the cheapest item
+   * would first see unpriced ones. Prisma cannot order by an expression (CASE WHEN price = 0), so the list is
+   * treated as two consecutive segments and paginated across them with the same offset/limit:
+   *   segment 1: priced products, in stock first then price ascending
+   *   segment 2: price-0 products, in stock first then newest
+   * `id` is the last tie-breaker in both: many products share a price, and without a unique final key MySQL may
+   * return overlapping or missing rows between pages.
+   * Invariant: `where` is the same filter used for the page's total count, so the two segments always add up to it.
+   */
+  private async findPricedBeforeOnRequest(
+    where: Prisma.ProductWhereInput,
+    offset: number,
+    limit: number,
+  ): Promise<ProductWithRelations[]> {
+    const pricedWhere: Prisma.ProductWhereInput = { AND: [where, PRICED_ONLY] };
+    const pricedCount = await prisma.product.count({ where: pricedWhere });
+
+    const rows: ProductWithRelations[] = [];
+    if (offset < pricedCount) {
+      rows.push(...await prisma.product.findMany({
+        where: pricedWhere,
+        include: productInclude,
+        orderBy: [{ inStock: 'desc' }, { price: 'asc' }, { id: 'asc' }],
+        skip: offset,
+        take: Math.min(limit, pricedCount - offset),
+      }));
+    }
+
+    const remaining = limit - rows.length;
+    if (remaining > 0) {
+      rows.push(...await prisma.product.findMany({
+        where: { AND: [where, { price: 0 }] },
+        include: productInclude,
+        orderBy: [{ inStock: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
+        skip: Math.max(0, offset - pricedCount), // how far into the price-0 segment this page starts
+        take: remaining,
+      }));
+    }
+    return rows;
   }
 
   // ── Spec Values for Filters ───────────────────────
@@ -392,8 +442,9 @@ class ProductsRepository {
       ...(andConditions.length > 0 ? { AND: andConditions } : {}),
     };
 
+    // Price-on-request products (price 0) are excluded: they are not a real price, and would force min to 0.
     const agg = await prisma.product.aggregate({
-      where,
+      where: { AND: [where, PRICED_ONLY] },
       _min: { price: true },
       _max: { price: true },
     });
