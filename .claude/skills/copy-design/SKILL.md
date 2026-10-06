@@ -35,7 +35,7 @@ This means:
 
 ### Adapt to our architecture (without changing visual)
 
-The copied code must follow our project's file structure, import conventions, and component patterns (see `.claude/rules/client/`). But **architecture adaptation NEVER changes the visual output**. It only affects where files live and how imports are organized — the rendered UI stays identical.
+The copied code must follow our project's file structure, import conventions, and component patterns (see `client/AGENTS.md`). But **architecture adaptation NEVER changes the visual output**. It only affects where files live and how imports are organized — the rendered UI stays identical.
 
 ### Install missing dependencies
 
