@@ -17,9 +17,14 @@ interface BoughtTogetherProps {
   relatedProducts: IProduct[];
 }
 
-export function BoughtTogether({ mainProduct, relatedProducts }: BoughtTogetherProps): React.ReactElement | null {
+export function BoughtTogether({ mainProduct, relatedProducts: suggestedProducts }: BoughtTogetherProps): React.ReactElement | null {
   const { t } = useLocale();
   const addItem = useCartStore((s) => s.addItem);
+
+  // A price of 0 means "price on request" (see ProductCard): such a product cannot be bought online, so it is not
+  // a bundle item. Offering it showed "0 ₾" rows and let "buy all" put unpriced items in the cart and in the total.
+  const relatedProducts = useMemo(() => suggestedProducts.filter((p) => p.price > 0), [suggestedProducts]);
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     () => new Set(relatedProducts.map((p) => p.id))
   );
@@ -68,7 +73,8 @@ export function BoughtTogether({ mainProduct, relatedProducts }: BoughtTogetherP
     setTimeout(() => setAdded(false), 1500);
   }, [addItem, mainProduct, selectedProducts]);
 
-  if (relatedProducts.length === 0) return null;
+  // No bundle for a price-on-request main product, or when nothing priced is left to bundle with it.
+  if (mainProduct.price === 0 || relatedProducts.length === 0) return null;
 
   return (
     <div className="rounded-xl border border-border bg-card">

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { X, MagnifyingGlass } from '@phosphor-icons/react';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useLocale } from '@/lib/i18n';
+import { useLocale, localizeSpecValue } from '@/lib/i18n';
 import type { FilterFieldConfig } from '../types/catalog.types';
 
 interface CatalogToolbarProps {
@@ -18,7 +18,7 @@ export function CatalogToolbar({
   filterConfigs,
   filterSlot,
 }: CatalogToolbarProps): React.ReactElement {
-  const { t, localized } = useLocale();
+  const { t, localized, locale } = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -68,7 +68,7 @@ export function CatalogToolbar({
       const values = raw.split(',').filter(Boolean);
       for (const v of values) {
         activeChips.push({
-          label: `${localized(config.label)}: ${v}`,
+          label: `${localized(config.label)}: ${localizeSpecValue(v, locale)}`, // `value` below stays the stored string
           paramKey: config.id,
           value: v,
         });

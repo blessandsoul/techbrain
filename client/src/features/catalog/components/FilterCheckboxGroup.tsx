@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { CaretDown } from '@phosphor-icons/react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useLocale, localizeSpecValue } from '@/lib/i18n';
 import type { SpecValueOption } from '../types/catalog.types';
 
 interface FilterCheckboxGroupProps {
@@ -22,6 +23,7 @@ export function FilterCheckboxGroup({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { locale } = useLocale();
 
   const currentRaw = searchParams.get(paramKey) ?? '';
   const selectedValues = currentRaw ? currentRaw.split(',').filter(Boolean) : [];
@@ -101,7 +103,8 @@ export function FilterCheckboxGroup({
                     onCheckedChange={() => toggleValue(opt.value)}
                     tabIndex={expanded ? 0 : -1}
                   />
-                  <span className="text-sm text-foreground flex-1 leading-tight">{opt.value}</span>
+                  {/* opt.value is what the URL, selection state and server filter use; only the label is localized. */}
+                  <span className="text-sm text-foreground flex-1 leading-tight">{localizeSpecValue(opt.value, locale)}</span>
                   <span className="text-xs text-muted-foreground tabular-nums">{opt.count}</span>
                 </label>
               );

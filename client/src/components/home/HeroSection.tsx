@@ -9,7 +9,7 @@ import { CategoryNavBar } from '@/components/common/CategoryNavBar';
 import { SafeImage } from '@/components/common/SafeImage';
 import { useFeaturedProducts, useCategoryCounts, getProductImageUrl } from '@/features/catalog/hooks/useCatalog';
 import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
-import { useLocale } from '@/lib/i18n';
+import { useLocale, localizeSpecValue } from '@/lib/i18n';
 
 import type { IProduct } from '@/features/catalog/types/catalog.types';
 
@@ -61,12 +61,13 @@ function CarouselD({ products, currentIndex, dir, onPrev, onNext, productName }:
 // ── Spec Tags ─────────────────────────────────────────────────────────────────
 
 function ProductSpecTagsD({ product, specKeyLocalized }: { product: IProduct; specKeyLocalized: (key: IProduct['specs'][number]['key']) => string }) {
+  const { locale } = useLocale();
   return (
     <AnimatePresence mode="popLayout" initial={false}>
       {product.specs.slice(0, 6).map((spec, i) => (
         <motion.span key={`${product.id}-${i}`} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.15, delay: i * 0.02, ease: 'easeOut' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-background/50 backdrop-blur-sm border-border/50">
           <span className="text-muted-foreground/60 text-[11px]">{specKeyLocalized(spec.key)}:</span>
-          <span className="font-semibold">{spec.value}</span>
+          <span className="font-semibold">{localizeSpecValue(spec.value, locale)}</span>
         </motion.span>
       ))}
     </AnimatePresence>

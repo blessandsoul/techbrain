@@ -8,7 +8,7 @@ import { ProductGallery } from '@/features/catalog/components/ProductGallery';
 import { ProductCTA } from '@/features/catalog/components/ProductCTA';
 import { BoughtTogether } from '@/features/catalog/components/BoughtTogether';
 import { PopularProductsSlider } from '@/features/catalog/components/PopularProductsSlider';
-import { useLocale } from '@/lib/i18n';
+import { useLocale, localizeSpecValue } from '@/lib/i18n';
 
 import DOMPurify from 'isomorphic-dompurify';
 import type { IProduct, IProductSpec, LocalizedString } from '@/features/catalog/types/catalog.types';
@@ -38,10 +38,11 @@ function ProductDetailSkeleton(): React.ReactElement {
 const SPECS_COLLAPSED_COUNT = 15;
 
 function SpecsTable({ specs }: { specs: IProductSpec[] }): React.ReactElement {
-  const { t, localized } = useLocale();
+  const { t, localized, locale } = useLocale();
   const [expanded, setExpanded] = useState(false);
 
-  // Group specs by key so multi-value specs show as one row
+  // Group specs by key so multi-value specs show as one row. Values stay as stored (Georgian vocabulary) here and
+  // are only localized for display below, because filters match on the stored string.
   const grouped: Array<{ key: LocalizedString; values: string[] }> = [];
   const keyMap = new Map<string, number>();
   for (const spec of specs) {
@@ -73,7 +74,7 @@ function SpecsTable({ specs }: { specs: IProductSpec[] }): React.ReactElement {
             }`}
           >
             <span className="text-sm text-muted-foreground">{localized(group.key)}</span>
-            <span className="text-sm font-medium text-foreground tabular-nums">{group.values.join(', ')}</span>
+            <span className="text-sm font-medium text-foreground tabular-nums">{group.values.map((value) => localizeSpecValue(value, locale)).join(', ')}</span>
           </div>
         ))}
       </div>
