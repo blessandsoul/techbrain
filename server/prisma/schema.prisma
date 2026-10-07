@@ -199,9 +199,12 @@ model Project {
   titleKa    String   @db.VarChar(500)
   titleRu    String   @default("") @db.VarChar(500)
   titleEn    String   @default("") @db.VarChar(500)
-  excerptKa  String   @default("") @db.Text
-  excerptRu  String   @default("") @db.Text
-  excerptEn  String   @default("") @db.Text
+  // The TEXT/LONGTEXT columns in this model and in the FAQ models have no @default on purpose: MySQL rejects a
+  // literal DEFAULT '' on them (only an expression default is allowed), so Prisma's generated migration fails.
+  // The server always passes these values explicitly (projects.repo.ts, articles.repo.ts).
+  excerptKa  String   @db.Text
+  excerptRu  String   @db.Text
+  excerptEn  String   @db.Text
   locationKa String   @db.VarChar(500)
   locationRu String   @default("") @db.VarChar(500)
   locationEn String   @default("") @db.VarChar(500)
@@ -209,7 +212,7 @@ model Project {
   cameras    Int      @default(0)
   image      String?  @db.VarChar(500)
   videoUrl   String?  @db.VarChar(500)
-  content    String   @default("") @db.LongText
+  content    String   @db.LongText
   year       String   @db.VarChar(10)
   isActive   Boolean  @default(true)
   sortOrder  Int      @default(0)
@@ -380,11 +383,11 @@ model ArticleFaq {
   id         String   @id @default(uuid())
   articleId  String
   questionKa String   @db.Text
-  questionRu String   @default("") @db.Text
-  questionEn String   @default("") @db.Text
+  questionRu String   @db.Text
+  questionEn String   @db.Text
   answerKa   String   @db.Text
-  answerRu   String   @default("") @db.Text
-  answerEn   String   @default("") @db.Text
+  answerRu   String   @db.Text
+  answerEn   String   @db.Text
   sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -399,11 +402,11 @@ model ProjectFaq {
   id         String   @id @default(uuid())
   projectId  String
   questionKa String   @db.Text
-  questionRu String   @default("") @db.Text
-  questionEn String   @default("") @db.Text
+  questionRu String   @db.Text
+  questionEn String   @db.Text
   answerKa   String   @db.Text
-  answerRu   String   @default("") @db.Text
-  answerEn   String   @default("") @db.Text
+  answerRu   String   @db.Text
+  answerEn   String   @db.Text
   sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

@@ -148,7 +148,11 @@ async function main(): Promise<void> {
 
   const existingCount = await prisma.project.count();
   if (existingCount === 0) {
-    await prisma.project.createMany({ data: projectsData });
+    // excerpt*/content have no schema default (see the note in schema.prisma), so the demo projects get explicit
+    // empty values instead of relying on a default.
+    await prisma.project.createMany({
+      data: projectsData.map((project) => ({ excerptKa: '', excerptRu: '', excerptEn: '', content: '', ...project })),
+    });
   }
 
   // eslint-disable-next-line no-console
