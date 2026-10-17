@@ -4,9 +4,11 @@ vi.mock('@libs/prisma.js', () => ({
   prisma: {
     product: { aggregate: vi.fn(), count: vi.fn(), findMany: vi.fn() },
     category: { findMany: vi.fn() },
+    $transaction: vi.fn(),
   },
 }));
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '@libs/prisma.js';
 
 import { productsRepository } from '../products.repo.js';
@@ -120,6 +122,96 @@ describe('ProductsRepository price handling', () => {
           orderBy: [{ inStock: 'desc' }, { price: 'asc' }, { id: 'asc' }],
         }));
       });
+    });
+  });
+});
+
+describe('ProductsRepository related products', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // relatedProducts has three states: never set (NULL/undefined) = automatic suggestions, `[]` = explicitly none,
+  // ids = a curated list. The admin can move a product between all three.
+  const productWith = (relatedProducts?: string[]): never =>
+    ({ id: 'main', categories: ['ip-cameras'], relatedProducts }) as never;
+
+  describe('findRelated', () => {
+    it('should return the curated products, active only, when the list has ids', async () => {
+      productMock.findMany.mockResolvedValue([row('a', 10), row('b', 20)]);
+
+      const result = await productsRepository.findRelated(productWith(['a', 'b']), 3);
+
+      expect(result.map((p) => p.id)).toEqual(['a', 'b']);
+      expect(productMock.findMany).toHaveBeenCalledTimes(1);
+      expect(productMock.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: { in: ['a', 'b'] }, isActive: true } }),
+      );
+    });
+
+    it('should never offer a product as its own bundle partner, even if its own id is in the stored list', async () => {
+      productMock.findMany.mockResolvedValue([row('a', 10)]);
+
+      await productsRepository.findRelated(productWith(['main', 'a']), 3);
+
+      expect(productMock.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: { in: ['a'] }, isActive: true } }),
+      );
+    });
+
+    it('should return nothing, without querying, when the list was explicitly emptied', async () => {
+      const result = await productsRepository.findRelated(productWith([]), 3);
+
+      expect(result).toEqual([]);
+      expect(productMock.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should fall back to category-based suggestions when the list was never set', async () => {
+      productMock.findMany.mockResolvedValue([row('auto-1', 5)]);
+
+      const result = await productsRepository.findRelated(productWith(undefined), 3);
+
+      expect(result.map((p) => p.id)).toEqual(['auto-1']);
+      expect(productMock.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ take: 3, where: expect.objectContaining({ id: { not: 'main' }, isActive: true }) }),
+      );
+    });
+  });
+
+  describe('update: relatedProducts', () => {
+    /** Runs update() against a fake transaction and returns the data passed to product.update. */
+    async function updatedData(data: { relatedProducts?: string[] | null }): Promise<Record<string, unknown>> {
+      const tx = {
+        productCategory: { deleteMany: vi.fn(), createMany: vi.fn() },
+        productSpec: { deleteMany: vi.fn(), createMany: vi.fn() },
+        product: { update: vi.fn().mockResolvedValue(row('main', 10)) },
+      };
+      (prisma.$transaction as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+        async (callback: (client: typeof tx) => unknown) => callback(tx),
+      );
+
+      await productsRepository.update('main', data);
+
+      return tx.product.update.mock.calls[0][0].data as Record<string, unknown>;
+    }
+
+    it('should store an emptied list as [] so the product shows no bundle', async () => {
+      const data = await updatedData({ relatedProducts: [] });
+
+      expect(data.relatedProducts).toEqual([]);
+    });
+
+    it('should store null as a database NULL so the product goes back to automatic suggestions', async () => {
+      const data = await updatedData({ relatedProducts: null });
+
+      // A plain JS null is rejected by Prisma for a Json column; DbNull is the required marker.
+      expect(data.relatedProducts).toBe(Prisma.DbNull);
+    });
+
+    it('should leave the stored list untouched when the field is not sent', async () => {
+      const data = await updatedData({});
+
+      expect(data).not.toHaveProperty('relatedProducts');
     });
   });
 });

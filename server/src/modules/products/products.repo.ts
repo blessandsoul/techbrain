@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '@libs/prisma.js';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client'; // a value import: Prisma.DbNull is needed at runtime (see update())
 import type {
   ProductResponse,
   SpecValueOption,
@@ -506,17 +506,27 @@ class ProductsRepository {
 
   // ── Related Products ──────────────────────────────
 
+  /**
+   * Products shown in the "bought together" box. `product.relatedProducts` has three states, and the admin can
+   * move a product between them:
+   *   - never set (undefined; NULL in the database): automatic suggestions from related categories
+   *   - `[]`: the admin cleared the list on purpose, so the product has NO bundle
+   *   - ids: a curated list (inactive products are skipped)
+   */
   async findRelated(product: ProductResponse, limit: number): Promise<ProductResponse[]> {
-    // If explicit related products set, use those
     if (product.relatedProducts && product.relatedProducts.length > 0) {
       const rows = await prisma.product.findMany({
-        where: { id: { in: product.relatedProducts }, isActive: true },
+        // A product is never its own bundle partner, whatever the stored list says (the API accepts any ids).
+        where: { id: { in: product.relatedProducts.filter((id) => id !== product.id) }, isActive: true },
         include: productInclude,
       });
       return rows.map(toProductResponse);
     }
 
-    // Fallback: find products from related categories
+    // An explicitly emptied list is a decision, not "unset": do not refill it with automatic suggestions.
+    if (product.relatedProducts) return [];
+
+    // Fallback (never set): find products from related categories
     const primaryCategory = product.categories[0];
     if (!primaryCategory) return [];
     const relatedCats = RELATED_CATEGORIES[primaryCategory] ?? [];
@@ -721,7 +731,11 @@ class ProductsRepository {
       if (updateFields.descriptionRu !== undefined) updateData.descriptionRu = updateFields.descriptionRu;
       if (updateFields.descriptionEn !== undefined) updateData.descriptionEn = updateFields.descriptionEn;
       if (updateFields.content !== undefined) updateData.content = updateFields.content;
-      if (updateFields.relatedProducts !== undefined) updateData.relatedProducts = updateFields.relatedProducts;
+      // relatedProducts: omitted = leave as is; ids or [] = store as given ([] means "no bundle"); null = back to
+      // automatic suggestions. Prisma rejects a plain null for a Json column, so null is written as DbNull.
+      if (updateFields.relatedProducts !== undefined) {
+        updateData.relatedProducts = updateFields.relatedProducts === null ? Prisma.DbNull : updateFields.relatedProducts;
+      }
 
       return tx.product.update({
         where: { id },

@@ -544,7 +544,7 @@
                   "host": ["{{baseUrl}}"],
                   "path": ["products", "{{productSlug}}", "related"]
                 },
-                "description": "Get related products for a given product. Uses explicit relatedProducts IDs or falls back to same-category products."
+                "description": "Get the 'bought together' products for a product. relatedProducts has three states: never set (NULL) = automatic suggestions from related categories (max 3); [] = the admin emptied the list on purpose, so the result is empty and the shop shows no bundle box; product ids = that curated list (active products only; a product is never listed as its own partner)."
               },
               "response": []
             }
@@ -649,7 +649,7 @@
                   "host": ["{{baseUrl}}"],
                   "path": ["products"]
                 },
-                "description": "Create a new product. Requires ADMIN role."
+                "description": "Create a new product. Requires ADMIN role. relatedProducts ('bought together') is optional: omit it for automatic suggestions, send product ids for a curated list, or [] for no bundle box (null is rejected on create)."
               },
               "event": [
                 {
@@ -689,7 +689,7 @@
                   "host": ["{{baseUrl}}"],
                   "path": ["products", "{{productId}}"]
                 },
-                "description": "Update an existing product by ID. All fields are optional. Requires ADMIN role."
+                "description": "Update an existing product by ID. All fields are optional. Requires ADMIN role. relatedProducts ('bought together'): omit it to leave the list unchanged; send an array of product ids to curate it; send [] to show no bundle box; send null to go back to automatic suggestions."
               },
               "response": []
             },
@@ -745,7 +745,7 @@
                     { "key": "search", "value": "", "disabled": true },
                     { "key": "category", "value": "", "disabled": true },
                     { "key": "isActive", "value": "true", "disabled": true },
-                    { "key": "ids", "value": "{{productId}}", "disabled": true, "description": "Comma-separated product IDs. When set, returns only those products (used by admin Related Products picker to hydrate saved selections regardless of category/pagination)." }
+                    { "key": "ids", "value": "{{productId}}", "disabled": true, "description": "Comma-separated product IDs. When set, returns only those products (used by the admin Related Products picker to hydrate saved selections regardless of category/pagination, and by the product edit page to load one product by id however many products exist)." }
                   ]
                 },
                 "description": "Get paginated list of all products (active and inactive) with optional filters. Pass `ids=id1,id2` to fetch a specific set of products by ID (bypasses pagination order). Requires ADMIN role."
