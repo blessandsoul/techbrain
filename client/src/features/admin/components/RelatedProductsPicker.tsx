@@ -11,7 +11,15 @@ interface RelatedProductsPickerProps {
   selectedCategorySlugs: string[];
   selectedIds: string[];
   currentProductId?: string;
+  /**
+   * True while the product has never had a curated list, so the shop shows automatic category suggestions.
+   * False once the admin curated it, even if the list is now empty (that means "no bundle box").
+   */
+  auto: boolean;
+  /** Called on every add or remove with the new list. */
   onChange: (ids: string[]) => void;
+  /** Return a curated or emptied list to the automatic suggestions. */
+  onUseAutomatic: () => void;
 }
 
 const categoryLabel: Record<string, string> = {
@@ -33,7 +41,9 @@ export function RelatedProductsPicker({
   selectedCategorySlugs,
   selectedIds,
   currentProductId,
+  auto,
   onChange,
+  onUseAutomatic,
 }: RelatedProductsPickerProps): React.ReactElement {
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
@@ -167,7 +177,7 @@ export function RelatedProductsPicker({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemove(id)}
-                className="text-muted-foreground hover:text-destructive shrink-0 w-6 h-6"
+                className="text-muted-foreground hover:text-destructive shrink-0 w-11 h-11 -my-2 -mr-2" /* 44px target; negative margins keep the row compact */
                 aria-label={`წაშლა: ${id}`}
               >
                 <svg
@@ -197,7 +207,7 @@ export function RelatedProductsPicker({
                 <img
                   src={getProductImageUrl(p.images[0])}
                   alt=""
-                  className="w-7 h-7 rounded object-cover shrink-0"
+                  className="w-7 h-7 rounded object-contain bg-muted shrink-0"
                 />
               )}
               <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
@@ -212,7 +222,7 @@ export function RelatedProductsPicker({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemove(p.id)}
-                className="text-muted-foreground hover:text-destructive shrink-0 w-6 h-6"
+                className="text-muted-foreground hover:text-destructive shrink-0 w-11 h-11 -my-2 -mr-2" /* 44px target; negative margins keep the row compact */
                 aria-label={`წაშლა: ${p.name.ka}`}
               >
                 <svg
@@ -270,7 +280,7 @@ export function RelatedProductsPicker({
                       <img
                         src={getProductImageUrl(p.images[0])}
                         alt=""
-                        className="w-7 h-7 rounded object-cover shrink-0"
+                        className="w-7 h-7 rounded object-contain bg-muted shrink-0"
                       />
                     )}
                     <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
@@ -288,10 +298,22 @@ export function RelatedProductsPicker({
         )}
       </div>
 
-      {selectedIds.length === 0 && (
+      {/* Empty list, two meanings: never curated (automatic suggestions) vs. emptied on purpose (no bundle box). */}
+      {selectedIds.length === 0 && auto && (
         <p className="text-xs text-muted-foreground mt-1.5">
           ცარიელის შემთხვევაში ავტომატურად შეირჩევა მსგავსი კატეგორიიდან.
         </p>
+      )}
+      {selectedIds.length === 0 && !auto && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="text-xs text-muted-foreground">
+            სია ცარიელია — ამ პროდუქტზე „ერთად შეძენა“ არ გამოჩნდება.
+          </p>
+          {/* h-11: a 44px touch target, like every other action on a client screen */}
+          <Button type="button" variant="link" size="sm" onClick={onUseAutomatic} className="h-11 px-2 text-xs">
+            ავტომატური შერჩევის დაბრუნება
+          </Button>
+        </div>
       )}
     </div>
   );

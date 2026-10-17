@@ -10,7 +10,9 @@ import { useAdminProducts } from '@/features/admin/hooks/useAdminProducts';
 
 function EditProductContent({ productId }: { productId: string }): React.ReactElement {
   const router = useRouter();
-  const { data, isLoading } = useAdminProducts({ limit: 100 });
+  // Fetch this one product by id. The admin list is paged (max 100, newest first), so searching a list for the
+  // product made every product beyond the newest 100 show "not found" and become impossible to edit.
+  const { data, isLoading } = useAdminProducts({ ids: [productId], limit: 1 });
   const product = (data?.items ?? []).find((p) => p.id === productId);
 
   if (isLoading) {

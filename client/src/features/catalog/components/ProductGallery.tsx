@@ -64,7 +64,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
             src={imgSrc}
             alt={productName}
             priority
-            className="object-cover"
+            className="object-contain" // whole photo, never cropped: product photos come in many aspect ratios
             sizes="(max-width: 1024px) 100vw, 50vw"
           />
 
@@ -110,7 +110,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
                   key={img}
                   type="button"
                   onClick={() => setSelected(i)}
-                  className={`relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-150 cursor-pointer ${
+                  className={`relative shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-muted border-2 transition-all duration-150 cursor-pointer ${
                     i === selected
                       ? 'border-primary ring-1 ring-primary/30'
                       : 'border-border hover:border-muted-foreground/40'
@@ -120,7 +120,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps): Re
                   <SafeImage
                     src={thumbSrc}
                     alt=""
-                    className="object-cover"
+                    className="object-contain"
                     sizes="64px"
                   />
                 </button>

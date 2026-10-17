@@ -3,9 +3,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { catalogKeys } from '@/features/catalog/hooks/useCatalog';
 import { getErrorMessage } from '@/lib/utils/error';
 import { adminProductService } from '../services/admin-product.service';
 
+import type { QueryClient } from '@tanstack/react-query';
 import type { AdminProductFilters, CreateProductInput, UpdateProductInput, ICategory } from '../types/admin.types';
 
 /**
@@ -44,6 +46,15 @@ export const adminProductKeys = {
   specSuggestions: () => [...adminProductKeys.all, 'spec-suggestions'] as const,
   dashboardStats: () => ['admin-dashboard-stats'] as const,
 };
+
+/**
+ * Admin edits change what the shop shows (lists, product pages, bundles). The shop caches its data for minutes
+ * (React Query staleTime), so after an admin save, going back to the shop in the same tab would show the OLD
+ * data and an edit could look like it did not work. Refresh the shop's cache whenever products change.
+ */
+function invalidateShop(queryClient: QueryClient): void {
+  void queryClient.invalidateQueries({ queryKey: catalogKeys.all });
+}
 
 // ── Queries ──────────────────────────────────────────
 
@@ -123,6 +134,7 @@ export function useCreateProduct() {
     onSuccess: () => {
       toast.success('პროდუქტი შეიქმნა');
       queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
+      invalidateShop(queryClient);
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));
@@ -139,6 +151,7 @@ export function useUpdateProduct() {
     onSuccess: () => {
       toast.success('პროდუქტი განახლდა');
       queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
+      invalidateShop(queryClient);
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));
@@ -152,6 +165,7 @@ export function useToggleProduct() {
     mutationFn: (id: string) => adminProductService.toggleActive(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
+      invalidateShop(queryClient);
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));
@@ -166,6 +180,7 @@ export function useDeleteProduct() {
     onSuccess: () => {
       toast.success('პროდუქტი წაიშალა');
       queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
+      invalidateShop(queryClient);
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));
@@ -181,6 +196,7 @@ export function useBatchToggle() {
     onSuccess: (_, { isActive }) => {
       toast.success(isActive ? 'პროდუქტები გააქტიურდა' : 'პროდუქტები დაიმალა');
       queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
+      invalidateShop(queryClient);
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));
@@ -195,6 +211,7 @@ export function useBatchDelete() {
     onSuccess: () => {
       toast.success('პროდუქტები წაიშალა');
       queryClient.invalidateQueries({ queryKey: adminProductKeys.all });
+      invalidateShop(queryClient);
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));

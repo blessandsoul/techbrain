@@ -366,7 +366,7 @@ function ProductRow({ product, isSelected, onToggleSelect, onToggleActive, isTog
             <img
               src={getProductImageUrl(product.images[0])}
               alt={product.name.ka}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

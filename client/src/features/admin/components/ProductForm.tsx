@@ -14,6 +14,7 @@ import { RichTextEditor } from './RichTextEditor';
 import { ROUTES } from '@/lib/constants/routes';
 import { useAdminCategories, useCreateProduct, useUpdateProduct } from '../hooks/useAdminProducts';
 import { useAdminCatalogConfig, useUpdateCatalogConfig } from '../hooks/useCatalogConfig';
+import { buildRelatedProductsPayload } from '../utils/related-products';
 import type { IProduct, FilterFieldConfig, CatalogConfigResponse } from '@/features/catalog/types/catalog.types';
 import type { ICategory, CreateProductInput, UpdateProductInput } from '../types/admin.types';
 
@@ -62,6 +63,11 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
   const [inStockChecked, setInStockChecked] = useState<boolean>(product?.inStock ?? true);
   const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<string[]>(product?.categories ?? []);
   const [relatedIds, setRelatedIds] = useState<string[]>(product?.relatedProducts ?? []);
+  // "Bought together" is automatic until the admin touches the list. The API omits relatedProducts for an automatic
+  // product and returns [] for one the admin emptied on purpose, so `undefined` is the only automatic state.
+  const [relatedAuto, setRelatedAuto] = useState<boolean>(product?.relatedProducts === undefined);
+  // The list is only sent on save if the admin touched it, so a stale form cannot overwrite another session's change.
+  const [relatedTouched, setRelatedTouched] = useState(false);
   const [nameKa, setNameKa] = useState(product?.name.ka ?? '');
   const [descriptionKa, setDescriptionKa] = useState(product?.description?.ka ?? '');
   const [price, setPrice] = useState(String(product?.price ?? 0));
@@ -212,6 +218,12 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
           })),
       ];
 
+      // undefined = leave as is, null = back to automatic (update only), array incl. [] = store that list.
+      const relatedPayload = buildRelatedProductsPayload(
+        { ids: relatedIds, auto: relatedAuto, touched: relatedTouched },
+        product?.relatedProducts,
+      );
+
       const input: CreateProductInput = {
         categoryIds,
         price: parsedPrice,
@@ -223,11 +235,11 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
         name: { ka: nameKa, ru: '', en: '' },
         description: descriptionKa ? { ka: descriptionKa } : undefined,
         specs,
-        relatedProducts: relatedIds.length > 0 ? relatedIds : undefined,
+        relatedProducts: relatedPayload ?? undefined, // null can only occur on update, where it is set below
       };
 
       if (isEditMode) {
-        const updateInput: UpdateProductInput = { ...input };
+        const updateInput: UpdateProductInput = { ...input, relatedProducts: relatedPayload };
         await updateMutation.mutateAsync({ id: product.id, data: updateInput });
       } else {
         await createMutation.mutateAsync(input);
@@ -397,7 +409,18 @@ export function ProductForm({ product }: ProductFormProps): React.ReactElement {
             selectedCategorySlugs={selectedCategorySlugs}
             selectedIds={relatedIds}
             currentProductId={product?.id}
-            onChange={setRelatedIds}
+            auto={relatedAuto}
+            onChange={(ids) => {
+              // Any add or remove is the admin curating the list, even if it ends up empty ("no bundle").
+              setRelatedIds(ids);
+              setRelatedAuto(false);
+              setRelatedTouched(true);
+            }}
+            onUseAutomatic={() => {
+              setRelatedIds([]);
+              setRelatedAuto(true);
+              setRelatedTouched(true);
+            }}
           />
         </div>
 

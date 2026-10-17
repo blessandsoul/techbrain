@@ -59,7 +59,7 @@ export function ImageManager({ images, setImages }: ImageManagerProps): React.Re
       <div className="flex flex-wrap gap-2">
         {images.map((img, idx) => (
           <div key={img} className="relative w-16 h-16 rounded-lg overflow-hidden bg-muted group">
-            <Image src={resolveImageSrc(img)} alt="" fill className="object-cover" unoptimized />
+            <Image src={resolveImageSrc(img)} alt="" fill className="object-contain" unoptimized />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-end justify-center gap-0.5 pb-0.5 opacity-0 group-hover:opacity-100">
               {idx > 0 && (
                 <button

@@ -5,10 +5,24 @@ import { describe, expect, it, vi } from 'vitest';
 import { ProductGallery } from '../ProductGallery';
 
 vi.mock('@/components/common/SafeImage', () => ({
-  SafeImage: ({ src, alt }: { src: string; alt: string }) => (
-    <span role="img" aria-label={alt} data-src={src} />
+  SafeImage: ({ src, alt, className }: { src: string; alt: string; className?: string }) => (
+    <span role="img" aria-label={alt} data-src={src} className={className} />
   ),
 }));
+
+describe('ProductGallery image fit', () => {
+  it('shows the whole photo (contain), never cropped, in the main image and in every thumbnail', () => {
+    const { container } = render(<ProductGallery images={['wide.jpg', 'tall.jpg']} productName="Recorder" />);
+
+    const photos = container.querySelectorAll('[data-src]');
+
+    expect(photos).toHaveLength(3); // the main image plus one thumbnail per image
+    photos.forEach((photo) => {
+      expect(photo).toHaveClass('object-contain');
+      expect(photo).not.toHaveClass('object-cover');
+    });
+  });
+});
 
 describe('ProductGallery lightbox', () => {
   it('shows compact high-contrast previous and next controls above the image', async () => {

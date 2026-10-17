@@ -54,7 +54,7 @@ export default function CartPage(): React.ReactElement {
                         fill={false}
                         width={80}
                         height={80}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         sizes="80px"
                       />
                     ) : (

@@ -183,7 +183,7 @@ export default function OrderDetailPage(): React.ReactElement {
                     <img
                       src={getProductImageUrl(item.productImage)}
                       alt={item.productName}
-                      className="w-10 h-10 rounded-lg object-cover shrink-0"
+                      className="w-10 h-10 rounded-lg object-contain bg-muted shrink-0"
                     />
                   ) : (
                     <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
