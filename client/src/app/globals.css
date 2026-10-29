@@ -65,6 +65,9 @@
 }
 
 :root {
+  /* aiNOW artwork keeps its brand colors across storefront themes. */
+  --ainow-ai-gradient: linear-gradient(130deg, #2f6bff 0%, #8b3dff 45%, #e040fb 100%);
+  --ainow-stripes: linear-gradient(#ec4899, #ec4899), linear-gradient(#2563eb, #2563eb), linear-gradient(#10b981, #10b981);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

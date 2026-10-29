@@ -3,6 +3,7 @@
 import { formatPhone, getWhatsAppUrl } from '@/lib/utils/format';
 import { usePublicSiteSettings } from '@/hooks/useSiteSettings';
 import { useLocale } from '@/lib/i18n';
+import { AiNowCredit } from '@/components/common/AiNowCredit';
 
 const socialIconClass = 'w-9 h-9 flex items-center justify-center rounded-lg border border-border/60 text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 cursor-pointer';
 
@@ -14,69 +15,77 @@ export const Footer = (): React.ReactElement => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/60 bg-surface mt-auto pb-14 md:pb-0">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl py-6">
-        {/* Mobile: social → phone → copyright. Desktop: social | copyright | phone. */}
-        <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
-          <div className="order-1 flex items-center gap-3">
-            {social.facebook && (
-              <a
-                href={social.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className={socialIconClass}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                </svg>
-              </a>
-            )}
-            {social.instagram && (
-              <a
-                href={social.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className={socialIconClass}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-                </svg>
-              </a>
-            )}
-            {social.tiktok && (
-              <a
-                href={social.tiktok}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-                className={socialIconClass}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.28 8.28 0 0 0 4.76 1.5V6.8a4.83 4.83 0 0 1-1-.11z"/>
-                </svg>
-              </a>
-            )}
+    <footer className="border-t border-border/60 bg-surface mt-auto">
+      {/* MainLayout already reserves room for the fixed mobile contact bar. */}
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl pt-4 pb-2 md:py-4">
+        {/* Equal desktop side columns keep aiNOW at the actual footer center.
+            On mobile, contents lets social → phone → copyright → credit share one left edge. */}
+        <div className="flex flex-col items-start gap-2 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:gap-4">
+          <div className="contents md:order-1 md:flex md:flex-wrap md:items-center md:gap-x-3 md:gap-y-2">
+            <div className="order-1 flex items-center gap-3">
+              {social.facebook && (
+                <a
+                  href={social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className={socialIconClass}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                  </svg>
+                </a>
+              )}
+              {social.instagram && (
+                <a
+                  href={social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className={socialIconClass}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                  </svg>
+                </a>
+              )}
+              {social.tiktok && (
+                <a
+                  href={social.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className={socialIconClass}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.28 8.28 0 0 0 4.76 1.5V6.8a4.83 4.83 0 0 1-1-.11z"/>
+                  </svg>
+                </a>
+              )}
+            </div>
+
+            <p className="order-3 text-xs text-subtle md:order-2">&copy; {year} {companyName}. {t('footer.rights')}</p>
           </div>
 
-          <p className="order-3 text-sm text-subtle whitespace-nowrap md:order-2">&copy; {year} {companyName}. {t('footer.rights')}</p>
+          <div className="order-4 md:order-2 md:justify-self-center">
+            <AiNowCredit />
+          </div>
 
           {phone ? (
             <a
               href={getWhatsAppUrl(phone)}
               target="_blank"
               rel="noopener noreferrer"
-              className="order-2 inline-flex max-w-full shrink-0 items-center gap-2 text-primary hover:text-primary-hover transition-colors duration-200 cursor-pointer group md:order-3 md:ml-auto"
+              className="order-2 inline-flex max-w-full shrink-0 items-center gap-2 text-primary hover:text-primary-hover transition-colors duration-200 cursor-pointer group md:order-3 md:justify-self-end"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
               </svg>
               <span className="font-noto font-bold text-lg tabular-nums tracking-wide group-hover:underline">{formatPhone(phone)}</span>
             </a>
-          ) : <div />}
+          ) : null}
         </div>
       </div>
     </footer>

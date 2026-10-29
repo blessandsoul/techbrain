@@ -25,12 +25,14 @@ describe('Footer', () => {
 
     const copyright = screen.getByText(/TechBrain\. All rights reserved\./);
     const phone = screen.getByRole('link', { name: '597 47 05 18' });
-    const row = copyright.parentElement;
+    const details = copyright.parentElement;
+    const row = details?.parentElement;
     const socialLinks = screen.getByRole('link', { name: 'Facebook' }).parentElement;
 
-    expect(row).toHaveClass('flex-col', 'items-start', 'md:flex-row');
+    expect(row).toHaveClass('flex-col', 'items-start', 'md:grid');
+    expect(details).toHaveClass('contents', 'md:flex');
     expect(socialLinks).toHaveClass('order-1');
-    expect(phone).toHaveClass('order-2', 'max-w-full', 'shrink-0', 'md:order-3', 'md:ml-auto');
+    expect(phone).toHaveClass('order-2', 'max-w-full', 'shrink-0', 'md:order-3', 'md:justify-self-end');
     expect(phone).not.toHaveClass('ml-auto');
     expect(copyright).toHaveClass('order-3', 'md:order-2');
   });
