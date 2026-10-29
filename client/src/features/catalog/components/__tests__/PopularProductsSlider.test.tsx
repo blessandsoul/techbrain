@@ -13,14 +13,23 @@ vi.mock('@/components/common/SafeImage', () => ({
 
 describe('PopularProductsSlider', () => {
   it('keeps horizontal scrolling while hiding the native scrollbar', () => {
-    const product = {
+    const product: IProduct = {
       id: 'camera',
       slug: 'camera',
       categories: ['cameras'],
       name: { ka: 'Camera', ru: '', en: '' },
+      description: { ka: '', ru: '', en: '' },
       images: [],
       price: 450,
-    } as IProduct;
+      discount: null,
+      currency: 'GEL',
+      isActive: true,
+      isFeatured: false,
+      inStock: true,
+      videoUrl: null,
+      specs: [],
+      createdAt: '2026-01-01T00:00:00.000Z',
+    };
 
     render(
       <PopularProductsSlider
