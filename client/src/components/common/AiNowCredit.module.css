@@ -68,8 +68,20 @@
 .credit:is(:hover, :focus-visible) .mark i { transform: scaleY(1.25); }
 .credit:focus-visible { outline: 2px solid var(--ainow-credit-blue); outline-offset: 4px; }
 @keyframes ainow-credit-shine { to { transform: translateX(130%); } }
+@keyframes ainow-credit-touch-shine {
+  0% { transform: translateX(-130%); }
+  17%, 100% { transform: translateX(130%); }
+}
+/* Touch cannot hover. Repeat the 850ms sweep with a pause so it still appears
+ * when this below-the-fold badge scrolls into view later. */
+@media (hover: none) and (pointer: coarse) {
+  .credit.credit { border-color: var(--ainow-credit-hover-line); box-shadow: var(--ainow-credit-hover-shadow); transform: translateY(-1px); }
+  .credit.credit::before { animation: ainow-credit-touch-shine 5s ease infinite; }
+  .credit.credit .arrow { transform: translate(1px, -1px); }
+  .credit.credit .mark i { transform: scaleY(1.25); }
+}
 @media (prefers-reduced-motion: reduce) {
   .credit, .credit * { transition: none !important; }
   .credit::before { animation: none !important; }
-  .credit:is(:hover, :focus-visible), .credit:is(:hover, :focus-visible) .arrow, .credit:is(:hover, :focus-visible) .mark i { transform: none; }
+  .credit.credit, .credit.credit .arrow, .credit.credit .mark i { transform: none; }
 }
