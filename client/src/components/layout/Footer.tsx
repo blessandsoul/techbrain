@@ -70,7 +70,7 @@ export const Footer = (): React.ReactElement => {
           </div>
 
           <div className="order-4 md:order-2 md:justify-self-center">
-            <AiNowCredit />
+            <AiNowCredit theme="auto" />
           </div>
 
           {phone ? (

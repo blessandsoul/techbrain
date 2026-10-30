@@ -65,9 +65,23 @@
 }
 
 :root {
-  /* aiNOW artwork keeps its brand colors across storefront themes. */
-  --ainow-ai-gradient: linear-gradient(130deg, #2f6bff 0%, #8b3dff 45%, #e040fb 100%);
-  --ainow-stripes: linear-gradient(#ec4899, #ec4899), linear-gradient(#2563eb, #2563eb), linear-gradient(#10b981, #10b981);
+  /* Approved aiNOW badge colors; select the variant from the footer background. */
+  --ainow-credit-light-ink: #17212c;
+  --ainow-credit-light-muted: #53616e;
+  --ainow-credit-light-surface: #fff;
+  --ainow-credit-light-line: #dce2e7;
+  --ainow-credit-dark-ink: #f4f7fa;
+  --ainow-credit-dark-muted: #b2beca;
+  --ainow-credit-dark-surface: #161d25;
+  --ainow-credit-dark-line: #35414e;
+  --ainow-credit-pink: #ec4899;
+  --ainow-credit-blue: #2563eb;
+  --ainow-credit-green: #10b981;
+  --ainow-credit-hover-line: #7d8e9e;
+  --ainow-credit-shadow: 0 2px 3px #00000003, 0 5px 16px #00000004;
+  --ainow-credit-hover-shadow: 0 4px 20px #2563eb12;
+  --ainow-credit-shine: linear-gradient(110deg, transparent 15%, #ec489917 40%, #2563eb17 50%, #10b98117 60%, transparent 85%);
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

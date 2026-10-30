@@ -1,55 +1,75 @@
-.credit {
+/* Supplied powered-by badge. Explicit themes follow the footer, not OS preferences.
+ * Keep the 44px touch target and reduced-motion/focus behavior when restyling. */
+.credit.credit {
+  --an-ink: var(--ainow-credit-light-ink);
+  --an-muted: var(--ainow-credit-light-muted);
+  --an-surface: var(--ainow-credit-light-surface);
+  --an-line: var(--ainow-credit-light-line);
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
-  min-width: 44px;
-  min-height: 44px;
   align-items: center;
-  justify-content: center;
-  padding: 0;
-  border-radius: 6px;
-  color: inherit;
+  gap: 9px;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 9px 14px;
+  overflow: hidden;
+  border: 1px solid var(--an-line);
+  border-radius: 999px;
+  background: var(--an-surface);
+  color: var(--an-ink);
+  font: 400 11px/1.3 Arial, Helvetica, sans-serif;
   text-decoration: none;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+  vertical-align: middle;
+  box-shadow: var(--ainow-credit-shadow);
+  transition: border-color .25s, box-shadow .25s, transform .25s;
+  -webkit-tap-highlight-color: transparent;
 }
-
-.credit:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 4px;
+.credit[data-theme="dark"],
+:global(.dark) .credit[data-theme="auto"] {
+  --an-ink: var(--ainow-credit-dark-ink);
+  --an-muted: var(--ainow-credit-dark-muted);
+  --an-surface: var(--ainow-credit-dark-surface);
+  --an-line: var(--ainow-credit-dark-line);
 }
-
-.wordmark {
-  display: inline-flex;
-  align-items: baseline;
-  font-size: 20px;
-  line-height: 0.92;
+.credit::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(--ainow-credit-shine);
+  transform: translateX(-130%);
+  pointer-events: none;
 }
-
-.ai {
-  background: var(--ainow-ai-gradient);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  font-family: 'Courier New', monospace;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+.label { color: var(--an-muted); }
+.brand { font-size: 15px; font-weight: 750; letter-spacing: -.65px; }
+.domain { color: var(--an-muted); font-weight: 400; letter-spacing: -.4px; }
+.mark { display: inline-flex; gap: 2px; margin: 0 2px 0 0; transform: skewX(-15deg); }
+.mark i { display: block; width: 3px; height: 12px; border-radius: 1px; background: var(--ainow-credit-pink); transition: transform .35s; }
+.mark i:nth-child(2) { background: var(--ainow-credit-blue); transition-delay: .04s; }
+.mark i:nth-child(3) { background: var(--ainow-credit-green); transition-delay: .08s; }
+.arrow { color: var(--an-muted); font-size: 14px; margin-left: 1px; transition: transform .25s; }
+/* Preserve badge contrast against legacy footer-wide link color selectors. */
+:global(:root) .credit.credit { color: var(--an-ink); }
+/* Locale-wide font resets use !important on every descendant. Keep this Latin
+ * brand's Arial pairing and weights independent without changing site typography. */
+:global(:root) .credit.credit,
+:global(:root) .credit.credit * {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 400 !important;
 }
-
-/* Inherit the footer's text color so NOW remains legible on either theme. */
-.now {
-  margin-left: 0.04em;
-  font-family: Arial, sans-serif;
-  font-weight: 900;
-  letter-spacing: -0.05em;
-}
-
-.stripes {
-  align-self: flex-start;
-  width: 0.46em;
-  height: 0.4em;
-  margin-top: 0.18em;
-  margin-left: 0.12em;
-  transform: skewX(-15deg);
-  background-image: var(--ainow-stripes);
-  background-repeat: no-repeat;
-  background-size: 100% 0.085em;
-  background-position: 0 0, 0 0.16em, 0 0.32em;
+:global(:root) .credit.credit .brand { font-weight: 750 !important; }
+.credit:is(:hover, :focus-visible) { border-color: var(--ainow-credit-hover-line); box-shadow: var(--ainow-credit-hover-shadow); transform: translateY(-1px); }
+.credit:is(:hover, :focus-visible)::before { animation: ainow-credit-shine .85s ease both; }
+.credit:is(:hover, :focus-visible) .arrow { transform: translate(1px, -1px); }
+.credit:is(:hover, :focus-visible) .mark i { transform: scaleY(1.25); }
+.credit:focus-visible { outline: 2px solid var(--ainow-credit-blue); outline-offset: 4px; }
+@keyframes ainow-credit-shine { to { transform: translateX(130%); } }
+@media (prefers-reduced-motion: reduce) {
+  .credit, .credit * { transition: none !important; }
+  .credit::before { animation: none !important; }
+  .credit:is(:hover, :focus-visible), .credit:is(:hover, :focus-visible) .arrow, .credit:is(:hover, :focus-visible) .mark i { transform: none; }
 }
