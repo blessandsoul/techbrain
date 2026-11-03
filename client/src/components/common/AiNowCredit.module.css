@@ -51,7 +51,7 @@
 .mark i { display: block; width: 3px; height: 12px; border-radius: 1px; background: var(--ainow-credit-pink); transition: transform .35s; }
 .mark i:nth-child(2) { background: var(--ainow-credit-blue); transition-delay: .04s; }
 .mark i:nth-child(3) { background: var(--ainow-credit-green); transition-delay: .08s; }
-.arrow { color: var(--an-muted); font-size: 14px; margin-left: 1px; transition: transform .25s; }
+.arrow { flex-shrink: 0; color: var(--an-muted); margin-left: 1px; transition: transform .25s; }
 /* Preserve badge contrast against legacy footer-wide link color selectors. */
 :global(:root) .credit.credit { color: var(--an-ink); }
 /* Locale-wide font resets use !important on every descendant. Keep this Latin

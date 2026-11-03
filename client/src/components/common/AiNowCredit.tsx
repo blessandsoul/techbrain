@@ -27,7 +27,24 @@ export function AiNowCredit({
       <span className={styles.label}>powered by</span>
       <span className={styles.brand}>aiNOW<span className={styles.domain}>.ge</span></span>
       <span className={styles.mark} aria-hidden="true"><i /><i /><i /></span>
-      <span className={styles.arrow} aria-hidden="true">↗</span>
+      {/* Bundle Solar's vector paths so the duotone icon needs no font or icon API. */}
+      <svg
+        className={styles.arrow}
+        data-icon="solar:arrow-right-up-bold-duotone"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <metadata>
+          Solar Icons, arrow-right-up-bold-duotone, by 480 Design.
+          Source: https://www.figma.com/community/file/1166831539721848736.
+          License: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/.
+        </metadata>
+        <path fill="currentColor" fillRule="evenodd" d="M17.47 15.53a.75.75 0 0 0 1.28-.53V6a.75.75 0 0 0-.75-.75H9a.75.75 0 0 0-.53 1.28z" clipRule="evenodd" />
+        <path fill="currentColor" d="M5.47 17.47a.75.75 0 1 0 1.06 1.06l6.97-6.97l-1.06-1.06z" opacity=".5" />
+      </svg>
     </a>
   );
 }
